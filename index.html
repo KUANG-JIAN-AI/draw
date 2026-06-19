@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>隔空手势画板</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="toolbar" aria-label="绘画工具">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>隔空手势画板</span>
+        </div>
+
+        <button id="cameraButton" class="tool-button primary" type="button">开启摄像头</button>
+
+        <div class="tool-group color-group" aria-label="颜色">
+          <button class="swatch active" type="button" data-color="#111827" style="--swatch:#111827" aria-label="黑色"></button>
+          <button class="swatch" type="button" data-color="#e11d48" style="--swatch:#e11d48" aria-label="玫红"></button>
+          <button class="swatch" type="button" data-color="#f59e0b" style="--swatch:#f59e0b" aria-label="琥珀"></button>
+          <button class="swatch" type="button" data-color="#10b981" style="--swatch:#10b981" aria-label="绿色"></button>
+          <button class="swatch" type="button" data-color="#2563eb" style="--swatch:#2563eb" aria-label="蓝色"></button>
+          <label class="color-picker">
+            <input id="customColor" type="color" value="#111827" aria-label="自定义颜色">
+          </label>
+        </div>
+
+        <div class="size-toggle" aria-label="线条粗细">
+          <button class="size-option active" type="button" data-size="8">细</button>
+          <button class="size-option" type="button" data-size="24">粗</button>
+        </div>
+
+        <div class="tool-group actions" aria-label="操作">
+          <button id="eraserButton" class="tool-button" type="button" aria-pressed="false">橡皮</button>
+          <button id="undoButton" class="tool-button" type="button">撤销</button>
+          <button id="clearButton" class="tool-button danger" type="button">清空</button>
+          <button id="saveButton" class="tool-button" type="button">保存</button>
+        </div>
+      </header>
+
+      <section class="stage" aria-label="手势画布">
+        <canvas id="drawingCanvas"></canvas>
+        <canvas id="gestureCanvas"></canvas>
+
+        <div class="camera-preview" aria-label="摄像头预览">
+          <video id="cameraView" playsinline muted></video>
+        </div>
+
+        <div class="gesture-toolbar" aria-label="手势工具栏">
+          <div class="gesture-panel color-pad">
+            <button class="gesture-tool swatch active" type="button" data-gesture-action="color" data-color="#111827" style="--swatch:#111827" aria-label="黑色"></button>
+            <button class="gesture-tool swatch" type="button" data-gesture-action="color" data-color="#e11d48" style="--swatch:#e11d48" aria-label="玫红"></button>
+            <button class="gesture-tool swatch" type="button" data-gesture-action="color" data-color="#f59e0b" style="--swatch:#f59e0b" aria-label="琥珀"></button>
+            <button class="gesture-tool swatch" type="button" data-gesture-action="color" data-color="#10b981" style="--swatch:#10b981" aria-label="绿色"></button>
+            <button class="gesture-tool swatch" type="button" data-gesture-action="color" data-color="#2563eb" style="--swatch:#2563eb" aria-label="蓝色"></button>
+          </div>
+
+          <div class="gesture-panel">
+            <button class="gesture-tool gesture-button active" type="button" data-gesture-action="size" data-size="8">细</button>
+            <button class="gesture-tool gesture-button" type="button" data-gesture-action="size" data-size="24">粗</button>
+          </div>
+
+          <div class="gesture-panel">
+            <button class="gesture-tool gesture-button" type="button" data-gesture-action="eraser">橡皮</button>
+            <button class="gesture-tool gesture-button" type="button" data-gesture-action="undo">撤销</button>
+            <button class="gesture-tool gesture-button danger" type="button" data-gesture-action="clear">清空</button>
+            <button class="gesture-tool gesture-button" type="button" data-gesture-action="save">保存</button>
+          </div>
+        </div>
+
+        <div class="hud" aria-live="polite">
+          <span id="statusDot" class="status-dot"></span>
+          <span id="statusText">先开启摄像头；食指停在工具上一会儿会自动选择，捏合空白处画画</span>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
