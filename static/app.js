@@ -44,6 +44,8 @@ const roomInput = document.getElementById("roomInput");
 const nameInput = document.getElementById("nameInput");
 const joinRoomButton = document.getElementById("joinRoomButton");
 const membersList = document.getElementById("membersList");
+const langZhBtn = document.getElementById("langZhBtn");
+const langJaBtn = document.getElementById("langJaBtn");
 let currentRoom = null;
 
 function normalizePoint(point) {
@@ -81,9 +83,20 @@ socket.on("action_history", (history) => {
 });
 
 socket.on("room_members", (members) => {
-  // members is an array of names
   if (!membersList) return;
-  membersList.textContent = "房间成员：" + (members.length ? members.join("，") : "(空)");
+  const membersLabel = t("hud_members");
+  const emptyText = t("hud_empty");
+  membersList.textContent = membersLabel + "：" + (members.length ? members.join("，") : emptyText);
+});
+
+// Listen for language changes to update room members display
+window.addEventListener("language-changed", () => {
+  if (membersList.textContent.includes("：")) {
+    const parts = membersList.textContent.split("：");
+    const memberNames = parts[1];
+    const membersLabel = t("hud_members");
+    membersList.textContent = membersLabel + "：" + memberNames;
+  }
 });
 
 socket.on("draw_line", (data) => {
@@ -103,7 +116,10 @@ socket.on("undo", (history) => {
   redrawHistory();
 });
 
-function setStatus(message, state = "") {
+function setStatus(messageOrKey, state = "") {
+  const message = typeof messageOrKey === "string" && translations && translations[getLanguage()]?.[messageOrKey]
+    ? t(messageOrKey)
+    : messageOrKey;
   statusText.textContent = message;
   statusDot.className = `status-dot ${state}`.trim();
 }
@@ -304,27 +320,27 @@ function activateGestureTool(tool) {
 
   if (action === "color") {
     updateActiveColor(tool.dataset.color);
-    setStatus("已选择颜色", "ready");
+    setStatus("color_selected", "ready");
   }
   if (action === "size") {
     updateBrushSize(tool.dataset.size);
-    setStatus(Number(tool.dataset.size) > 10 ? "已切换为粗线" : "已切换为细线", "ready");
+    setStatus(Number(tool.dataset.size) > 10 ? "line_thick" : "line_thin", "ready");
   }
   if (action === "eraser") {
     toggleEraser();
-    setStatus(erasing ? "已切换到橡皮" : "已切换到画笔", "ready");
+    setStatus(erasing ? "eraser_mode" : "brush_mode", "ready");
   }
   if (action === "undo") {
     undoDrawing();
-    setStatus("已撤销一步", "ready");
+    setStatus("undo_done", "ready");
   }
   if (action === "clear") {
     clearDrawing();
-    setStatus("画布已清空", "ready");
+    setStatus("canvas_cleared", "ready");
   }
   if (action === "save") {
     saveDrawing();
-    setStatus("已保存图片", "ready");
+    setStatus("image_saved", "ready");
   }
 }
 
@@ -375,7 +391,7 @@ function handleHandsResult(results) {
     lastPoint = null;
     setHoveredGestureTool(null);
     drawGestureOverlay(null);
-    setStatus("把手放进画面：食指停在工具上一会儿可选择，捏合空白处画画", "ready");
+    setStatus("put_hand", "ready");
     return;
   }
 
@@ -393,7 +409,7 @@ function handleHandsResult(results) {
     lastPoint = null;
     pinchWasDown = false;
     if (!updateHoldProgress()) {
-      setStatus(`停住选择：${tool.textContent || tool.getAttribute("aria-label")}`, "ready");
+      setStatus(`${t("select_hover")}：${tool.textContent || tool.getAttribute("aria-label")}`, "ready");
     }
     return;
   }
@@ -416,10 +432,10 @@ function handleHandsResult(results) {
       socket.emit("draw_line", action);
     }
     lastPoint = indexPoint;
-    setStatus(erasing ? "正在擦除" : "正在绘画", "drawing");
+    setStatus(erasing ? "erasing" : "drawing", "drawing");
   } else {
     lastPoint = null;
-    setStatus("移到中间工具条停住可选择；捏合空白处画画", "ready");
+    setStatus("move_to_toolbar", "ready");
   }
 
   pinchWasDown = isPinching;
@@ -427,13 +443,12 @@ function handleHandsResult(results) {
 
 async function startCamera() {
   if (!window.Hands || !window.Camera) {
-    setStatus("手势识别库还没有加载完成，请稍后再试", "error");
+    setStatus("loading_gesture_lib", "error");
     return;
   }
 
   cameraButton.disabled = true;
-  cameraButton.textContent = "启动中...";
-  setStatus("正在请求摄像头权限", "ready");
+  setStatus("requesting_camera", "ready");
 
   try {
     hands = new Hands({
@@ -456,13 +471,13 @@ async function startCamera() {
     });
 
     await camera.start();
-    cameraButton.textContent = "摄像头已开启";
-    setStatus("食指停在工具上一会儿可选择，捏合空白处画画", "ready");
+    cameraButton.textContent = t("camera_button");
+    setStatus("camera_ready", "ready");
   } catch (error) {
     console.error(error);
     cameraButton.disabled = false;
-    cameraButton.textContent = "开启摄像头";
-    setStatus("无法开启摄像头，请检查浏览器权限或使用 localhost 打开", "error");
+    cameraButton.textContent = t("camera_button");
+    setStatus("camera_error", "error");
   }
 }
 
@@ -504,7 +519,7 @@ joinRoomButton?.addEventListener("click", () => {
   const name = (nameInput?.value || "").trim() || `匿名${Math.floor(Math.random() * 9000) + 1000}`;
   currentRoom = room;
   socket.emit("join_room", { room, name });
-  setStatus(`已加入房间 ${room}`);
+  setStatus(t("room_joined") + ` ${room}`, "ready");
 });
 
 // Leave room when closing or navigating away
@@ -516,6 +531,32 @@ document.querySelector(".gesture-tool[data-gesture-action='eraser']").addEventLi
 document.querySelector(".gesture-tool[data-gesture-action='undo']").addEventListener("click", undoDrawing);
 document.querySelector(".gesture-tool[data-gesture-action='clear']").addEventListener("click", clearDrawing);
 document.querySelector(".gesture-tool[data-gesture-action='save']").addEventListener("click", saveDrawing);
+
+// Language selection
+langZhBtn?.addEventListener("click", () => {
+  setLanguage("zh");
+  langZhBtn.style.background = "var(--accent)";
+  langZhBtn.style.color = "#ffffff";
+  langJaBtn.style.background = "transparent";
+  langJaBtn.style.color = "inherit";
+});
+
+langJaBtn?.addEventListener("click", () => {
+  setLanguage("ja");
+  langJaBtn.style.background = "var(--accent)";
+  langJaBtn.style.color = "#ffffff";
+  langZhBtn.style.background = "transparent";
+  langZhBtn.style.color = "inherit";
+});
+
+// Initialize language button state
+if (getLanguage() === "zh") {
+  langZhBtn.style.background = "var(--accent)";
+  langZhBtn.style.color = "#ffffff";
+} else {
+  langJaBtn.style.background = "var(--accent)";
+  langJaBtn.style.color = "#ffffff";
+}
 
 window.addEventListener("resize", resizeCanvases);
 resizeCanvases();
