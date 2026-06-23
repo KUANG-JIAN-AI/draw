@@ -1,562 +1,561 @@
-const video = document.querySelector("#cameraView");
-const drawingCanvas = document.querySelector("#drawingCanvas");
-const gestureCanvas = document.querySelector("#gestureCanvas");
-const drawCtx = drawingCanvas.getContext("2d");
-const gestureCtx = gestureCanvas.getContext("2d");
-const swatches = [...document.querySelectorAll(".toolbar .swatch")];
-const customColor = document.querySelector("#customColor");
-const sizeOptions = [...document.querySelectorAll(".size-option")];
-const cameraButton = document.querySelector("#cameraButton");
-const eraserButton = document.querySelector("#eraserButton");
-const undoButton = document.querySelector("#undoButton");
-const clearButton = document.querySelector("#clearButton");
-const saveButton = document.querySelector("#saveButton");
-const statusDot = document.querySelector("#statusDot");
-const statusText = document.querySelector("#statusText");
+(function () {
+  "use strict";
 
-let color = "#111827";
-let size = 8;
-let erasing = false;
-let camera = null;
-let hands = null;
-let lastPoint = null;
-let pinchWasDown = false;
-let undoStack = [];
-let hoveredGestureTool = null;
-let hoverStartedAt = 0;
-let hoverActivated = false;
+  const video = document.querySelector("#cameraView");
+  const drawingCanvas = document.querySelector("#drawingCanvas");
+  const gestureCanvas = document.querySelector("#gestureCanvas");
+  const drawCtx = drawingCanvas.getContext("2d");
+  const gestureCtx = gestureCanvas.getContext("2d");
+  const swatches = [...document.querySelectorAll(".toolbar .swatch")];
+  const customColor = document.querySelector("#customColor");
+  const sizeOptions = [...document.querySelectorAll(".size-option")];
+  const cameraButton = document.querySelector("#cameraButton");
+  const eraserButton = document.querySelector("#eraserButton");
+  const undoButton = document.querySelector("#undoButton");
+  const clearButton = document.querySelector("#clearButton");
+  const saveButton = document.querySelector("#saveButton");
+  const statusDot = document.querySelector("#statusDot");
+  const statusText = document.querySelector("#statusText");
+  const roomInput = document.getElementById("roomInput");
+  const nameInput = document.getElementById("nameInput");
+  const joinRoomButton = document.getElementById("joinRoomButton");
+  const membersList = document.getElementById("membersList");
+  const langZhBtn = document.getElementById("langZhBtn");
+  const langJaBtn = document.getElementById("langJaBtn");
 
-const HOLD_TO_SELECT_MS = 800;
-const PINCH_THRESHOLD = 0.075;
+  let color = "#111827";
+  let size = 8;
+  let erasing = false;
+  let camera = null;
+  let hands = null;
+  let lastPoint = null;
+  let pinchWasDown = false;
+  let hoveredGestureTool = null;
+  let hoverStartedAt = 0;
+  let hoverActivated = false;
 
-const handConnections = [
-  [0, 1], [1, 2], [2, 3], [3, 4],
-  [0, 5], [5, 6], [6, 7], [7, 8],
-  [5, 9], [9, 10], [10, 11], [11, 12],
-  [9, 13], [13, 14], [14, 15], [15, 16],
-  [13, 17], [17, 18], [18, 19], [19, 20],
-  [0, 17],
-];
+  const HOLD_TO_SELECT_MS = 800;
+  const PINCH_THRESHOLD = 0.075;
 
-const socket = io();
-const actionHistory = [];
-const roomInput = document.getElementById("roomInput");
-const nameInput = document.getElementById("nameInput");
-const joinRoomButton = document.getElementById("joinRoomButton");
-const membersList = document.getElementById("membersList");
-const langZhBtn = document.getElementById("langZhBtn");
-const langJaBtn = document.getElementById("langJaBtn");
-let currentRoom = null;
+  const handConnections = [
+    [0, 1], [1, 2], [2, 3], [3, 4],
+    [0, 5], [5, 6], [6, 7], [7, 8],
+    [5, 9], [9, 10], [10, 11], [11, 12],
+    [9, 13], [13, 14], [14, 15], [15, 16],
+    [13, 17], [17, 18], [18, 19], [19, 20],
+    [0, 17],
+  ];
 
-function normalizePoint(point) {
-  const rect = drawingCanvas.getBoundingClientRect();
-  return {
-    x: point.x / rect.width,
-    y: point.y / rect.height,
-  };
-}
+  const socket = io();
+  const actionHistory = [];
+  let currentRoom = null;
 
-function denormalizePoint(point) {
-  const rect = drawingCanvas.getBoundingClientRect();
-  return {
-    x: point.x * rect.width,
-    y: point.y * rect.height,
-  };
-}
+  // --- Coordinate helpers ---
 
-function applyAction(action) {
-  if (action.type === "draw_line") {
-    drawLine(denormalizePoint(action.from), denormalizePoint(action.to), action);
-  }
-}
-
-function redrawHistory() {
-  const rect = drawingCanvas.getBoundingClientRect();
-  drawCtx.clearRect(0, 0, rect.width, rect.height);
-  actionHistory.forEach(applyAction);
-}
-
-socket.on("action_history", (history) => {
-  actionHistory.length = 0;
-  actionHistory.push(...history);
-  redrawHistory();
-});
-
-socket.on("room_members", (members) => {
-  if (!membersList) return;
-  const membersLabel = t("hud_members");
-  const emptyText = t("hud_empty");
-  membersList.textContent = membersLabel + "：" + (members.length ? members.join("，") : emptyText);
-});
-
-// Listen for language changes to update room members display
-window.addEventListener("language-changed", () => {
-  if (membersList.textContent.includes("：")) {
-    const parts = membersList.textContent.split("：");
-    const memberNames = parts[1];
-    const membersLabel = t("hud_members");
-    membersList.textContent = membersLabel + "：" + memberNames;
-  }
-});
-
-socket.on("draw_line", (data) => {
-  actionHistory.push(data);
-  applyAction(data);
-});
-
-socket.on("clear_canvas", () => {
-  actionHistory.length = 0;
-  const rect = drawingCanvas.getBoundingClientRect();
-  drawCtx.clearRect(0, 0, rect.width, rect.height);
-});
-
-socket.on("undo", (history) => {
-  actionHistory.length = 0;
-  actionHistory.push(...history);
-  redrawHistory();
-});
-
-function setStatus(messageOrKey, state = "") {
-  const message = typeof messageOrKey === "string" && translations && translations[getLanguage()]?.[messageOrKey]
-    ? t(messageOrKey)
-    : messageOrKey;
-  statusText.textContent = message;
-  statusDot.className = `status-dot ${state}`.trim();
-}
-
-function resizeCanvases() {
-  const rect = drawingCanvas.getBoundingClientRect();
-  const ratio = window.devicePixelRatio || 1;
-  const previous = drawingCanvas.width > 0 ? drawingCanvas.toDataURL("image/png") : null;
-
-  for (const canvas of [drawingCanvas, gestureCanvas]) {
-    canvas.width = Math.max(1, Math.floor(rect.width * ratio));
-    canvas.height = Math.max(1, Math.floor(rect.height * ratio));
-    canvas.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+  function normalizePoint(point, rect) {
+    rect = rect || drawingCanvas.getBoundingClientRect();
+    return { x: point.x / rect.width, y: point.y / rect.height };
   }
 
-  drawCtx.lineCap = "round";
-  drawCtx.lineJoin = "round";
-
-  if (previous) {
-    const image = new Image();
-    image.onload = () => drawCtx.drawImage(image, 0, 0, rect.width, rect.height);
-    image.src = previous;
+  function denormalizePoint(point) {
+    const rect = drawingCanvas.getBoundingClientRect();
+    return { x: point.x * rect.width, y: point.y * rect.height };
   }
-}
 
-function saveState() {
-  undoStack.push(drawingCanvas.toDataURL("image/png"));
-  if (undoStack.length > 24) {
-    undoStack.shift();
+  function landmarkToPoint(landmark, rect) {
+    rect = rect || drawingCanvas.getBoundingClientRect();
+    return { x: (1 - landmark.x) * rect.width, y: landmark.y * rect.height };
   }
-}
 
-function restoreState(dataUrl) {
-  const rect = drawingCanvas.getBoundingClientRect();
-  const image = new Image();
-  image.onload = () => {
+  function distance(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+
+  function normalizedDistance(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y, (a.z || 0) - (b.z || 0));
+  }
+
+  // --- Drawing ---
+
+  function drawLine(from, to, style = {}) {
+    const prevOp = drawCtx.globalCompositeOperation;
+    try {
+      const lineColor = style.erasing ? "destination-out" : style.color || color;
+      const lineSize = style.erasing ? (style.size || size) * 1.8 : (style.size || size);
+      drawCtx.globalCompositeOperation = style.erasing ? "destination-out" : "source-over";
+      drawCtx.strokeStyle = lineColor;
+      drawCtx.lineWidth = lineSize;
+      drawCtx.beginPath();
+      drawCtx.moveTo(from.x, from.y);
+      drawCtx.lineTo(to.x, to.y);
+      drawCtx.stroke();
+    } finally {
+      drawCtx.globalCompositeOperation = prevOp;
+    }
+  }
+
+  function applyAction(action) {
+    if (action.type === "draw_line") {
+      drawLine(denormalizePoint(action.from), denormalizePoint(action.to), action);
+    }
+  }
+
+  function redrawHistory() {
+    const rect = drawingCanvas.getBoundingClientRect();
     drawCtx.clearRect(0, 0, rect.width, rect.height);
-    drawCtx.drawImage(image, 0, 0, rect.width, rect.height);
-  };
-  image.src = dataUrl;
-}
+    actionHistory.forEach(applyAction);
+  }
 
-function drawLine(from, to, style = {}) {
-  const lineColor = style.erasing ? "destination-out" : style.color || color;
-  const lineSize = style.erasing ? (style.size || size) * 1.8 : (style.size || size);
-  drawCtx.globalCompositeOperation = style.erasing ? "destination-out" : "source-over";
-  drawCtx.strokeStyle = lineColor;
-  drawCtx.lineWidth = lineSize;
-  drawCtx.beginPath();
-  drawCtx.moveTo(from.x, from.y);
-  drawCtx.lineTo(to.x, to.y);
-  drawCtx.stroke();
-  drawCtx.globalCompositeOperation = "source-over";
-}
+  // --- Socket events ---
 
-function clearDrawing() {
-  const rect = drawingCanvas.getBoundingClientRect();
-  drawCtx.clearRect(0, 0, rect.width, rect.height);
-  actionHistory.length = 0;
-  socket.emit("clear_canvas", { room: currentRoom });
-}
-
-function saveDrawing() {
-  const rect = drawingCanvas.getBoundingClientRect();
-  const output = document.createElement("canvas");
-  const outputCtx = output.getContext("2d");
-  const ratio = window.devicePixelRatio || 1;
-
-  output.width = Math.floor(rect.width * ratio);
-  output.height = Math.floor(rect.height * ratio);
-  outputCtx.fillStyle = "#ffffff";
-  outputCtx.fillRect(0, 0, output.width, output.height);
-  outputCtx.drawImage(drawingCanvas, 0, 0);
-
-  const link = document.createElement("a");
-  link.download = `gesture-drawing-${new Date().toISOString().slice(0, 10)}.png`;
-  link.href = output.toDataURL("image/png");
-  link.click();
-}
-
-function undoDrawing() {
-  if (actionHistory.length) {
-    actionHistory.pop();
+  socket.on("action_history", (history) => {
+    actionHistory.length = 0;
+    actionHistory.push(...history);
     redrawHistory();
-    socket.emit("undo", { room: currentRoom });
-  }
-}
-
-function landmarkToPoint(landmark) {
-  const rect = drawingCanvas.getBoundingClientRect();
-  return {
-    x: (1 - landmark.x) * rect.width,
-    y: landmark.y * rect.height,
-  };
-}
-
-function distance(a, b) {
-  return Math.hypot(a.x - b.x, a.y - b.y);
-}
-
-function normalizedDistance(a, b) {
-  return Math.hypot(a.x - b.x, a.y - b.y, (a.z || 0) - (b.z || 0));
-}
-
-function setHoveredGestureTool(tool) {
-  if (hoveredGestureTool === tool) return;
-
-  if (hoveredGestureTool) {
-    hoveredGestureTool.classList.remove("gesture-hover");
-    hoveredGestureTool.style.setProperty("--hold", "0%");
-  }
-
-  hoveredGestureTool = tool;
-  hoverStartedAt = performance.now();
-  hoverActivated = false;
-
-  if (hoveredGestureTool) {
-    hoveredGestureTool.classList.add("gesture-hover");
-  }
-}
-
-function updateHoldProgress() {
-  if (!hoveredGestureTool) return false;
-
-  const elapsed = performance.now() - hoverStartedAt;
-  const progress = Math.min(1, elapsed / HOLD_TO_SELECT_MS);
-  hoveredGestureTool.style.setProperty("--hold", `${Math.round(progress * 100)}%`);
-
-  if (progress >= 1 && !hoverActivated) {
-    hoverActivated = true;
-    activateGestureTool(hoveredGestureTool);
-    hoveredGestureTool.classList.remove("selected-flash");
-    void hoveredGestureTool.offsetWidth;
-    hoveredGestureTool.classList.add("selected-flash");
-    setTimeout(() => hoveredGestureTool?.classList.remove("selected-flash"), 360);
-    return true;
-  }
-
-  return false;
-}
-
-function findGestureToolAt(point) {
-  const rect = drawingCanvas.getBoundingClientRect();
-  const screenX = rect.left + point.x;
-  const screenY = rect.top + point.y;
-  const element = document.elementFromPoint(screenX, screenY);
-  return element?.closest?.(".gesture-tool") || null;
-}
-
-function updateActiveColor(nextColor) {
-  color = nextColor;
-  erasing = false;
-  eraserButton.setAttribute("aria-pressed", "false");
-
-  document.querySelectorAll(".gesture-tool[data-gesture-action='eraser']").forEach((button) => {
-    button.classList.remove("active");
   });
+
+  socket.on("room_members", (members) => {
+    if (!membersList) return;
+    const membersLabel = t("hud_members");
+    const emptyText = t("hud_empty");
+    membersList.textContent = membersLabel + "：" + (members.length ? members.join("，") : emptyText);
+  });
+
+  window.addEventListener("language-changed", () => {
+    if (membersList && membersList.textContent.includes("：")) {
+      const parts = membersList.textContent.split("：");
+      const memberNames = parts[1];
+      const membersLabel = t("hud_members");
+      membersList.textContent = membersLabel + "：" + memberNames;
+    }
+  });
+
+  socket.on("draw_line", (data) => {
+    actionHistory.push(data);
+    applyAction(data);
+  });
+
+  socket.on("clear_canvas", () => {
+    actionHistory.length = 0;
+    const rect = drawingCanvas.getBoundingClientRect();
+    drawCtx.clearRect(0, 0, rect.width, rect.height);
+  });
+
+  socket.on("undo", (history) => {
+    actionHistory.length = 0;
+    actionHistory.push(...history);
+    redrawHistory();
+  });
+
+  // --- Canvas resize ---
+
+  function resizeCanvases() {
+    const rect = drawingCanvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    const previous = drawingCanvas.width > 0 ? drawingCanvas.toDataURL("image/png") : null;
+
+    for (const canvas of [drawingCanvas, gestureCanvas]) {
+      canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+      canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+      canvas.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    drawCtx.lineCap = "round";
+    drawCtx.lineJoin = "round";
+
+    if (previous) {
+      const image = new Image();
+      image.onload = () => drawCtx.drawImage(image, 0, 0, rect.width, rect.height);
+      image.src = previous;
+    }
+  }
+
+  // --- Canvas actions ---
+
+  function clearDrawing() {
+    const rect = drawingCanvas.getBoundingClientRect();
+    drawCtx.clearRect(0, 0, rect.width, rect.height);
+    actionHistory.length = 0;
+    socket.emit("clear_canvas", { room: currentRoom });
+  }
+
+  function saveDrawing() {
+    const rect = drawingCanvas.getBoundingClientRect();
+    const output = document.createElement("canvas");
+    const outputCtx = output.getContext("2d");
+    const ratio = window.devicePixelRatio || 1;
+
+    output.width = Math.floor(rect.width * ratio);
+    output.height = Math.floor(rect.height * ratio);
+    outputCtx.fillStyle = "#ffffff";
+    outputCtx.fillRect(0, 0, output.width, output.height);
+    outputCtx.drawImage(drawingCanvas, 0, 0);
+
+    const link = document.createElement("a");
+    link.download = `gesture-drawing-${new Date().toISOString().slice(0, 10)}.png`;
+    link.href = output.toDataURL("image/png");
+    link.click();
+  }
+
+  function undoDrawing() {
+    if (actionHistory.length) {
+      actionHistory.pop();
+      redrawHistory();
+      socket.emit("undo", { room: currentRoom });
+    }
+  }
+
+  // --- UI helpers ---
+
+  function setStatus(messageOrKey, state = "") {
+    statusText.textContent = t(messageOrKey);
+    statusDot.className = "status-dot" + (state ? " " + state : "");
+  }
+
+  function setHoveredGestureTool(tool) {
+    if (hoveredGestureTool === tool) return;
+
+    if (hoveredGestureTool) {
+      hoveredGestureTool.classList.remove("gesture-hover");
+      hoveredGestureTool.style.setProperty("--hold", "0%");
+    }
+
+    hoveredGestureTool = tool;
+    hoverStartedAt = performance.now();
+    hoverActivated = false;
+
+    if (hoveredGestureTool) {
+      hoveredGestureTool.classList.add("gesture-hover");
+    }
+  }
+
+  function updateHoldProgress() {
+    if (!hoveredGestureTool) return false;
+
+    const elapsed = performance.now() - hoverStartedAt;
+    const progress = Math.min(1, elapsed / HOLD_TO_SELECT_MS);
+    hoveredGestureTool.style.setProperty("--hold", `${Math.round(progress * 100)}%`);
+
+    if (progress >= 1 && !hoverActivated) {
+      hoverActivated = true;
+      activateGestureTool(hoveredGestureTool);
+      hoveredGestureTool.classList.remove("selected-flash");
+      void hoveredGestureTool.offsetWidth;
+      hoveredGestureTool.classList.add("selected-flash");
+      setTimeout(() => hoveredGestureTool?.classList.remove("selected-flash"), 360);
+      return true;
+    }
+
+    return false;
+  }
+
+  function findGestureToolAt(point) {
+    const rect = drawingCanvas.getBoundingClientRect();
+    const screenX = rect.left + point.x;
+    const screenY = rect.top + point.y;
+    const element = document.elementFromPoint(screenX, screenY);
+    return element?.closest?.(".gesture-tool") || null;
+  }
+
+  // --- Tool state management ---
+
+  function updateActiveColor(nextColor) {
+    color = nextColor;
+    erasing = false;
+    eraserButton.setAttribute("aria-pressed", "false");
+
+    document.querySelectorAll(".gesture-tool[data-gesture-action='eraser']").forEach((button) => {
+      button.classList.remove("active");
+    });
+    swatches.forEach((button) => {
+      button.classList.toggle("active", button.dataset.color === nextColor);
+    });
+    document.querySelectorAll(".gesture-tool[data-gesture-action='color']").forEach((button) => {
+      button.classList.toggle("active", button.dataset.color === nextColor);
+    });
+    customColor.parentElement.classList.remove("active");
+    customColor.value = nextColor;
+  }
+
+  function updateBrushSize(nextSize) {
+    size = Number(nextSize);
+    sizeOptions.forEach((button) => {
+      button.classList.toggle("active", Number(button.dataset.size) === size);
+    });
+    document.querySelectorAll(".gesture-tool[data-gesture-action='size']").forEach((button) => {
+      button.classList.toggle("active", Number(button.dataset.size) === size);
+    });
+  }
+
+  function toggleEraser() {
+    erasing = !erasing;
+    eraserButton.setAttribute("aria-pressed", String(erasing));
+    document.querySelectorAll(".gesture-tool[data-gesture-action='eraser']").forEach((button) => {
+      button.classList.toggle("active", erasing);
+    });
+
+    if (erasing) {
+      swatches.forEach((button) => button.classList.remove("active"));
+      document.querySelectorAll(".gesture-tool[data-gesture-action='color']").forEach((button) => {
+        button.classList.remove("active");
+      });
+      customColor.parentElement.classList.remove("active");
+    } else {
+      updateActiveColor(color);
+    }
+  }
+
+  function activateGestureTool(tool) {
+    const action = tool.dataset.gestureAction;
+
+    if (action === "color") {
+      updateActiveColor(tool.dataset.color);
+      setStatus("color_selected", "ready");
+    }
+    if (action === "size") {
+      updateBrushSize(tool.dataset.size);
+      setStatus(Number(tool.dataset.size) > 10 ? "line_thick" : "line_thin", "ready");
+    }
+    if (action === "eraser") {
+      toggleEraser();
+      setStatus(erasing ? "eraser_mode" : "brush_mode", "ready");
+    }
+    if (action === "undo") {
+      undoDrawing();
+      setStatus("undo_done", "ready");
+    }
+    if (action === "clear") {
+      clearDrawing();
+      setStatus("canvas_cleared", "ready");
+    }
+    if (action === "save") {
+      saveDrawing();
+      setStatus("image_saved", "ready");
+    }
+  }
+
+  // --- Gesture overlay ---
+
+  function drawGestureOverlay(landmarks, point, isPinching, tool) {
+    const rect = gestureCanvas.getBoundingClientRect();
+    gestureCtx.clearRect(0, 0, rect.width, rect.height);
+
+    if (!landmarks) return;
+
+    gestureCtx.lineWidth = 2;
+    gestureCtx.strokeStyle = "rgba(17,24,39,0.32)";
+    gestureCtx.fillStyle = "rgba(17,24,39,0.42)";
+
+    for (const [from, to] of handConnections) {
+      const a = landmarkToPoint(landmarks[from], rect);
+      const b = landmarkToPoint(landmarks[to], rect);
+      gestureCtx.beginPath();
+      gestureCtx.moveTo(a.x, a.y);
+      gestureCtx.lineTo(b.x, b.y);
+      gestureCtx.stroke();
+    }
+
+    for (const landmark of landmarks) {
+      const dot = landmarkToPoint(landmark, rect);
+      gestureCtx.beginPath();
+      gestureCtx.arc(dot.x, dot.y, 3, 0, Math.PI * 2);
+      gestureCtx.fill();
+    }
+
+    gestureCtx.beginPath();
+    gestureCtx.arc(point.x, point.y, Math.max(10, size * 0.72), 0, Math.PI * 2);
+    gestureCtx.fillStyle = tool
+      ? "rgba(245,158,11,0.92)"
+      : isPinching
+        ? "rgba(225,29,72,0.88)"
+        : "rgba(15,118,110,0.88)";
+    gestureCtx.fill();
+    gestureCtx.lineWidth = 3;
+    gestureCtx.strokeStyle = "#ffffff";
+    gestureCtx.stroke();
+  }
+
+  // --- Hand tracking ---
+
+  function handleHandsResult(results) {
+    const landmarks = results.multiHandLandmarks?.[0];
+    const rect = drawingCanvas.getBoundingClientRect();
+
+    if (!landmarks) {
+      pinchWasDown = false;
+      lastPoint = null;
+      setHoveredGestureTool(null);
+      drawGestureOverlay(null, null, false, null);
+      setStatus("put_hand", "ready");
+      return;
+    }
+
+    const indexTip = landmarks[8];
+    const thumbTip = landmarks[4];
+    const indexPoint = landmarkToPoint(indexTip, rect);
+    const pinchDistance = normalizedDistance(indexTip, thumbTip);
+    const isPinching = pinchDistance < PINCH_THRESHOLD;
+    const tool = findGestureToolAt(indexPoint);
+
+    setHoveredGestureTool(tool);
+    drawGestureOverlay(landmarks, indexPoint, isPinching, tool);
+
+    if (tool) {
+      lastPoint = null;
+      pinchWasDown = false;
+      if (!updateHoldProgress()) {
+        setStatus(`${t("select_hover")}：${tool.textContent || tool.getAttribute("aria-label")}`, "ready");
+      }
+      return;
+    }
+
+    if (isPinching) {
+      if (!pinchWasDown) {
+        lastPoint = indexPoint;
+      } else if (lastPoint && distance(lastPoint, indexPoint) < 80) {
+        const action = {
+          type: "draw_line",
+          from: normalizePoint(lastPoint, rect),
+          to: normalizePoint(indexPoint, rect),
+          color,
+          size,
+          erasing,
+        };
+        action.room = currentRoom;
+        drawLine(lastPoint, indexPoint, action);
+        actionHistory.push(action);
+        socket.emit("draw_line", action);
+      }
+      lastPoint = indexPoint;
+      setStatus(erasing ? "erasing" : "drawing", "drawing");
+    } else {
+      lastPoint = null;
+      setStatus("move_to_toolbar", "ready");
+    }
+
+    pinchWasDown = isPinching;
+  }
+
+  // --- Camera ---
+
+  async function startCamera() {
+    if (!window.Hands || !window.Camera) {
+      setStatus("loading_gesture_lib", "error");
+      return;
+    }
+
+    cameraButton.disabled = true;
+    setStatus("requesting_camera", "ready");
+
+    try {
+      hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.72,
+        minTrackingConfidence: 0.68,
+      });
+      hands.onResults(handleHandsResult);
+
+      camera = new Camera(video, {
+        onFrame: async () => {
+          await hands.send({ image: video });
+        },
+        width: 1280,
+        height: 720,
+      });
+
+      await camera.start();
+      cameraButton.textContent = t("camera_button");
+      setStatus("camera_ready", "ready");
+    } catch (error) {
+      console.error(error);
+      cameraButton.disabled = false;
+      cameraButton.textContent = t("camera_button");
+      setStatus("camera_error", "error");
+    }
+  }
+
+  // --- Event listeners ---
+
   swatches.forEach((button) => {
-    button.classList.toggle("active", button.dataset.color === nextColor);
+    button.addEventListener("click", () => updateActiveColor(button.dataset.color));
   });
+
   document.querySelectorAll(".gesture-tool[data-gesture-action='color']").forEach((button) => {
-    button.classList.toggle("active", button.dataset.color === nextColor);
-  });
-  customColor.parentElement.classList.remove("active");
-  customColor.value = nextColor;
-}
-
-function updateBrushSize(nextSize) {
-  size = Number(nextSize);
-  sizeOptions.forEach((button) => {
-    button.classList.toggle("active", Number(button.dataset.size) === size);
-  });
-  document.querySelectorAll(".gesture-tool[data-gesture-action='size']").forEach((button) => {
-    button.classList.toggle("active", Number(button.dataset.size) === size);
-  });
-}
-
-function toggleEraser() {
-  erasing = !erasing;
-  eraserButton.setAttribute("aria-pressed", String(erasing));
-  document.querySelectorAll(".gesture-tool[data-gesture-action='eraser']").forEach((button) => {
-    button.classList.toggle("active", erasing);
+    button.addEventListener("click", () => updateActiveColor(button.dataset.color));
   });
 
-  if (erasing) {
+  customColor.addEventListener("input", () => {
+    color = customColor.value;
+    erasing = false;
+    eraserButton.setAttribute("aria-pressed", "false");
     swatches.forEach((button) => button.classList.remove("active"));
     document.querySelectorAll(".gesture-tool[data-gesture-action='color']").forEach((button) => {
       button.classList.remove("active");
     });
-    customColor.parentElement.classList.remove("active");
-  } else {
-    updateActiveColor(color);
-  }
-}
-
-function activateGestureTool(tool) {
-  const action = tool.dataset.gestureAction;
-
-  if (action === "color") {
-    updateActiveColor(tool.dataset.color);
-    setStatus("color_selected", "ready");
-  }
-  if (action === "size") {
-    updateBrushSize(tool.dataset.size);
-    setStatus(Number(tool.dataset.size) > 10 ? "line_thick" : "line_thin", "ready");
-  }
-  if (action === "eraser") {
-    toggleEraser();
-    setStatus(erasing ? "eraser_mode" : "brush_mode", "ready");
-  }
-  if (action === "undo") {
-    undoDrawing();
-    setStatus("undo_done", "ready");
-  }
-  if (action === "clear") {
-    clearDrawing();
-    setStatus("canvas_cleared", "ready");
-  }
-  if (action === "save") {
-    saveDrawing();
-    setStatus("image_saved", "ready");
-  }
-}
-
-function drawGestureOverlay(landmarks, point, isPinching, tool) {
-  const rect = gestureCanvas.getBoundingClientRect();
-  gestureCtx.clearRect(0, 0, rect.width, rect.height);
-
-  if (!landmarks) return;
-
-  gestureCtx.lineWidth = 2;
-  gestureCtx.strokeStyle = "rgba(17,24,39,0.32)";
-  gestureCtx.fillStyle = "rgba(17,24,39,0.42)";
-
-  for (const [from, to] of handConnections) {
-    const a = landmarkToPoint(landmarks[from]);
-    const b = landmarkToPoint(landmarks[to]);
-    gestureCtx.beginPath();
-    gestureCtx.moveTo(a.x, a.y);
-    gestureCtx.lineTo(b.x, b.y);
-    gestureCtx.stroke();
-  }
-
-  for (const landmark of landmarks) {
-    const dot = landmarkToPoint(landmark);
-    gestureCtx.beginPath();
-    gestureCtx.arc(dot.x, dot.y, 3, 0, Math.PI * 2);
-    gestureCtx.fill();
-  }
-
-  gestureCtx.beginPath();
-  gestureCtx.arc(point.x, point.y, Math.max(10, size * 0.72), 0, Math.PI * 2);
-  gestureCtx.fillStyle = tool
-    ? "rgba(245,158,11,0.92)"
-    : isPinching
-      ? "rgba(225,29,72,0.88)"
-      : "rgba(15,118,110,0.88)";
-  gestureCtx.fill();
-  gestureCtx.lineWidth = 3;
-  gestureCtx.strokeStyle = "#ffffff";
-  gestureCtx.stroke();
-}
-
-function handleHandsResult(results) {
-  const landmarks = results.multiHandLandmarks?.[0];
-
-  if (!landmarks) {
-    pinchWasDown = false;
-    lastPoint = null;
-    setHoveredGestureTool(null);
-    drawGestureOverlay(null);
-    setStatus("put_hand", "ready");
-    return;
-  }
-
-  const indexTip = landmarks[8];
-  const thumbTip = landmarks[4];
-  const indexPoint = landmarkToPoint(indexTip);
-  const pinchDistance = normalizedDistance(indexTip, thumbTip);
-  const isPinching = pinchDistance < PINCH_THRESHOLD;
-  const tool = findGestureToolAt(indexPoint);
-
-  setHoveredGestureTool(tool);
-  drawGestureOverlay(landmarks, indexPoint, isPinching, tool);
-
-  if (tool) {
-    lastPoint = null;
-    pinchWasDown = false;
-    if (!updateHoldProgress()) {
-      setStatus(`${t("select_hover")}：${tool.textContent || tool.getAttribute("aria-label")}`, "ready");
-    }
-    return;
-  }
-
-  if (isPinching) {
-    if (!pinchWasDown) {
-      lastPoint = indexPoint;
-    } else if (lastPoint && distance(lastPoint, indexPoint) < 80) {
-      const action = {
-        type: "draw_line",
-        from: normalizePoint(lastPoint),
-        to: normalizePoint(indexPoint),
-        color,
-        size,
-        erasing,
-      };
-      action.room = currentRoom;
-      drawLine(lastPoint, indexPoint, action);
-      actionHistory.push(action);
-      socket.emit("draw_line", action);
-    }
-    lastPoint = indexPoint;
-    setStatus(erasing ? "erasing" : "drawing", "drawing");
-  } else {
-    lastPoint = null;
-    setStatus("move_to_toolbar", "ready");
-  }
-
-  pinchWasDown = isPinching;
-}
-
-async function startCamera() {
-  if (!window.Hands || !window.Camera) {
-    setStatus("loading_gesture_lib", "error");
-    return;
-  }
-
-  cameraButton.disabled = true;
-  setStatus("requesting_camera", "ready");
-
-  try {
-    hands = new Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
-    });
-    hands.setOptions({
-      maxNumHands: 1,
-      modelComplexity: 1,
-      minDetectionConfidence: 0.72,
-      minTrackingConfidence: 0.68,
-    });
-    hands.onResults(handleHandsResult);
-
-    camera = new Camera(video, {
-      onFrame: async () => {
-        await hands.send({ image: video });
-      },
-      width: 1280,
-      height: 720,
-    });
-
-    await camera.start();
-    cameraButton.textContent = t("camera_button");
-    setStatus("camera_ready", "ready");
-  } catch (error) {
-    console.error(error);
-    cameraButton.disabled = false;
-    cameraButton.textContent = t("camera_button");
-    setStatus("camera_error", "error");
-  }
-}
-
-swatches.forEach((button) => {
-  button.addEventListener("click", () => updateActiveColor(button.dataset.color));
-});
-
-document.querySelectorAll(".gesture-tool[data-gesture-action='color']").forEach((button) => {
-  button.addEventListener("click", () => updateActiveColor(button.dataset.color));
-});
-
-customColor.addEventListener("input", () => {
-  color = customColor.value;
-  erasing = false;
-  eraserButton.setAttribute("aria-pressed", "false");
-  swatches.forEach((button) => button.classList.remove("active"));
-  document.querySelectorAll(".gesture-tool[data-gesture-action='color']").forEach((button) => {
-    button.classList.remove("active");
+    customColor.parentElement.classList.add("active");
   });
-  customColor.parentElement.classList.add("active");
-});
 
-sizeOptions.forEach((button) => {
-  button.addEventListener("click", () => updateBrushSize(button.dataset.size));
-});
+  sizeOptions.forEach((button) => {
+    button.addEventListener("click", () => updateBrushSize(button.dataset.size));
+  });
 
-document.querySelectorAll(".gesture-tool[data-gesture-action='size']").forEach((button) => {
-  button.addEventListener("click", () => updateBrushSize(button.dataset.size));
-});
+  document.querySelectorAll(".gesture-tool[data-gesture-action='size']").forEach((button) => {
+    button.addEventListener("click", () => updateBrushSize(button.dataset.size));
+  });
 
-cameraButton.addEventListener("click", startCamera);
-eraserButton.addEventListener("click", toggleEraser);
-undoButton.addEventListener("click", undoDrawing);
-clearButton.addEventListener("click", clearDrawing);
-saveButton.addEventListener("click", saveDrawing);
+  cameraButton.addEventListener("click", startCamera);
+  eraserButton.addEventListener("click", toggleEraser);
+  undoButton.addEventListener("click", undoDrawing);
+  clearButton.addEventListener("click", clearDrawing);
+  saveButton.addEventListener("click", saveDrawing);
 
-joinRoomButton?.addEventListener("click", () => {
-  const room = (roomInput?.value || "").trim() || "lobby";
-  const name = (nameInput?.value || "").trim() || `匿名${Math.floor(Math.random() * 9000) + 1000}`;
-  currentRoom = room;
-  socket.emit("join_room", { room, name });
-  setStatus(t("room_joined") + ` ${room}`, "ready");
-});
+  joinRoomButton?.addEventListener("click", () => {
+    const room = (roomInput?.value || "").trim() || "lobby";
+    const name = (nameInput?.value || "").trim() || `匿名${Math.floor(Math.random() * 9000) + 1000}`;
+    currentRoom = room;
+    socket.emit("join_room", { room, name });
+    setStatus(t("room_joined") + ` ${room}`, "ready");
+  });
 
-// Leave room when closing or navigating away
-window.addEventListener("beforeunload", () => {
-  if (currentRoom) socket.emit("leave_room", { room: currentRoom });
-});
+  window.addEventListener("beforeunload", () => {
+    if (currentRoom) socket.emit("leave_room", { room: currentRoom });
+  });
 
-document.querySelector(".gesture-tool[data-gesture-action='eraser']").addEventListener("click", toggleEraser);
-document.querySelector(".gesture-tool[data-gesture-action='undo']").addEventListener("click", undoDrawing);
-document.querySelector(".gesture-tool[data-gesture-action='clear']").addEventListener("click", clearDrawing);
-document.querySelector(".gesture-tool[data-gesture-action='save']").addEventListener("click", saveDrawing);
+  document.querySelector(".gesture-tool[data-gesture-action='eraser']").addEventListener("click", toggleEraser);
+  document.querySelector(".gesture-tool[data-gesture-action='undo']").addEventListener("click", undoDrawing);
+  document.querySelector(".gesture-tool[data-gesture-action='clear']").addEventListener("click", clearDrawing);
+  document.querySelector(".gesture-tool[data-gesture-action='save']").addEventListener("click", saveDrawing);
 
-// Language selection
-langZhBtn?.addEventListener("click", () => {
-  setLanguage("zh");
-  langZhBtn.style.background = "var(--accent)";
-  langZhBtn.style.color = "#ffffff";
-  langJaBtn.style.background = "transparent";
-  langJaBtn.style.color = "inherit";
-});
+  // --- Language buttons ---
 
-langJaBtn?.addEventListener("click", () => {
-  setLanguage("ja");
-  langJaBtn.style.background = "var(--accent)";
-  langJaBtn.style.color = "#ffffff";
-  langZhBtn.style.background = "transparent";
-  langZhBtn.style.color = "inherit";
-});
+  langZhBtn?.addEventListener("click", () => {
+    setLanguage("zh");
+    langZhBtn.style.background = "var(--accent)";
+    langZhBtn.style.color = "#ffffff";
+    langJaBtn.style.background = "transparent";
+    langJaBtn.style.color = "inherit";
+  });
 
-// Initialize language button state
-if (getLanguage() === "zh") {
-  langZhBtn.style.background = "var(--accent)";
-  langZhBtn.style.color = "#ffffff";
-} else {
-  langJaBtn.style.background = "var(--accent)";
-  langJaBtn.style.color = "#ffffff";
-}
+  langJaBtn?.addEventListener("click", () => {
+    setLanguage("ja");
+    langJaBtn.style.background = "var(--accent)";
+    langJaBtn.style.color = "#ffffff";
+    langZhBtn.style.background = "transparent";
+    langZhBtn.style.color = "inherit";
+  });
 
-window.addEventListener("resize", resizeCanvases);
-resizeCanvases();
+  if (getLanguage() === "zh") {
+    langZhBtn.style.background = "var(--accent)";
+    langZhBtn.style.color = "#ffffff";
+  } else {
+    langJaBtn.style.background = "var(--accent)";
+    langJaBtn.style.color = "#ffffff";
+  }
+
+  window.addEventListener("resize", resizeCanvases);
+  resizeCanvases();
+})();

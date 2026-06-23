@@ -47,8 +47,8 @@ const translations = {
 
     // Gesture actions
     gesture_label: "手势工具栏",
-    stage_label: "手势画布",
-    camera_preview: "摄像头预览",
+    stage_label: "キャンバス",
+    camera_preview: "カメラプレビュー",
   },
   ja: {
     // Toolbar
@@ -138,6 +138,9 @@ function updateUIText() {
     const key = el.getAttribute("data-i18n-label");
     el.setAttribute("aria-label", t(key));
   });
+
+  // Update the html lang attribute
+  document.documentElement.lang = currentLanguage === "ja" ? "ja" : "zh-CN";
 
   // Trigger custom event for dynamic updates
   window.dispatchEvent(new Event("language-changed"));

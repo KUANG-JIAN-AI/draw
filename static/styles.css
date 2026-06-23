@@ -397,3 +397,46 @@ input {
     width: min(170px, 42vw);
   }
 }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .gesture-tool.selected-flash {
+    animation: none;
+  }
+
+  .gesture-hover {
+    transition: none;
+  }
+}
+
+/* Inline style replacements */
+.lang-group {
+  align-items: center;
+  gap: 4px;
+}
+
+.lang-btn {
+  min-width: 36px;
+}
+
+.field-input {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+#roomInput.field-input {
+  min-width: 120px;
+}
+
+#nameInput.field-input {
+  min-width: 100px;
+}
+
+.members-list {
+  margin-left: 12px;
+  display: inline-block;
+  max-width: 320px;
+  overflow: auto;
+  color: #ffffff;
+}

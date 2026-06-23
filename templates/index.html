@@ -14,16 +14,16 @@
           <span data-i18n="title">隔空手势画板</span>
         </div>
 
-        <div class="tool-group" style="align-items:center; gap:4px;">
-          <button id="langZhBtn" class="tool-button" type="button" style="min-width:36px;">中文</button>
-          <button id="langJaBtn" class="tool-button" type="button" style="min-width:36px;">日本語</button>
+        <div class="tool-group lang-group">
+          <button id="langZhBtn" class="tool-button lang-btn" type="button">中文</button>
+          <button id="langJaBtn" class="tool-button lang-btn" type="button">日本語</button>
         </div>
 
         <button id="cameraButton" class="tool-button primary" type="button" data-i18n="camera_button">开启摄像头</button>
 
-        <div class="tool-group" style="align-items:center; gap:8px;">
-          <input id="roomInput" type="text" data-i18n-placeholder="room_placeholder" placeholder="房间名 (默认 lobby)" style="min-width:120px; padding:6px; border-radius:6px; border:1px solid var(--line);">
-          <input id="nameInput" type="text" data-i18n-placeholder="name_placeholder" placeholder="昵称 (可选)" style="min-width:100px; padding:6px; border-radius:6px; border:1px solid var(--line);">
+        <div class="tool-group" style="gap:8px;">
+          <input id="roomInput" class="field-input" type="text" data-i18n-placeholder="room_placeholder" placeholder="房间名 (默认 lobby)">
+          <input id="nameInput" class="field-input" type="text" data-i18n-placeholder="name_placeholder" placeholder="昵称 (可选)">
           <button id="joinRoomButton" class="tool-button" type="button" data-i18n="join_room_button">加入房间</button>
         </div>
 
@@ -84,14 +84,14 @@
         <div class="hud" aria-live="polite">
           <span id="statusDot" class="status-dot"></span>
           <span id="statusText">先开启摄像头；食指停在工具上一会儿会自动选择，捏合空白处画画</span>
-          <div id="membersList" style="margin-left:12px; display:inline-block; max-width:320px; overflow:auto; color:#ffffff;"></div>
+          <div id="membersList" class="members-list"></div>
         </div>
       </section>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" integrity="sha384-q1KhAZhJcJXr3zfC3Tz07pBqQSabwFIZhXlmlUAB8s0zk4ETWERkIKGBCFQ5Jc3e" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" integrity="sha384-oHwoZ9HyKv5ark5VOH+XWdbNfmhYtptAOBuV8plz6mAfXvTA6d8fULuYllWouEK2" crossorigin="anonymous"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='i18n.js') }}"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
   </body>
