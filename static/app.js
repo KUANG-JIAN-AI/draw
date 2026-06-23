@@ -38,6 +38,60 @@ const handConnections = [
   [0, 17],
 ];
 
+const socket = io();
+const actionHistory = [];
+
+function normalizePoint(point) {
+  const rect = drawingCanvas.getBoundingClientRect();
+  return {
+    x: point.x / rect.width,
+    y: point.y / rect.height,
+  };
+}
+
+function denormalizePoint(point) {
+  const rect = drawingCanvas.getBoundingClientRect();
+  return {
+    x: point.x * rect.width,
+    y: point.y * rect.height,
+  };
+}
+
+function applyAction(action) {
+  if (action.type === "draw_line") {
+    drawLine(denormalizePoint(action.from), denormalizePoint(action.to), action);
+  }
+}
+
+function redrawHistory() {
+  const rect = drawingCanvas.getBoundingClientRect();
+  drawCtx.clearRect(0, 0, rect.width, rect.height);
+  actionHistory.forEach(applyAction);
+}
+
+socket.on("action_history", (history) => {
+  actionHistory.length = 0;
+  actionHistory.push(...history);
+  redrawHistory();
+});
+
+socket.on("draw_line", (data) => {
+  actionHistory.push(data);
+  applyAction(data);
+});
+
+socket.on("clear_canvas", () => {
+  actionHistory.length = 0;
+  const rect = drawingCanvas.getBoundingClientRect();
+  drawCtx.clearRect(0, 0, rect.width, rect.height);
+});
+
+socket.on("undo", (history) => {
+  actionHistory.length = 0;
+  actionHistory.push(...history);
+  redrawHistory();
+});
+
 function setStatus(message, state = "") {
   statusText.textContent = message;
   statusDot.className = `status-dot ${state}`.trim();
@@ -81,10 +135,12 @@ function restoreState(dataUrl) {
   image.src = dataUrl;
 }
 
-function drawLine(from, to) {
-  drawCtx.globalCompositeOperation = erasing ? "destination-out" : "source-over";
-  drawCtx.strokeStyle = color;
-  drawCtx.lineWidth = erasing ? size * 1.8 : size;
+function drawLine(from, to, style = {}) {
+  const lineColor = style.erasing ? "destination-out" : style.color || color;
+  const lineSize = style.erasing ? (style.size || size) * 1.8 : (style.size || size);
+  drawCtx.globalCompositeOperation = style.erasing ? "destination-out" : "source-over";
+  drawCtx.strokeStyle = lineColor;
+  drawCtx.lineWidth = lineSize;
   drawCtx.beginPath();
   drawCtx.moveTo(from.x, from.y);
   drawCtx.lineTo(to.x, to.y);
@@ -94,8 +150,9 @@ function drawLine(from, to) {
 
 function clearDrawing() {
   const rect = drawingCanvas.getBoundingClientRect();
-  saveState();
   drawCtx.clearRect(0, 0, rect.width, rect.height);
+  actionHistory.length = 0;
+  socket.emit("clear_canvas");
 }
 
 function saveDrawing() {
@@ -117,9 +174,10 @@ function saveDrawing() {
 }
 
 function undoDrawing() {
-  const previous = undoStack.pop();
-  if (previous) {
-    restoreState(previous);
+  if (actionHistory.length) {
+    actionHistory.pop();
+    redrawHistory();
+    socket.emit("undo");
   }
 }
 
@@ -331,10 +389,19 @@ function handleHandsResult(results) {
 
   if (isPinching) {
     if (!pinchWasDown) {
-      saveState();
       lastPoint = indexPoint;
     } else if (lastPoint && distance(lastPoint, indexPoint) < 80) {
-      drawLine(lastPoint, indexPoint);
+      const action = {
+        type: "draw_line",
+        from: normalizePoint(lastPoint),
+        to: normalizePoint(indexPoint),
+        color,
+        size,
+        erasing,
+      };
+      drawLine(lastPoint, indexPoint, action);
+      actionHistory.push(action);
+      socket.emit("draw_line", action);
     }
     lastPoint = indexPoint;
     setStatus(erasing ? "正在擦除" : "正在绘画", "drawing");
