@@ -40,6 +40,11 @@ const handConnections = [
 
 const socket = io();
 const actionHistory = [];
+const roomInput = document.getElementById("roomInput");
+const nameInput = document.getElementById("nameInput");
+const joinRoomButton = document.getElementById("joinRoomButton");
+const membersList = document.getElementById("membersList");
+let currentRoom = null;
 
 function normalizePoint(point) {
   const rect = drawingCanvas.getBoundingClientRect();
@@ -73,6 +78,12 @@ socket.on("action_history", (history) => {
   actionHistory.length = 0;
   actionHistory.push(...history);
   redrawHistory();
+});
+
+socket.on("room_members", (members) => {
+  // members is an array of names
+  if (!membersList) return;
+  membersList.textContent = "房间成员：" + (members.length ? members.join("，") : "(空)");
 });
 
 socket.on("draw_line", (data) => {
@@ -152,7 +163,7 @@ function clearDrawing() {
   const rect = drawingCanvas.getBoundingClientRect();
   drawCtx.clearRect(0, 0, rect.width, rect.height);
   actionHistory.length = 0;
-  socket.emit("clear_canvas");
+  socket.emit("clear_canvas", { room: currentRoom });
 }
 
 function saveDrawing() {
@@ -177,7 +188,7 @@ function undoDrawing() {
   if (actionHistory.length) {
     actionHistory.pop();
     redrawHistory();
-    socket.emit("undo");
+    socket.emit("undo", { room: currentRoom });
   }
 }
 
@@ -399,6 +410,7 @@ function handleHandsResult(results) {
         size,
         erasing,
       };
+      action.room = currentRoom;
       drawLine(lastPoint, indexPoint, action);
       actionHistory.push(action);
       socket.emit("draw_line", action);
@@ -486,6 +498,19 @@ eraserButton.addEventListener("click", toggleEraser);
 undoButton.addEventListener("click", undoDrawing);
 clearButton.addEventListener("click", clearDrawing);
 saveButton.addEventListener("click", saveDrawing);
+
+joinRoomButton?.addEventListener("click", () => {
+  const room = (roomInput?.value || "").trim() || "lobby";
+  const name = (nameInput?.value || "").trim() || `匿名${Math.floor(Math.random() * 9000) + 1000}`;
+  currentRoom = room;
+  socket.emit("join_room", { room, name });
+  setStatus(`已加入房间 ${room}`);
+});
+
+// Leave room when closing or navigating away
+window.addEventListener("beforeunload", () => {
+  if (currentRoom) socket.emit("leave_room", { room: currentRoom });
+});
 
 document.querySelector(".gesture-tool[data-gesture-action='eraser']").addEventListener("click", toggleEraser);
 document.querySelector(".gesture-tool[data-gesture-action='undo']").addEventListener("click", undoDrawing);
