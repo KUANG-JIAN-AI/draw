@@ -14,6 +14,15 @@
   const undoButton = document.querySelector("#undoButton");
   const clearButton = document.querySelector("#clearButton");
   const saveButton = document.querySelector("#saveButton");
+  const generateButton = document.querySelector("#generateButton");
+  const aiGenerateButton = document.querySelector("#aiGenerateButton");
+  const aiDownloadButton = document.querySelector("#aiDownloadButton");
+  const aiStyleSelect = document.querySelector("#aiStyleSelect");
+  const aiSizeSelect = document.querySelector("#aiSizeSelect");
+  const aiModelSelect = document.querySelector("#aiModelSelect");
+  const aiPromptInput = document.querySelector("#aiPromptInput");
+  const aiResultImage = document.querySelector("#aiResultImage");
+  const aiStatus = document.querySelector("#aiStatus");
   const statusDot = document.querySelector("#statusDot");
   const statusText = document.querySelector("#statusText");
   const roomInput = document.getElementById("roomInput");
@@ -29,13 +38,23 @@
   let camera = null;
   let hands = null;
   let lastPoint = null;
+  let lastPanPoint = null;
   let pinchWasDown = false;
   let hoveredGestureTool = null;
   let hoverStartedAt = 0;
   let hoverActivated = false;
+  let latestAiImageUrl = "";
 
   const HOLD_TO_SELECT_MS = 800;
   const PINCH_THRESHOLD = 0.075;
+  const WORLD_WIDTH = 4096;
+  const WORLD_HEIGHT = 3072;
+  const VIEWPORT_MARGIN = 80;
+  const viewport = {
+    x: 36,
+    y: 36,
+    scale: 1,
+  };
 
   const handConnections = [
     [0, 1], [1, 2], [2, 3], [3, 4],
@@ -52,19 +71,28 @@
 
   // --- Coordinate helpers ---
 
-  function normalizePoint(point, rect) {
-    rect = rect || drawingCanvas.getBoundingClientRect();
-    return { x: point.x / rect.width, y: point.y / rect.height };
+  function normalizePoint(point) {
+    return { x: point.x / WORLD_WIDTH, y: point.y / WORLD_HEIGHT };
   }
 
   function denormalizePoint(point) {
-    const rect = drawingCanvas.getBoundingClientRect();
-    return { x: point.x * rect.width, y: point.y * rect.height };
+    return { x: point.x * WORLD_WIDTH, y: point.y * WORLD_HEIGHT };
   }
 
   function landmarkToPoint(landmark, rect) {
-    rect = rect || drawingCanvas.getBoundingClientRect();
+    rect = rect || gestureCanvas.getBoundingClientRect();
     return { x: (1 - landmark.x) * rect.width, y: landmark.y * rect.height };
+  }
+
+  function screenToWorld(point) {
+    return {
+      x: (point.x - viewport.x) / viewport.scale,
+      y: (point.y - viewport.y) / viewport.scale,
+    };
+  }
+
+  function isInsideWorld(point) {
+    return point.x >= 0 && point.x <= WORLD_WIDTH && point.y >= 0 && point.y <= WORLD_HEIGHT;
   }
 
   function distance(a, b) {
@@ -73,6 +101,37 @@
 
   function normalizedDistance(a, b) {
     return Math.hypot(a.x - b.x, a.y - b.y, (a.z || 0) - (b.z || 0));
+  }
+
+  function clampViewport() {
+    const rect = gestureCanvas.getBoundingClientRect();
+    const scaledWidth = WORLD_WIDTH * viewport.scale;
+    const scaledHeight = WORLD_HEIGHT * viewport.scale;
+    const minX = Math.min(VIEWPORT_MARGIN, rect.width - scaledWidth - VIEWPORT_MARGIN);
+    const minY = Math.min(VIEWPORT_MARGIN, rect.height - scaledHeight - VIEWPORT_MARGIN);
+
+    viewport.x = Math.min(VIEWPORT_MARGIN, Math.max(minX, viewport.x));
+    viewport.y = Math.min(VIEWPORT_MARGIN, Math.max(minY, viewport.y));
+  }
+
+  function applyViewport() {
+    clampViewport();
+    drawingCanvas.style.width = `${WORLD_WIDTH}px`;
+    drawingCanvas.style.height = `${WORLD_HEIGHT}px`;
+    drawingCanvas.style.transform = `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`;
+  }
+
+  function isOpenPalm(landmarks) {
+    const fingers = [
+      [8, 6],
+      [12, 10],
+      [16, 14],
+      [20, 18],
+    ];
+    const extendedCount = fingers.reduce((count, [tip, pip]) => {
+      return count + (landmarks[tip].y < landmarks[pip].y - 0.015 ? 1 : 0);
+    }, 0);
+    return extendedCount >= 3;
   }
 
   // --- Drawing ---
@@ -101,8 +160,7 @@
   }
 
   function redrawHistory() {
-    const rect = drawingCanvas.getBoundingClientRect();
-    drawCtx.clearRect(0, 0, rect.width, rect.height);
+    drawCtx.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     actionHistory.forEach(applyAction);
   }
 
@@ -137,8 +195,7 @@
 
   socket.on("clear_canvas", () => {
     actionHistory.length = 0;
-    const rect = drawingCanvas.getBoundingClientRect();
-    drawCtx.clearRect(0, 0, rect.width, rect.height);
+    drawCtx.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
   });
 
   socket.on("undo", (history) => {
@@ -150,50 +207,51 @@
   // --- Canvas resize ---
 
   function resizeCanvases() {
-    const rect = drawingCanvas.getBoundingClientRect();
+    const rect = gestureCanvas.getBoundingClientRect();
     const ratio = window.devicePixelRatio || 1;
-    const previous = drawingCanvas.width > 0 ? drawingCanvas.toDataURL("image/png") : null;
 
-    for (const canvas of [drawingCanvas, gestureCanvas]) {
-      canvas.width = Math.max(1, Math.floor(rect.width * ratio));
-      canvas.height = Math.max(1, Math.floor(rect.height * ratio));
-      canvas.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
-    }
+    drawingCanvas.width = Math.max(1, Math.floor(WORLD_WIDTH * ratio));
+    drawingCanvas.height = Math.max(1, Math.floor(WORLD_HEIGHT * ratio));
+    drawingCanvas.style.width = `${WORLD_WIDTH}px`;
+    drawingCanvas.style.height = `${WORLD_HEIGHT}px`;
+    drawCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    gestureCanvas.width = Math.max(1, Math.floor(rect.width * ratio));
+    gestureCanvas.height = Math.max(1, Math.floor(rect.height * ratio));
+    gestureCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
     drawCtx.lineCap = "round";
     drawCtx.lineJoin = "round";
 
-    if (previous) {
-      const image = new Image();
-      image.onload = () => drawCtx.drawImage(image, 0, 0, rect.width, rect.height);
-      image.src = previous;
-    }
+    applyViewport();
+    redrawHistory();
   }
 
   // --- Canvas actions ---
 
+  function getFlattenedDrawingDataUrl(targetWidth = WORLD_WIDTH, targetHeight = WORLD_HEIGHT) {
+    const output = document.createElement("canvas");
+    const outputCtx = output.getContext("2d");
+
+    output.width = targetWidth;
+    output.height = targetHeight;
+    outputCtx.fillStyle = "#ffffff";
+    outputCtx.fillRect(0, 0, output.width, output.height);
+    outputCtx.drawImage(drawingCanvas, 0, 0, output.width, output.height);
+
+    return output.toDataURL("image/png");
+  }
+
   function clearDrawing() {
-    const rect = drawingCanvas.getBoundingClientRect();
-    drawCtx.clearRect(0, 0, rect.width, rect.height);
+    drawCtx.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     actionHistory.length = 0;
     socket.emit("clear_canvas", { room: currentRoom });
   }
 
   function saveDrawing() {
-    const rect = drawingCanvas.getBoundingClientRect();
-    const output = document.createElement("canvas");
-    const outputCtx = output.getContext("2d");
-    const ratio = window.devicePixelRatio || 1;
-
-    output.width = Math.floor(rect.width * ratio);
-    output.height = Math.floor(rect.height * ratio);
-    outputCtx.fillStyle = "#ffffff";
-    outputCtx.fillRect(0, 0, output.width, output.height);
-    outputCtx.drawImage(drawingCanvas, 0, 0);
-
     const link = document.createElement("a");
     link.download = `gesture-drawing-${new Date().toISOString().slice(0, 10)}.png`;
-    link.href = output.toDataURL("image/png");
+    link.href = getFlattenedDrawingDataUrl();
     link.click();
   }
 
@@ -210,6 +268,107 @@
   function setStatus(messageOrKey, state = "") {
     statusText.textContent = t(messageOrKey);
     statusDot.className = "status-dot" + (state ? " " + state : "");
+  }
+
+  function setAiStatus(messageOrKey, state = "") {
+    if (!aiStatus) return;
+    aiStatus.textContent = t(messageOrKey);
+    aiStatus.className = "ai-status" + (state ? " " + state : "");
+  }
+
+  function buildAiPrompt() {
+    const prompt = (aiPromptInput?.value || "").trim();
+    const stylePrompts = {
+      children: "polished cute children's book illustration, soft friendly colors, clean outlines, gentle lighting",
+      watercolor: "delicate watercolor illustration, textured paper, soft gradients, elegant brush strokes",
+      cartoon3d: "high quality 3D cartoon render, rounded shapes, playful materials, studio lighting",
+      sticker: "clean sticker icon, bold outline, simple background, crisp vector-like edges",
+      realistic: "realistic photo style, natural materials, detailed lighting, clean composition",
+    };
+    const selectedStyle = aiStyleSelect?.value || "children";
+    const basePrompt = prompt || "A cute simple hand-drawn subject";
+
+    return [
+      `Turn this simple hand-drawn sketch into ${stylePrompts[selectedStyle]}.`,
+      `Subject request: ${basePrompt}.`,
+      "Preserve the original composition, main shape, relative position, and camera angle.",
+      "Remove messy sketch artifacts, keep the image wholesome, bright, and high quality.",
+    ].join(" ");
+  }
+
+  function getResultImageFromAgnes(data) {
+    const first = data?.data?.[0] || data?.images?.[0] || data?.output?.[0] || data;
+    const b64 = first?.b64_json || first?.base64 || first?.image_base64 || first?.data;
+    const url = first?.url || first?.image_url;
+
+    if (typeof b64 === "string" && b64.startsWith("data:image/")) return b64;
+    if (typeof b64 === "string" && b64.length > 100) return `data:image/png;base64,${b64}`;
+    if (typeof url === "string") return url;
+    return "";
+  }
+
+  function sizeToDimensions(sizeValue) {
+    const [width, height] = String(sizeValue || "1024x768").split("x").map(Number);
+    return {
+      width: Number.isFinite(width) ? width : 1024,
+      height: Number.isFinite(height) ? height : 768,
+    };
+  }
+
+  async function generateAiImage() {
+    if (!aiGenerateButton) return;
+
+    const sizeValue = aiSizeSelect?.value || "1024x768";
+    const { width, height } = sizeToDimensions(sizeValue);
+    const payload = {
+      image: getFlattenedDrawingDataUrl(width, height),
+      prompt: buildAiPrompt(),
+      model: aiModelSelect?.value || "agnes-image-2.1-flash",
+      size: sizeValue,
+    };
+
+    aiGenerateButton.disabled = true;
+    generateButton.disabled = true;
+    setAiStatus("ai_generating", "loading");
+    setStatus("ai_generation_started", "ready");
+
+    try {
+      const response = await fetch("/api/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.details || data?.error || response.statusText);
+      }
+
+      latestAiImageUrl = getResultImageFromAgnes(data);
+      if (!latestAiImageUrl) {
+        throw new Error("No image found in Agnes response");
+      }
+
+      aiResultImage.src = latestAiImageUrl;
+      aiResultImage.classList.add("has-result");
+      aiDownloadButton.disabled = false;
+      setAiStatus("ai_done", "ready");
+      setStatus("ai_generation_done", "ready");
+    } catch (error) {
+      console.error(error);
+      setAiStatus("ai_failed", "error");
+      setStatus("ai_generation_failed", "error");
+    } finally {
+      aiGenerateButton.disabled = false;
+      generateButton.disabled = false;
+    }
+  }
+
+  function downloadAiImage() {
+    if (!latestAiImageUrl) return;
+    const link = document.createElement("a");
+    link.download = `agnes-ai-image-${new Date().toISOString().slice(0, 10)}.png`;
+    link.href = latestAiImageUrl;
+    link.click();
   }
 
   function setHoveredGestureTool(tool) {
@@ -250,7 +409,7 @@
   }
 
   function findGestureToolAt(point) {
-    const rect = drawingCanvas.getBoundingClientRect();
+    const rect = gestureCanvas.getBoundingClientRect();
     const screenX = rect.left + point.x;
     const screenY = rect.top + point.y;
     const element = document.elementFromPoint(screenX, screenY);
@@ -379,11 +538,12 @@
 
   function handleHandsResult(results) {
     const landmarks = results.multiHandLandmarks?.[0];
-    const rect = drawingCanvas.getBoundingClientRect();
+    const rect = gestureCanvas.getBoundingClientRect();
 
     if (!landmarks) {
       pinchWasDown = false;
       lastPoint = null;
+      lastPanPoint = null;
       setHoveredGestureTool(null);
       drawGestureOverlay(null, null, false, null);
       setStatus("put_hand", "ready");
@@ -393,15 +553,18 @@
     const indexTip = landmarks[8];
     const thumbTip = landmarks[4];
     const indexPoint = landmarkToPoint(indexTip, rect);
+    const worldPoint = screenToWorld(indexPoint);
     const pinchDistance = normalizedDistance(indexTip, thumbTip);
     const isPinching = pinchDistance < PINCH_THRESHOLD;
+    const isPanning = !isPinching && isOpenPalm(landmarks);
     const tool = findGestureToolAt(indexPoint);
 
     setHoveredGestureTool(tool);
-    drawGestureOverlay(landmarks, indexPoint, isPinching, tool);
+    drawGestureOverlay(landmarks, indexPoint, isPinching || isPanning, tool);
 
     if (tool) {
       lastPoint = null;
+      lastPanPoint = null;
       pinchWasDown = false;
       if (!updateHoldProgress()) {
         setStatus(`${t("select_hover")}：${tool.textContent || tool.getAttribute("aria-label")}`, "ready");
@@ -409,24 +572,39 @@
       return;
     }
 
-    if (isPinching) {
+    if (isPanning) {
+      if (lastPanPoint) {
+        viewport.x += indexPoint.x - lastPanPoint.x;
+        viewport.y += indexPoint.y - lastPanPoint.y;
+        applyViewport();
+      }
+      lastPanPoint = indexPoint;
+      lastPoint = null;
+      pinchWasDown = false;
+      setStatus("panning_canvas", "ready");
+      return;
+    }
+
+    lastPanPoint = null;
+
+    if (isPinching && isInsideWorld(worldPoint)) {
       if (!pinchWasDown) {
-        lastPoint = indexPoint;
-      } else if (lastPoint && distance(lastPoint, indexPoint) < 80) {
+        lastPoint = worldPoint;
+      } else if (lastPoint && distance(lastPoint, worldPoint) < 80 / viewport.scale) {
         const action = {
           type: "draw_line",
-          from: normalizePoint(lastPoint, rect),
-          to: normalizePoint(indexPoint, rect),
+          from: normalizePoint(lastPoint),
+          to: normalizePoint(worldPoint),
           color,
           size,
           erasing,
         };
         action.room = currentRoom;
-        drawLine(lastPoint, indexPoint, action);
+        drawLine(lastPoint, worldPoint, action);
         actionHistory.push(action);
         socket.emit("draw_line", action);
       }
-      lastPoint = indexPoint;
+      lastPoint = worldPoint;
       setStatus(erasing ? "erasing" : "drawing", "drawing");
     } else {
       lastPoint = null;
@@ -512,6 +690,9 @@
   undoButton.addEventListener("click", undoDrawing);
   clearButton.addEventListener("click", clearDrawing);
   saveButton.addEventListener("click", saveDrawing);
+  generateButton?.addEventListener("click", generateAiImage);
+  aiGenerateButton?.addEventListener("click", generateAiImage);
+  aiDownloadButton?.addEventListener("click", downloadAiImage);
 
   joinRoomButton?.addEventListener("click", () => {
     const room = (roomInput?.value || "").trim() || "lobby";

@@ -18,13 +18,25 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. 运行 Flask 应用
+3. 设置配置文件
+
+```bash
+cp .env.example .env
+```
+
+然后编辑 `.env`：
+
+```dotenv
+AGNES_API_KEY="你的 Agnes API Key"
+```
+
+4. 运行 Flask 应用
 
 ```bash
 python app.py
 ```
 
-4. 在浏览器中打开
+5. 在浏览器中打开
 
 ```bash
 http://127.0.0.1:5000
@@ -39,6 +51,10 @@ python app.py --port 5001
 ## 多人协作
 
 客户端现在可通过 Socket.IO 连接同一个房间，实时同步绘画、清空和撤销操作。新用户加入时会自动接收当前画布历史。 
+
+## AI 图生图
+
+画完简笔画后，在右侧 AI 面板选择风格、尺寸和模型，输入想要的效果，然后点击“AI 生成”。后端会把当前画布导出为白底 PNG，并通过 `AGNES_API_KEY` 调用 Agnes Image 图生图接口。
 
 4. 在浏览器中打开
 
