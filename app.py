@@ -36,6 +36,11 @@ def index():
     return render_template("index.html")
 
 
+@app.get("/api/generate-image/status")
+def generate_image_status():
+    return jsonify({"configured": bool(os.environ.get("AGNES_API_KEY"))})
+
+
 @app.post("/api/generate-image")
 def generate_image():
     api_key = os.environ.get("AGNES_API_KEY")

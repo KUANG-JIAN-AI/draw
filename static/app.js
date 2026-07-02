@@ -1,5 +1,26 @@
-(function () {
-  "use strict";
+import {
+  HAND_CONNECTIONS,
+  HOLD_TO_SELECT_MS,
+  PINCH_THRESHOLD,
+  VIEWPORT_MARGIN,
+  WORLD_HEIGHT,
+  WORLD_WIDTH,
+} from "./js/constants.js";
+import {
+  denormalizePoint,
+  distance,
+  isInsideWorld,
+  isOpenPalm,
+  landmarkToPoint,
+  normalizePoint,
+  normalizedDistance,
+  screenToWorld,
+} from "./js/geometry.js";
+import { createAiImageController } from "./js/ai-image.js";
+
+const t = window.t;
+const setLanguage = window.setLanguage;
+const getLanguage = window.getLanguage;
 
   const video = document.querySelector("#cameraView");
   const drawingCanvas = document.querySelector("#drawingCanvas");
@@ -43,65 +64,16 @@
   let hoveredGestureTool = null;
   let hoverStartedAt = 0;
   let hoverActivated = false;
-  let latestAiImageUrl = "";
 
-  const HOLD_TO_SELECT_MS = 800;
-  const PINCH_THRESHOLD = 0.075;
-  const WORLD_WIDTH = 4096;
-  const WORLD_HEIGHT = 3072;
-  const VIEWPORT_MARGIN = 80;
   const viewport = {
     x: 36,
     y: 36,
     scale: 1,
   };
 
-  const handConnections = [
-    [0, 1], [1, 2], [2, 3], [3, 4],
-    [0, 5], [5, 6], [6, 7], [7, 8],
-    [5, 9], [9, 10], [10, 11], [11, 12],
-    [9, 13], [13, 14], [14, 15], [15, 16],
-    [13, 17], [17, 18], [18, 19], [19, 20],
-    [0, 17],
-  ];
-
-  const socket = io();
+  const socket = window.io();
   const actionHistory = [];
   let currentRoom = null;
-
-  // --- Coordinate helpers ---
-
-  function normalizePoint(point) {
-    return { x: point.x / WORLD_WIDTH, y: point.y / WORLD_HEIGHT };
-  }
-
-  function denormalizePoint(point) {
-    return { x: point.x * WORLD_WIDTH, y: point.y * WORLD_HEIGHT };
-  }
-
-  function landmarkToPoint(landmark, rect) {
-    rect = rect || gestureCanvas.getBoundingClientRect();
-    return { x: (1 - landmark.x) * rect.width, y: landmark.y * rect.height };
-  }
-
-  function screenToWorld(point) {
-    return {
-      x: (point.x - viewport.x) / viewport.scale,
-      y: (point.y - viewport.y) / viewport.scale,
-    };
-  }
-
-  function isInsideWorld(point) {
-    return point.x >= 0 && point.x <= WORLD_WIDTH && point.y >= 0 && point.y <= WORLD_HEIGHT;
-  }
-
-  function distance(a, b) {
-    return Math.hypot(a.x - b.x, a.y - b.y);
-  }
-
-  function normalizedDistance(a, b) {
-    return Math.hypot(a.x - b.x, a.y - b.y, (a.z || 0) - (b.z || 0));
-  }
 
   function clampViewport() {
     const rect = gestureCanvas.getBoundingClientRect();
@@ -119,19 +91,6 @@
     drawingCanvas.style.width = `${WORLD_WIDTH}px`;
     drawingCanvas.style.height = `${WORLD_HEIGHT}px`;
     drawingCanvas.style.transform = `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`;
-  }
-
-  function isOpenPalm(landmarks) {
-    const fingers = [
-      [8, 6],
-      [12, 10],
-      [16, 14],
-      [20, 18],
-    ];
-    const extendedCount = fingers.reduce((count, [tip, pip]) => {
-      return count + (landmarks[tip].y < landmarks[pip].y - 0.015 ? 1 : 0);
-    }, 0);
-    return extendedCount >= 3;
   }
 
   // --- Drawing ---
@@ -276,101 +235,6 @@
     aiStatus.className = "ai-status" + (state ? " " + state : "");
   }
 
-  function buildAiPrompt() {
-    const prompt = (aiPromptInput?.value || "").trim();
-    const stylePrompts = {
-      children: "polished cute children's book illustration, soft friendly colors, clean outlines, gentle lighting",
-      watercolor: "delicate watercolor illustration, textured paper, soft gradients, elegant brush strokes",
-      cartoon3d: "high quality 3D cartoon render, rounded shapes, playful materials, studio lighting",
-      sticker: "clean sticker icon, bold outline, simple background, crisp vector-like edges",
-      realistic: "realistic photo style, natural materials, detailed lighting, clean composition",
-    };
-    const selectedStyle = aiStyleSelect?.value || "children";
-    const basePrompt = prompt || "A cute simple hand-drawn subject";
-
-    return [
-      `Turn this simple hand-drawn sketch into ${stylePrompts[selectedStyle]}.`,
-      `Subject request: ${basePrompt}.`,
-      "Preserve the original composition, main shape, relative position, and camera angle.",
-      "Remove messy sketch artifacts, keep the image wholesome, bright, and high quality.",
-    ].join(" ");
-  }
-
-  function getResultImageFromAgnes(data) {
-    const first = data?.data?.[0] || data?.images?.[0] || data?.output?.[0] || data;
-    const b64 = first?.b64_json || first?.base64 || first?.image_base64 || first?.data;
-    const url = first?.url || first?.image_url;
-
-    if (typeof b64 === "string" && b64.startsWith("data:image/")) return b64;
-    if (typeof b64 === "string" && b64.length > 100) return `data:image/png;base64,${b64}`;
-    if (typeof url === "string") return url;
-    return "";
-  }
-
-  function sizeToDimensions(sizeValue) {
-    const [width, height] = String(sizeValue || "1024x768").split("x").map(Number);
-    return {
-      width: Number.isFinite(width) ? width : 1024,
-      height: Number.isFinite(height) ? height : 768,
-    };
-  }
-
-  async function generateAiImage() {
-    if (!aiGenerateButton) return;
-
-    const sizeValue = aiSizeSelect?.value || "1024x768";
-    const { width, height } = sizeToDimensions(sizeValue);
-    const payload = {
-      image: getFlattenedDrawingDataUrl(width, height),
-      prompt: buildAiPrompt(),
-      model: aiModelSelect?.value || "agnes-image-2.1-flash",
-      size: sizeValue,
-    };
-
-    aiGenerateButton.disabled = true;
-    generateButton.disabled = true;
-    setAiStatus("ai_generating", "loading");
-    setStatus("ai_generation_started", "ready");
-
-    try {
-      const response = await fetch("/api/generate-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.details || data?.error || response.statusText);
-      }
-
-      latestAiImageUrl = getResultImageFromAgnes(data);
-      if (!latestAiImageUrl) {
-        throw new Error("No image found in Agnes response");
-      }
-
-      aiResultImage.src = latestAiImageUrl;
-      aiResultImage.classList.add("has-result");
-      aiDownloadButton.disabled = false;
-      setAiStatus("ai_done", "ready");
-      setStatus("ai_generation_done", "ready");
-    } catch (error) {
-      console.error(error);
-      setAiStatus("ai_failed", "error");
-      setStatus("ai_generation_failed", "error");
-    } finally {
-      aiGenerateButton.disabled = false;
-      generateButton.disabled = false;
-    }
-  }
-
-  function downloadAiImage() {
-    if (!latestAiImageUrl) return;
-    const link = document.createElement("a");
-    link.download = `agnes-ai-image-${new Date().toISOString().slice(0, 10)}.png`;
-    link.href = latestAiImageUrl;
-    link.click();
-  }
-
   function setHoveredGestureTool(tool) {
     if (hoveredGestureTool === tool) return;
 
@@ -505,7 +369,7 @@
     gestureCtx.strokeStyle = "rgba(17,24,39,0.32)";
     gestureCtx.fillStyle = "rgba(17,24,39,0.42)";
 
-    for (const [from, to] of handConnections) {
+    for (const [from, to] of HAND_CONNECTIONS) {
       const a = landmarkToPoint(landmarks[from], rect);
       const b = landmarkToPoint(landmarks[to], rect);
       gestureCtx.beginPath();
@@ -553,7 +417,7 @@
     const indexTip = landmarks[8];
     const thumbTip = landmarks[4];
     const indexPoint = landmarkToPoint(indexTip, rect);
-    const worldPoint = screenToWorld(indexPoint);
+    const worldPoint = screenToWorld(indexPoint, viewport);
     const pinchDistance = normalizedDistance(indexTip, thumbTip);
     const isPinching = pinchDistance < PINCH_THRESHOLD;
     const isPanning = !isPinching && isOpenPalm(landmarks);
@@ -626,7 +490,7 @@
     setStatus("requesting_camera", "ready");
 
     try {
-      hands = new Hands({
+      hands = new window.Hands({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
       });
       hands.setOptions({
@@ -637,7 +501,7 @@
       });
       hands.onResults(handleHandsResult);
 
-      camera = new Camera(video, {
+      camera = new window.Camera(video, {
         onFrame: async () => {
           await hands.send({ image: video });
         },
@@ -655,6 +519,23 @@
       setStatus("camera_error", "error");
     }
   }
+
+  const aiImageController = createAiImageController({
+    elements: {
+      generateButton,
+      panelGenerateButton: aiGenerateButton,
+      downloadButton: aiDownloadButton,
+      styleSelect: aiStyleSelect,
+      sizeSelect: aiSizeSelect,
+      modelSelect: aiModelSelect,
+      promptInput: aiPromptInput,
+      resultImage: aiResultImage,
+    },
+    hasDrawing: () => actionHistory.length > 0,
+    getDrawingDataUrl: getFlattenedDrawingDataUrl,
+    setStatus,
+    setAiStatus,
+  });
 
   // --- Event listeners ---
 
@@ -690,9 +571,7 @@
   undoButton.addEventListener("click", undoDrawing);
   clearButton.addEventListener("click", clearDrawing);
   saveButton.addEventListener("click", saveDrawing);
-  generateButton?.addEventListener("click", generateAiImage);
-  aiGenerateButton?.addEventListener("click", generateAiImage);
-  aiDownloadButton?.addEventListener("click", downloadAiImage);
+  aiImageController.bindEvents();
 
   joinRoomButton?.addEventListener("click", () => {
     const room = (roomInput?.value || "").trim() || "lobby";
@@ -739,4 +618,3 @@
 
   window.addEventListener("resize", resizeCanvases);
   resizeCanvases();
-})();
