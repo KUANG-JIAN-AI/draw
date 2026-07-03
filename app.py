@@ -1,6 +1,11 @@
 import argparse
+import base64
+import binascii
+from datetime import datetime
 import json
 import os
+from pathlib import Path
+import re
 
 import gevent.monkey
 gevent.monkey.patch_all()
@@ -24,11 +29,57 @@ DEFAULT_NAME = "匿名"
 AGNES_IMAGE_ENDPOINT = "https://apihub.agnes-ai.com/v1/images/generations"
 AGNES_IMAGE_MODELS = {"agnes-image-2.1-flash", "agnes-image-2.0-flash"}
 AGNES_IMAGE_SIZES = {"1024x1024", "1024x768", "768x1024"}
+SAVED_IMAGES_DIR = Path(__file__).resolve().parent / "saved-images"
+DATA_URL_PATTERN = re.compile(r"^data:image/(?P<ext>png|jpeg|jpg|webp);base64,(?P<data>.+)$", re.DOTALL)
+IMAGE_EXTENSIONS_BY_CONTENT_TYPE = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/webp": "webp",
+}
 
 action_history = {}
 room_members = {}
 sid_room = {}
 _lock = RLock()
+
+
+def _decode_data_url(data_url):
+    match = DATA_URL_PATTERN.match(data_url or "")
+    if not match:
+        raise ValueError("Expected a PNG, JPEG, or WebP data URL")
+
+    extension = "jpg" if match.group("ext") == "jpeg" else match.group("ext")
+    try:
+        image_bytes = base64.b64decode(match.group("data"), validate=True)
+    except binascii.Error as error:
+        raise ValueError("Invalid base64 image data") from error
+
+    return image_bytes, extension
+
+
+def _read_image_source(source):
+    if isinstance(source, str) and source.startswith("data:image/"):
+        return _decode_data_url(source)
+
+    if isinstance(source, str) and source.startswith(("http://", "https://")):
+        image_request = urllib.request.Request(source, headers={"User-Agent": "gesture-draw/1.0"})
+        with urllib.request.urlopen(image_request, timeout=60) as response:
+            content_type = response.headers.get_content_type()
+            extension = IMAGE_EXTENSIONS_BY_CONTENT_TYPE.get(content_type)
+            if not extension:
+                raise ValueError(f"Unsupported image content type: {content_type}")
+            return response.read(), extension
+
+    raise ValueError("Expected an image data URL or image URL")
+
+
+def _save_image_source(source, stem):
+    image_bytes, extension = _read_image_source(source)
+    SAVED_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+    file_path = SAVED_IMAGES_DIR / f"{stem}.{extension}"
+    file_path.write_bytes(image_bytes)
+    return file_path
 
 
 @app.route("/")
@@ -39,6 +90,29 @@ def index():
 @app.get("/api/generate-image/status")
 def generate_image_status():
     return jsonify({"configured": bool(os.environ.get("AGNES_API_KEY"))})
+
+
+@app.post("/api/save-generated-images")
+def save_generated_images():
+    data = request.get_json(silent=True) or {}
+    drawing_image = data.get("drawingImage")
+    generated_image = data.get("generatedImage")
+
+    if not drawing_image or not generated_image:
+        return jsonify({"error": "Missing drawingImage or generatedImage"}), 400
+
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    try:
+        drawing_path = _save_image_source(drawing_image, f"{timestamp}-drawing")
+        generated_path = _save_image_source(generated_image, f"{timestamp}-generated")
+    except (ValueError, urllib.error.URLError, TimeoutError) as error:
+        app.logger.warning("Could not save generated images: %s", error)
+        return jsonify({"error": "Could not save generated images", "details": str(error)}), 400
+
+    return jsonify({
+        "drawingPath": str(drawing_path.relative_to(Path(__file__).resolve().parent)),
+        "generatedPath": str(generated_path.relative_to(Path(__file__).resolve().parent)),
+    })
 
 
 @app.post("/api/generate-image")
@@ -87,10 +161,13 @@ def generate_image():
             response_body = response.read().decode("utf-8")
     except urllib.error.HTTPError as error:
         error_body = error.read().decode("utf-8", errors="replace")
+        app.logger.warning("Agnes API request failed (%s): %s", error.code, error_body[:1000])
         return jsonify({"error": "Agnes API 请求失败", "details": error_body}), error.code
     except urllib.error.URLError as error:
+        app.logger.warning("Could not connect to Agnes API: %s", error.reason)
         return jsonify({"error": "无法连接 Agnes API", "details": str(error.reason)}), 502
     except TimeoutError:
+        app.logger.warning("Agnes API request timed out")
         return jsonify({"error": "Agnes API 请求超时"}), 504
 
     try:

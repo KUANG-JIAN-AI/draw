@@ -37,12 +37,36 @@ function sizeToDimensions(sizeValue) {
   };
 }
 
+function formatGenerationError(error) {
+  const message = error?.message || String(error || "");
+  try {
+    const parsed = JSON.parse(message);
+    return parsed?.error?.message || parsed?.message || parsed?.error || message;
+  } catch {
+    return message;
+  }
+}
+
+async function saveGeneratedImages(drawingImage, generatedImage) {
+  const response = await fetch("/api/save-generated-images", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ drawingImage, generatedImage }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data?.details || data?.error || response.statusText);
+  }
+  return data;
+}
+
 export function createAiImageController({
   elements,
   hasDrawing = () => true,
   getDrawingDataUrl,
   setStatus,
   setAiStatus,
+  setGenerating = () => {},
 }) {
   let latestAiImageUrl = "";
   const {
@@ -70,6 +94,7 @@ export function createAiImageController({
 
     panelGenerateButton.disabled = true;
     if (generateButton) generateButton.disabled = true;
+    setGenerating(true);
     setAiStatus("ai_generating", "loading");
     setStatus("ai_generation_started", "ready");
 
@@ -80,8 +105,9 @@ export function createAiImageController({
         throw new Error("Agnes API key is not configured");
       }
 
+      const drawingImage = getDrawingDataUrl(width, height);
       const payload = {
-        image: getDrawingDataUrl(width, height),
+        image: drawingImage,
         prompt: buildPrompt(promptInput, styleSelect),
         model: modelSelect?.value || "agnes-image-2.1-flash",
         size: sizeValue,
@@ -106,12 +132,20 @@ export function createAiImageController({
       resultImage.classList.add("has-result");
       downloadButton.disabled = false;
       setAiStatus("ai_done", "ready");
-      setStatus("ai_generation_done", "ready");
+      try {
+        const saved = await saveGeneratedImages(drawingImage, latestAiImageUrl);
+        setStatus(`Saved: ${saved.drawingPath}, ${saved.generatedPath}`, "ready");
+      } catch (saveError) {
+        console.error(saveError);
+        setStatus(`Generated, but auto-save failed: ${formatGenerationError(saveError)}`, "error");
+      }
     } catch (error) {
+      const errorMessage = formatGenerationError(error);
       console.error(error);
       setAiStatus("ai_failed", "error");
-      setStatus("ai_generation_failed", "error");
+      setStatus(errorMessage || "ai_generation_failed", "error");
     } finally {
+      setGenerating(false);
       panelGenerateButton.disabled = false;
       if (generateButton) generateButton.disabled = false;
     }

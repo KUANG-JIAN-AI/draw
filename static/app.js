@@ -64,6 +64,7 @@ const getLanguage = window.getLanguage;
   let hoveredGestureTool = null;
   let hoverStartedAt = 0;
   let hoverActivated = false;
+  let aiGenerating = false;
 
   const viewport = {
     x: 36,
@@ -451,6 +452,13 @@ const getLanguage = window.getLanguage;
 
     lastPanPoint = null;
 
+    if (aiGenerating) {
+      lastPoint = null;
+      pinchWasDown = isPinching;
+      setStatus("ai_generating", "ready");
+      return;
+    }
+
     if (isPinching && isInsideWorld(worldPoint)) {
       if (!pinchWasDown) {
         lastPoint = worldPoint;
@@ -535,6 +543,13 @@ const getLanguage = window.getLanguage;
     getDrawingDataUrl: getFlattenedDrawingDataUrl,
     setStatus,
     setAiStatus,
+    setGenerating: (isGenerating) => {
+      aiGenerating = isGenerating;
+      if (isGenerating) {
+        lastPoint = null;
+        pinchWasDown = false;
+      }
+    },
   });
 
   // --- Event listeners ---
