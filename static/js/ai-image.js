@@ -8,13 +8,16 @@ function buildPrompt(promptInput, styleSelect) {
     realistic: "realistic photo style, natural materials, detailed lighting, clean composition",
   };
   const selectedStyle = styleSelect?.value || "children";
-  const basePrompt = prompt || "A cute simple hand-drawn subject";
+  const basePrompt = prompt || "the subject shown in the sketch";
 
   return [
-    `Turn this simple hand-drawn sketch into ${stylePrompts[selectedStyle]}.`,
+    `Use the provided sketch as a strict structure guide and redraw it as ${stylePrompts[selectedStyle]}.`,
     `Subject request: ${basePrompt}.`,
-    "Preserve the original composition, main shape, relative position, and camera angle.",
-    "Remove messy sketch artifacts, keep the image wholesome, bright, and high quality.",
+    "Preserve the exact layout, silhouette, proportions, relative positions, and camera angle from the sketch.",
+    "Do not add, remove, merge, or reorder visible parts from the sketch.",
+    "If the sketch has repeated visible parts, keep the exact same count and placement.",
+    "Do not replace the sketched subject with a more generic or different object.",
+    "Clean up messy line artifacts only after preserving the drawn structure. Keep the result wholesome, bright, and high quality.",
   ].join(" ");
 }
 
