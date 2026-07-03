@@ -242,7 +242,7 @@ input {
   z-index: 3;
   top: 14px;
   left: 50%;
-  width: min(820px, calc(100% - 28px));
+  width: min(1120px, calc(100% - 28px));
   justify-content: center;
   display: flex;
   align-items: center;
@@ -288,6 +288,22 @@ input {
 .gesture-button {
   padding: 0 12px;
   background-color: rgba(255, 255, 255, 0.12);
+}
+
+.gesture-button.compact {
+  max-width: 132px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gesture-button.primary {
+  border-color: rgba(20, 184, 166, 0.85);
+  background-color: rgba(15, 118, 110, 0.9);
+}
+
+.gesture-ai-panel {
+  background: rgba(15, 23, 42, 0.78);
 }
 
 .gesture-button.danger {

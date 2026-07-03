@@ -44,6 +44,10 @@ const getLanguage = window.getLanguage;
   const aiPromptInput = document.querySelector("#aiPromptInput");
   const aiResultImage = document.querySelector("#aiResultImage");
   const aiStatus = document.querySelector("#aiStatus");
+  const gestureAiStyleButton = document.querySelector("#gestureAiStyleButton");
+  const gestureAiSizeButton = document.querySelector("#gestureAiSizeButton");
+  const gestureAiModelButton = document.querySelector("#gestureAiModelButton");
+  const gestureAiGenerateButton = document.querySelector("#gestureAiGenerateButton");
   const statusDot = document.querySelector("#statusDot");
   const statusText = document.querySelector("#statusText");
   const roomInput = document.getElementById("roomInput");
@@ -281,6 +285,20 @@ const getLanguage = window.getLanguage;
     return element?.closest?.(".gesture-tool") || null;
   }
 
+  function hasStableDrawingLandmarks(landmarks) {
+    const edgeMargin = 0.04;
+    const keyPoints = [0, 4, 5, 8, 9, 12, 17, 20];
+    return keyPoints.every((index) => {
+      const landmark = landmarks[index];
+      return (
+        landmark.x > edgeMargin &&
+        landmark.x < 1 - edgeMargin &&
+        landmark.y > edgeMargin &&
+        landmark.y < 1 - edgeMargin
+      );
+    });
+  }
+
   // --- Tool state management ---
 
   function updateActiveColor(nextColor) {
@@ -329,6 +347,24 @@ const getLanguage = window.getLanguage;
     }
   }
 
+  function selectedOptionLabel(select) {
+    return select?.selectedOptions?.[0]?.textContent?.trim() || select?.value || "";
+  }
+
+  function cycleSelect(select) {
+    if (!select?.options?.length) return "";
+    select.selectedIndex = (select.selectedIndex + 1) % select.options.length;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    return selectedOptionLabel(select);
+  }
+
+  function updateGestureAiControls() {
+    if (gestureAiStyleButton) gestureAiStyleButton.textContent = `风格: ${selectedOptionLabel(aiStyleSelect)}`;
+    if (gestureAiSizeButton) gestureAiSizeButton.textContent = `尺寸: ${selectedOptionLabel(aiSizeSelect)}`;
+    if (gestureAiModelButton) gestureAiModelButton.textContent = `模型: ${selectedOptionLabel(aiModelSelect)}`;
+    if (gestureAiGenerateButton) gestureAiGenerateButton.disabled = aiGenerating;
+  }
+
   function activateGestureTool(tool) {
     const action = tool.dataset.gestureAction;
 
@@ -355,6 +391,28 @@ const getLanguage = window.getLanguage;
     if (action === "save") {
       saveDrawing();
       setStatus("image_saved", "ready");
+    }
+    if (action === "ai-style") {
+      const label = cycleSelect(aiStyleSelect);
+      updateGestureAiControls();
+      setStatus(`AI 风格: ${label}`, "ready");
+    }
+    if (action === "ai-size") {
+      const label = cycleSelect(aiSizeSelect);
+      updateGestureAiControls();
+      setStatus(`AI 尺寸: ${label}`, "ready");
+    }
+    if (action === "ai-model") {
+      const label = cycleSelect(aiModelSelect);
+      updateGestureAiControls();
+      setStatus(`AI 模型: ${label}`, "ready");
+    }
+    if (action === "ai-generate") {
+      if (aiGenerating) {
+        setStatus("ai_generating", "ready");
+        return;
+      }
+      aiImageController.generate();
     }
   }
 
@@ -421,11 +479,13 @@ const getLanguage = window.getLanguage;
     const worldPoint = screenToWorld(indexPoint, viewport);
     const pinchDistance = normalizedDistance(indexTip, thumbTip);
     const isPinching = pinchDistance < PINCH_THRESHOLD;
-    const isPanning = !isPinching && isOpenPalm(landmarks);
+    const openPalm = isOpenPalm(landmarks);
+    const canDraw = isPinching && !openPalm && hasStableDrawingLandmarks(landmarks);
+    const isPanning = openPalm;
     const tool = findGestureToolAt(indexPoint);
 
     setHoveredGestureTool(tool);
-    drawGestureOverlay(landmarks, indexPoint, isPinching || isPanning, tool);
+    drawGestureOverlay(landmarks, indexPoint, canDraw || isPanning, tool);
 
     if (tool) {
       lastPoint = null;
@@ -459,7 +519,7 @@ const getLanguage = window.getLanguage;
       return;
     }
 
-    if (isPinching && isInsideWorld(worldPoint)) {
+    if (canDraw && isInsideWorld(worldPoint)) {
       if (!pinchWasDown) {
         lastPoint = worldPoint;
       } else if (lastPoint && distance(lastPoint, worldPoint) < 80 / viewport.scale) {
@@ -483,7 +543,7 @@ const getLanguage = window.getLanguage;
       setStatus("move_to_toolbar", "ready");
     }
 
-    pinchWasDown = isPinching;
+    pinchWasDown = canDraw;
   }
 
   // --- Camera ---
@@ -549,6 +609,7 @@ const getLanguage = window.getLanguage;
         lastPoint = null;
         pinchWasDown = false;
       }
+      updateGestureAiControls();
     },
   });
 
@@ -579,6 +640,14 @@ const getLanguage = window.getLanguage;
 
   document.querySelectorAll(".gesture-tool[data-gesture-action='size']").forEach((button) => {
     button.addEventListener("click", () => updateBrushSize(button.dataset.size));
+  });
+
+  [aiStyleSelect, aiSizeSelect, aiModelSelect].forEach((select) => {
+    select?.addEventListener("change", updateGestureAiControls);
+  });
+
+  document.querySelectorAll(".gesture-tool[data-gesture-action^='ai-']").forEach((button) => {
+    button.addEventListener("click", () => activateGestureTool(button));
   });
 
   cameraButton.addEventListener("click", startCamera);
@@ -632,4 +701,6 @@ const getLanguage = window.getLanguage;
   }
 
   window.addEventListener("resize", resizeCanvases);
+  window.addEventListener("language-changed", updateGestureAiControls);
+  updateGestureAiControls();
   resizeCanvases();
