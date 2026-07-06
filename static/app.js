@@ -1,13 +1,5 @@
+import { HOLD_TO_SELECT_MS, PINCH_THRESHOLD } from "./js/constants.js";
 import {
-  HAND_CONNECTIONS,
-  HOLD_TO_SELECT_MS,
-  PINCH_THRESHOLD,
-  VIEWPORT_MARGIN,
-  WORLD_HEIGHT,
-  WORLD_WIDTH,
-} from "./js/constants.js";
-import {
-  denormalizePoint,
   distance,
   isInsideWorld,
   isOpenPalm,
@@ -17,6 +9,9 @@ import {
   screenToWorld,
 } from "./js/geometry.js";
 import { createAiImageController } from "./js/ai-image.js";
+import { createCanvasController } from "./js/canvas.js";
+import { createGestureOverlay } from "./js/gesture-overlay.js";
+import { createRoomController } from "./js/socket-room.js";
 
 const t = window.t;
 const setLanguage = window.setLanguage;
@@ -25,8 +20,6 @@ const getLanguage = window.getLanguage;
   const video = document.querySelector("#cameraView");
   const drawingCanvas = document.querySelector("#drawingCanvas");
   const gestureCanvas = document.querySelector("#gestureCanvas");
-  const drawCtx = drawingCanvas.getContext("2d");
-  const gestureCtx = gestureCanvas.getContext("2d");
   const swatches = [...document.querySelectorAll(".toolbar .swatch")];
   const customColor = document.querySelector("#customColor");
   const sizeOptions = [...document.querySelectorAll(".size-option")];
@@ -43,6 +36,8 @@ const getLanguage = window.getLanguage;
   const aiModelSelect = document.querySelector("#aiModelSelect");
   const aiPromptInput = document.querySelector("#aiPromptInput");
   const aiResultImage = document.querySelector("#aiResultImage");
+  const aiResultWrap = document.querySelector(".ai-result-wrap");
+  const aiResultLoading = document.querySelector("#aiResultLoading");
   const aiStatus = document.querySelector("#aiStatus");
   const gestureAiStyleButton = document.querySelector("#gestureAiStyleButton");
   const gestureAiSizeButton = document.querySelector("#gestureAiSizeButton");
@@ -70,160 +65,42 @@ const getLanguage = window.getLanguage;
   let hoverActivated = false;
   let aiGenerating = false;
 
-  const viewport = {
-    x: 36,
-    y: 36,
-    scale: 1,
-  };
-
   const socket = window.io();
   const actionHistory = [];
-  let currentRoom = null;
-
-  function clampViewport() {
-    const rect = gestureCanvas.getBoundingClientRect();
-    const scaledWidth = WORLD_WIDTH * viewport.scale;
-    const scaledHeight = WORLD_HEIGHT * viewport.scale;
-    const minX = Math.min(VIEWPORT_MARGIN, rect.width - scaledWidth - VIEWPORT_MARGIN);
-    const minY = Math.min(VIEWPORT_MARGIN, rect.height - scaledHeight - VIEWPORT_MARGIN);
-
-    viewport.x = Math.min(VIEWPORT_MARGIN, Math.max(minX, viewport.x));
-    viewport.y = Math.min(VIEWPORT_MARGIN, Math.max(minY, viewport.y));
-  }
-
-  function applyViewport() {
-    clampViewport();
-    drawingCanvas.style.width = `${WORLD_WIDTH}px`;
-    drawingCanvas.style.height = `${WORLD_HEIGHT}px`;
-    drawingCanvas.style.transform = `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`;
-  }
-
-  // --- Drawing ---
-
-  function drawLine(from, to, style = {}) {
-    const prevOp = drawCtx.globalCompositeOperation;
-    try {
-      const lineColor = style.erasing ? "destination-out" : style.color || color;
-      const lineSize = style.erasing ? (style.size || size) * 1.8 : (style.size || size);
-      drawCtx.globalCompositeOperation = style.erasing ? "destination-out" : "source-over";
-      drawCtx.strokeStyle = lineColor;
-      drawCtx.lineWidth = lineSize;
-      drawCtx.beginPath();
-      drawCtx.moveTo(from.x, from.y);
-      drawCtx.lineTo(to.x, to.y);
-      drawCtx.stroke();
-    } finally {
-      drawCtx.globalCompositeOperation = prevOp;
-    }
-  }
-
-  function applyAction(action) {
-    if (action.type === "draw_line") {
-      drawLine(denormalizePoint(action.from), denormalizePoint(action.to), action);
-    }
-  }
-
-  function redrawHistory() {
-    drawCtx.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    actionHistory.forEach(applyAction);
-  }
-
-  // --- Socket events ---
-
-  socket.on("action_history", (history) => {
-    actionHistory.length = 0;
-    actionHistory.push(...history);
-    redrawHistory();
+  let roomController = null;
+  const canvas = createCanvasController({
+    drawingCanvas,
+    gestureCanvas,
+    actionHistory,
+    getBrushStyle: () => ({ color, size, erasing }),
   });
-
-  socket.on("room_members", (members) => {
-    if (!membersList) return;
-    const membersLabel = t("hud_members");
-    const emptyText = t("hud_empty");
-    membersList.textContent = membersLabel + "：" + (members.length ? members.join("，") : emptyText);
+  const gestureOverlay = createGestureOverlay({
+    gestureCanvas,
+    getBrushSize: () => size,
   });
-
-  window.addEventListener("language-changed", () => {
-    if (membersList && membersList.textContent.includes("：")) {
-      const parts = membersList.textContent.split("：");
-      const memberNames = parts[1];
-      const membersLabel = t("hud_members");
-      membersList.textContent = membersLabel + "：" + memberNames;
-    }
-  });
-
-  socket.on("draw_line", (data) => {
-    actionHistory.push(data);
-    applyAction(data);
-  });
-
-  socket.on("clear_canvas", () => {
-    actionHistory.length = 0;
-    drawCtx.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-  });
-
-  socket.on("undo", (history) => {
-    actionHistory.length = 0;
-    actionHistory.push(...history);
-    redrawHistory();
-  });
-
-  // --- Canvas resize ---
-
-  function resizeCanvases() {
-    const rect = gestureCanvas.getBoundingClientRect();
-    const ratio = window.devicePixelRatio || 1;
-
-    drawingCanvas.width = Math.max(1, Math.floor(WORLD_WIDTH * ratio));
-    drawingCanvas.height = Math.max(1, Math.floor(WORLD_HEIGHT * ratio));
-    drawingCanvas.style.width = `${WORLD_WIDTH}px`;
-    drawingCanvas.style.height = `${WORLD_HEIGHT}px`;
-    drawCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-    gestureCanvas.width = Math.max(1, Math.floor(rect.width * ratio));
-    gestureCanvas.height = Math.max(1, Math.floor(rect.height * ratio));
-    gestureCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-    drawCtx.lineCap = "round";
-    drawCtx.lineJoin = "round";
-
-    applyViewport();
-    redrawHistory();
-  }
+  const { viewport } = canvas;
 
   // --- Canvas actions ---
 
-  function getFlattenedDrawingDataUrl(targetWidth = WORLD_WIDTH, targetHeight = WORLD_HEIGHT) {
-    const output = document.createElement("canvas");
-    const outputCtx = output.getContext("2d");
-
-    output.width = targetWidth;
-    output.height = targetHeight;
-    outputCtx.fillStyle = "#ffffff";
-    outputCtx.fillRect(0, 0, output.width, output.height);
-    outputCtx.drawImage(drawingCanvas, 0, 0, output.width, output.height);
-
-    return output.toDataURL("image/png");
-  }
-
   function clearDrawing() {
-    drawCtx.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    canvas.clear();
     actionHistory.length = 0;
-    socket.emit("clear_canvas", { room: currentRoom });
+    socket.emit("clear_canvas", { room: roomController?.getCurrentRoom() });
+    resetDrawingGestureState();
   }
 
   function saveDrawing() {
     const link = document.createElement("a");
     link.download = `gesture-drawing-${new Date().toISOString().slice(0, 10)}.png`;
-    link.href = getFlattenedDrawingDataUrl();
+    link.href = canvas.getFlattenedDataUrl();
     link.click();
   }
 
   function undoDrawing() {
     if (actionHistory.length) {
       actionHistory.pop();
-      redrawHistory();
-      socket.emit("undo", { room: currentRoom });
+      canvas.redrawHistory();
+      socket.emit("undo", { room: roomController?.getCurrentRoom() });
     }
   }
 
@@ -240,6 +117,19 @@ const getLanguage = window.getLanguage;
     aiStatus.className = "ai-status" + (state ? " " + state : "");
   }
 
+  roomController = createRoomController({
+    socket,
+    actionHistory,
+    canvas,
+    membersList,
+    roomInput,
+    nameInput,
+    joinRoomButton,
+    setStatus,
+    t,
+  });
+  roomController.bindEvents();
+
   function setHoveredGestureTool(tool) {
     if (hoveredGestureTool === tool) return;
 
@@ -255,6 +145,18 @@ const getLanguage = window.getLanguage;
     if (hoveredGestureTool) {
       hoveredGestureTool.classList.add("gesture-hover");
     }
+  }
+
+  function resetGestureSelection() {
+    setHoveredGestureTool(null);
+    hoverActivated = false;
+    resetDrawingGestureState();
+  }
+
+  function resetDrawingGestureState() {
+    pinchWasDown = false;
+    lastPoint = null;
+    lastPanPoint = null;
   }
 
   function updateHoldProgress() {
@@ -382,6 +284,7 @@ const getLanguage = window.getLanguage;
     }
     if (action === "undo") {
       undoDrawing();
+      resetDrawingGestureState();
       setStatus("undo_done", "ready");
     }
     if (action === "clear") {
@@ -390,6 +293,7 @@ const getLanguage = window.getLanguage;
     }
     if (action === "save") {
       saveDrawing();
+      resetDrawingGestureState();
       setStatus("image_saved", "ready");
     }
     if (action === "ai-style") {
@@ -418,45 +322,6 @@ const getLanguage = window.getLanguage;
 
   // --- Gesture overlay ---
 
-  function drawGestureOverlay(landmarks, point, isPinching, tool) {
-    const rect = gestureCanvas.getBoundingClientRect();
-    gestureCtx.clearRect(0, 0, rect.width, rect.height);
-
-    if (!landmarks) return;
-
-    gestureCtx.lineWidth = 2;
-    gestureCtx.strokeStyle = "rgba(17,24,39,0.32)";
-    gestureCtx.fillStyle = "rgba(17,24,39,0.42)";
-
-    for (const [from, to] of HAND_CONNECTIONS) {
-      const a = landmarkToPoint(landmarks[from], rect);
-      const b = landmarkToPoint(landmarks[to], rect);
-      gestureCtx.beginPath();
-      gestureCtx.moveTo(a.x, a.y);
-      gestureCtx.lineTo(b.x, b.y);
-      gestureCtx.stroke();
-    }
-
-    for (const landmark of landmarks) {
-      const dot = landmarkToPoint(landmark, rect);
-      gestureCtx.beginPath();
-      gestureCtx.arc(dot.x, dot.y, 3, 0, Math.PI * 2);
-      gestureCtx.fill();
-    }
-
-    gestureCtx.beginPath();
-    gestureCtx.arc(point.x, point.y, Math.max(10, size * 0.72), 0, Math.PI * 2);
-    gestureCtx.fillStyle = tool
-      ? "rgba(245,158,11,0.92)"
-      : isPinching
-        ? "rgba(225,29,72,0.88)"
-        : "rgba(15,118,110,0.88)";
-    gestureCtx.fill();
-    gestureCtx.lineWidth = 3;
-    gestureCtx.strokeStyle = "#ffffff";
-    gestureCtx.stroke();
-  }
-
   // --- Hand tracking ---
 
   function handleHandsResult(results) {
@@ -468,7 +333,7 @@ const getLanguage = window.getLanguage;
       lastPoint = null;
       lastPanPoint = null;
       setHoveredGestureTool(null);
-      drawGestureOverlay(null, null, false, null);
+      gestureOverlay.draw(null, null, null);
       setStatus("put_hand", "ready");
       return;
     }
@@ -485,7 +350,11 @@ const getLanguage = window.getLanguage;
     const tool = findGestureToolAt(indexPoint);
 
     setHoveredGestureTool(tool);
-    drawGestureOverlay(landmarks, indexPoint, canDraw || isPanning, tool);
+    gestureOverlay.draw(landmarks, indexPoint, {
+      isPinching: isPinching && !openPalm,
+      isPanning,
+      tool,
+    });
 
     if (tool) {
       lastPoint = null;
@@ -501,7 +370,7 @@ const getLanguage = window.getLanguage;
       if (lastPanPoint) {
         viewport.x += indexPoint.x - lastPanPoint.x;
         viewport.y += indexPoint.y - lastPanPoint.y;
-        applyViewport();
+        canvas.applyViewport();
       }
       lastPanPoint = indexPoint;
       lastPoint = null;
@@ -531,8 +400,8 @@ const getLanguage = window.getLanguage;
           size,
           erasing,
         };
-        action.room = currentRoom;
-        drawLine(lastPoint, worldPoint, action);
+        action.room = roomController?.getCurrentRoom();
+        canvas.drawLine(lastPoint, worldPoint, action);
         actionHistory.push(action);
         socket.emit("draw_line", action);
       }
@@ -600,11 +469,13 @@ const getLanguage = window.getLanguage;
       resultImage: aiResultImage,
     },
     hasDrawing: () => actionHistory.length > 0,
-    getDrawingDataUrl: getFlattenedDrawingDataUrl,
+    getDrawingDataUrl: canvas.getFlattenedDataUrl,
     setStatus,
     setAiStatus,
     setGenerating: (isGenerating) => {
       aiGenerating = isGenerating;
+      aiResultWrap?.classList.toggle("is-loading", isGenerating);
+      aiResultLoading?.setAttribute("aria-hidden", String(!isGenerating));
       if (isGenerating) {
         lastPoint = null;
         pinchWasDown = false;
@@ -653,25 +524,13 @@ const getLanguage = window.getLanguage;
   cameraButton.addEventListener("click", startCamera);
   eraserButton.addEventListener("click", toggleEraser);
   undoButton.addEventListener("click", undoDrawing);
-  clearButton.addEventListener("click", clearDrawing);
+  clearButton.addEventListener("click", () => clearDrawing());
   saveButton.addEventListener("click", saveDrawing);
   aiImageController.bindEvents();
 
-  joinRoomButton?.addEventListener("click", () => {
-    const room = (roomInput?.value || "").trim() || "lobby";
-    const name = (nameInput?.value || "").trim() || `匿名${Math.floor(Math.random() * 9000) + 1000}`;
-    currentRoom = room;
-    socket.emit("join_room", { room, name });
-    setStatus(t("room_joined") + ` ${room}`, "ready");
-  });
-
-  window.addEventListener("beforeunload", () => {
-    if (currentRoom) socket.emit("leave_room", { room: currentRoom });
-  });
-
   document.querySelector(".gesture-tool[data-gesture-action='eraser']").addEventListener("click", toggleEraser);
   document.querySelector(".gesture-tool[data-gesture-action='undo']").addEventListener("click", undoDrawing);
-  document.querySelector(".gesture-tool[data-gesture-action='clear']").addEventListener("click", clearDrawing);
+  document.querySelector(".gesture-tool[data-gesture-action='clear']").addEventListener("click", () => clearDrawing());
   document.querySelector(".gesture-tool[data-gesture-action='save']").addEventListener("click", saveDrawing);
 
   // --- Language buttons ---
@@ -700,7 +559,7 @@ const getLanguage = window.getLanguage;
     langJaBtn.style.color = "#ffffff";
   }
 
-  window.addEventListener("resize", resizeCanvases);
+  window.addEventListener("resize", () => canvas.resize(gestureOverlay.context));
   window.addEventListener("language-changed", updateGestureAiControls);
   updateGestureAiControls();
-  resizeCanvases();
+  canvas.resize(gestureOverlay.context);

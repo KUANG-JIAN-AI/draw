@@ -540,6 +540,7 @@ input {
 }
 
 .ai-result-wrap {
+  position: relative;
   display: grid;
   place-items: center;
   min-height: 150px;
@@ -556,6 +557,11 @@ input {
   background-size: 16px 16px;
 }
 
+.ai-result-wrap.is-loading {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent) 45%, #aeb9b2);
+}
+
 .ai-result {
   display: none;
   width: 100%;
@@ -565,6 +571,40 @@ input {
 
 .ai-result.has-result {
   display: block;
+}
+
+.ai-result-loading {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  gap: 10px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--accent-strong);
+  font-size: 14px;
+  font-weight: 650;
+  text-align: center;
+  backdrop-filter: blur(3px);
+}
+
+.ai-result-wrap.is-loading .ai-result-loading {
+  display: grid;
+}
+
+.ai-loader {
+  width: 38px;
+  height: 38px;
+  border: 4px solid rgba(15, 118, 110, 0.18);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: ai-loader-spin 900ms linear infinite;
+}
+
+@keyframes ai-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 860px) {
