@@ -347,7 +347,7 @@ const getLanguage = window.getLanguage;
     const openPalm = isOpenPalm(landmarks);
     const canDraw = isPinching && !openPalm && hasStableDrawingLandmarks(landmarks);
     const isPanning = openPalm;
-    const tool = findGestureToolAt(indexPoint);
+    const tool = isPinching && !openPalm ? null : findGestureToolAt(indexPoint);
 
     setHoveredGestureTool(tool);
     gestureOverlay.draw(landmarks, indexPoint, {

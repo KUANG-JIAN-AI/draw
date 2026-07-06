@@ -60,7 +60,7 @@
           <video id="cameraView" playsinline muted></video>
         </div>
 
-        <div class="gesture-toolbar" aria-label="手势工具栏">
+        <div class="gesture-toolbar gesture-toolbar-left" aria-label="绘画手势工具栏">
           <div class="gesture-panel color-pad">
             <button class="gesture-tool swatch active" type="button" data-gesture-action="color" data-color="#111827" style="--swatch:#111827" aria-label="黑色"></button>
             <button class="gesture-tool swatch" type="button" data-gesture-action="color" data-color="#e11d48" style="--swatch:#e11d48" aria-label="玫红"></button>
@@ -80,7 +80,9 @@
             <button class="gesture-tool gesture-button danger" type="button" data-gesture-action="clear" data-i18n="clear">清空</button>
             <button class="gesture-tool gesture-button" type="button" data-gesture-action="save" data-i18n="save">保存</button>
           </div>
+        </div>
 
+        <div class="gesture-toolbar gesture-toolbar-right" aria-label="AI 手势工具栏">
           <div class="gesture-panel gesture-ai-panel">
             <button id="gestureAiStyleButton" class="gesture-tool gesture-button compact" type="button" data-gesture-action="ai-style">风格</button>
             <button id="gestureAiSizeButton" class="gesture-tool gesture-button compact" type="button" data-gesture-action="ai-size">尺寸</button>

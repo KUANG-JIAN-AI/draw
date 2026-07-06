@@ -200,7 +200,7 @@ input {
 .camera-preview {
   position: absolute;
   z-index: 4;
-  right: 14px;
+  left: 14px;
   bottom: 14px;
   width: min(220px, 28vw);
   aspect-ratio: 16 / 9;
@@ -240,20 +240,31 @@ input {
 .gesture-toolbar {
   position: absolute;
   z-index: 3;
-  top: 14px;
-  left: 50%;
-  width: min(1120px, calc(100% - 28px));
-  justify-content: center;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 10px;
-  flex-wrap: wrap;
-  transform: translateX(-50%);
+  width: 78px;
+  max-height: calc(100% - 128px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   pointer-events: auto;
+}
+
+.gesture-toolbar-left {
+  top: 14px;
+  left: 14px;
+}
+
+.gesture-toolbar-right {
+  top: 14px;
+  right: 14px;
+  width: 154px;
 }
 
 .gesture-panel {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 8px;
@@ -265,8 +276,8 @@ input {
 
 .gesture-tool {
   --hold: 0%;
-  min-width: 54px;
-  min-height: 48px;
+  min-width: 50px;
+  min-height: 44px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 8px;
   color: #ffffff;
@@ -278,10 +289,10 @@ input {
 }
 
 .gesture-tool.swatch {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  min-height: 48px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
 }
 
@@ -291,7 +302,7 @@ input {
 }
 
 .gesture-button.compact {
-  max-width: 132px;
+  width: 132px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -373,6 +384,87 @@ input {
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.24);
 }
 
+@media (max-height: 820px) and (min-width: 861px) {
+  .stage {
+    margin: 8px 12px;
+  }
+
+  .gesture-toolbar {
+    gap: 6px;
+    width: 66px;
+    max-height: calc(100% - 116px);
+  }
+
+  .gesture-toolbar-left,
+  .gesture-toolbar-right {
+    top: 10px;
+  }
+
+  .gesture-toolbar-left {
+    left: 10px;
+  }
+
+  .gesture-toolbar-right {
+    right: 10px;
+    width: 128px;
+  }
+
+  .gesture-panel {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .gesture-tool {
+    min-width: 42px;
+    min-height: 38px;
+    font-size: 13px;
+  }
+
+  .gesture-tool.swatch {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+  .gesture-button {
+    padding: 0 8px;
+  }
+
+  .gesture-button.compact {
+    width: 108px;
+  }
+
+  .ai-panel {
+    top: 222px;
+    right: 10px;
+    width: min(300px, calc(100% - 116px));
+    max-height: calc(100% - 236px);
+    overflow: auto;
+  }
+
+  .ai-prompt {
+    min-height: 58px;
+  }
+
+  .ai-result-wrap {
+    min-height: 110px;
+  }
+
+  .ai-result {
+    max-height: 170px;
+  }
+
+  .camera-preview {
+    width: min(160px, 22vw);
+  }
+
+  .hud {
+    left: 184px;
+    max-width: min(560px, calc(100% - 420px));
+  }
+}
+
 @media (max-width: 860px) {
   body {
     overflow: auto;
@@ -415,16 +507,32 @@ input {
   }
 
   .gesture-toolbar {
-    top: 12px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    flex-direction: row;
     align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .gesture-toolbar-left {
+    top: 12px;
+  }
+
+  .gesture-toolbar-right {
+    top: 90px;
   }
 
   .gesture-panel {
+    flex-direction: row;
     max-width: 100%;
     overflow-x: auto;
   }
 
   .camera-preview {
+    right: 14px;
+    left: auto;
     width: min(170px, 42vw);
   }
 }
@@ -475,7 +583,7 @@ input {
 .ai-panel {
   position: absolute;
   z-index: 4;
-  top: 92px;
+  top: 270px;
   right: 14px;
   width: min(360px, calc(100% - 28px));
   display: grid;
