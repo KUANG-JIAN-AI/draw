@@ -65,7 +65,10 @@ const getLanguage = window.getLanguage;
   let hoverActivated = false;
   let aiGenerating = false;
 
-  const socket = window.io();
+  const socket = window.io({
+    transports: ["websocket"],
+    upgrade: false,
+  });
   const actionHistory = [];
   let roomController = null;
   const canvas = createCanvasController({
