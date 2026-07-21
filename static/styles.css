@@ -583,7 +583,7 @@ input {
 .ai-panel {
   position: absolute;
   z-index: 4;
-  /* top: 270px; */
+  top: 270px;
   right: 14px;
   width: min(360px, calc(100% - 28px));
   display: grid;
