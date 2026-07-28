@@ -201,7 +201,7 @@ input {
   position: absolute;
   z-index: 4;
   left: 14px;
-  bottom: 14px;
+  top: min(438px, calc(100% - 150px));
   width: min(220px, 28vw);
   aspect-ratio: 16 / 9;
   overflow: hidden;
@@ -254,12 +254,39 @@ input {
 .gesture-toolbar-left {
   top: 14px;
   left: 14px;
+  width: 154px;
 }
 
 .gesture-toolbar-right {
   top: 14px;
   right: 14px;
+  width: 124px;
+}
+
+.drawing-gesture-toolbar {
+  top: 240px;
+  right: 14px;
+  max-height: calc(100% - 254px);
+}
+
+.ai-gesture-toolbar {
+  right: 14px;
   width: 154px;
+}
+
+.drawing-gesture-toolbar .gesture-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(44px, 1fr));
+}
+
+.drawing-gesture-toolbar .gesture-tool {
+  width: 100%;
+  min-width: 0;
+}
+
+.drawing-gesture-toolbar .gesture-tool.swatch {
+  width: 44px;
+  justify-self: center;
 }
 
 .gesture-panel {
@@ -402,9 +429,21 @@ input {
 
   .gesture-toolbar-left {
     left: 10px;
+    width: 128px;
   }
 
   .gesture-toolbar-right {
+    right: 10px;
+    width: 108px;
+  }
+
+  .drawing-gesture-toolbar {
+    top: 204px;
+    right: 10px;
+    max-height: calc(100% - 214px);
+  }
+
+  .ai-gesture-toolbar {
     right: 10px;
     width: 128px;
   }
@@ -427,6 +466,14 @@ input {
     min-height: 38px;
   }
 
+  .drawing-gesture-toolbar .gesture-panel {
+    grid-template-columns: repeat(2, minmax(38px, 1fr));
+  }
+
+  .drawing-gesture-toolbar .gesture-tool.swatch {
+    width: 38px;
+  }
+
   .gesture-button {
     padding: 0 8px;
   }
@@ -435,11 +482,12 @@ input {
     width: 108px;
   }
 
-  .ai-panel {
-    top: 222px;
-    right: 10px;
+  .stage .ai-panel {
+    top: 10px;
+    right: auto;
+    left: 10px;
     width: min(300px, calc(100% - 116px));
-    max-height: calc(100% - 236px);
+    max-height: calc(100% - 190px);
     overflow: auto;
   }
 
@@ -524,10 +572,29 @@ input {
     top: 90px;
   }
 
+  .ai-gesture-toolbar {
+    top: 12px;
+  }
+
+  .drawing-gesture-toolbar,
+  .ai-gesture-toolbar {
+    right: 10px;
+    width: auto;
+  }
+
   .gesture-panel {
     flex-direction: row;
     max-width: 100%;
     overflow-x: auto;
+  }
+
+  .drawing-gesture-toolbar .gesture-panel {
+    display: flex;
+  }
+
+  .drawing-gesture-toolbar .gesture-tool {
+    width: auto;
+    min-width: 50px;
   }
 
   .camera-preview {
@@ -583,9 +650,11 @@ input {
 .ai-panel {
   position: absolute;
   z-index: 4;
-  top: 270px;
-  right: 14px;
+  top: 14px;
+  left: 14px;
   width: min(360px, calc(100% - 28px));
+  max-height: calc(100% - 190px);
+  overflow: auto;
   display: grid;
   gap: 10px;
   padding: 12px;

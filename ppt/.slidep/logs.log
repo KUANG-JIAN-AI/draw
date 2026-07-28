@@ -1,0 +1,1290 @@
+=== boot pid=82177 ts=2026-07-28 13:57:20.987 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-start --project /Users/kyo/Projects/python/draw/ppt --filename 隔空手势画板.pptx ===
+[2026-07-28 13:57:20.986] [INFO ] [pid=82177] [start] invoked pid=82177 cwd=/Users/kyo/Projects/python/draw/ppt daemonChild=no dev=no argv=[--project /Users/kyo/Projects/python/draw/ppt --filename 隔空手势画板.pptx]
+[2026-07-28 13:57:20.987] [INFO ] [pid=82177] [start] spawning daemon projectDir=/Users/kyo/Projects/python/draw/ppt filename=隔空手势画板.pptx
+[2026-07-28 13:57:20.989] [INFO ] [pid=82177] [start] daemon spawned childPid=82179; waiting started ipc
+=== boot pid=82179 ts=2026-07-28 13:57:21.694 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-start --project /Users/kyo/Projects/python/draw/ppt --filename 隔空手势画板.pptx --__daemon-child ===
+[2026-07-28 13:57:21.693] [INFO ] [pid=82179] [start] invoked pid=82179 cwd=/Users/kyo/Projects/python/draw/ppt daemonChild=yes dev=no argv=[--project /Users/kyo/Projects/python/draw/ppt --filename 隔空手势画板.pptx --__daemon-child]
+[2026-07-28 13:57:21.694] [INFO ] [pid=82179] [start] daemon child runWorker ppid=82177
+[2026-07-28 13:57:21.694] [INFO ] [pid=82179] [worker] start projectDir=/Users/kyo/Projects/python/draw/ppt filename=隔空手势画板.pptx version=5.4.1
+[2026-07-28 13:57:21.694] [INFO ] [pid=82179] [worker] init ok dirs=ready
+[2026-07-28 13:57:21.694] [INFO ] [pid=82179] [server-url] env TENCENT_DOCS_LOCAL_MCP = http://127.0.0.1:39100/mcp
+[2026-07-28 13:57:21.695] [INFO ] [pid=82179] [worker] openFile start
+[2026-07-28 13:57:21.695] [INFO ] [pid=82179] [open-file] copy blank.pptx start src=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/lib/node_modules/@tencent/slidep/dist/resources/pptx/blank.pptx dest=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:57:21.696] [INFO ] [pid=82179] [open-file] copy blank.pptx ok dest=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=1
+[2026-07-28 13:57:21.711] [ERROR] [pid=82179] [http] editorStatus http 404 url=http://127.0.0.1:39100/api/editor/status body={"code":-1,"message":"no editor open for file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx"} ms=15
+[2026-07-28 13:57:21.711] [INFO ] [pid=82179] [open-file] open send url=http://127.0.0.1:39100/localapi/open filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:57:21.713] [INFO ] [pid=82179] [open-file] open ok fileId=B80C9E35 fileType=slide filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=2
+[2026-07-28 13:57:21.713] [INFO ] [pid=82179] [worker] openFile ok fileId=B80C9E35 filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:57:21.714] [INFO ] [pid=82179] [worker] previewUrl=http://127.0.0.1:39100/static/slide/pc.html?local_edit=1&client=sdk_local&localFilePath=%2FUsers%2Fkyo%2FProjects%2Fpython%2Fdraw%2Fppt%2F%E9%9A%94%E7%A9%BA%E6%89%8B%E5%8A%BF%E7%94%BB%E6%9D%BF.pptx
+[2026-07-28 13:57:21.714] [INFO ] [pid=82179] [state] state.json not found, creating path=/Users/kyo/Projects/python/draw/ppt/.slidep/state.json filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:57:21.714] [INFO ] [pid=82179] [worker] commitEndpoint=http://127.0.0.1:39100/localapi/commitrevision
+[2026-07-28 13:57:21.715] [INFO ] [pid=82179] [mcp] mcp:slide_get_info send url=http://127.0.0.1:39100/mcp args={"file_id":"B80C9E35-3B9A-4FE1-8968-1AE692056A42"}
+[2026-07-28 13:57:21.716] [INFO ] [pid=82179] [mcp] mcp:slide_get_info ok ms=1
+[2026-07-28 13:57:21.716] [INFO ] [pid=82179] [purge] purge start backendSlideCount=0
+[2026-07-28 13:57:21.716] [INFO ] [pid=82179] [purge] purge ok removed=0 ms=2
+[2026-07-28 13:57:21.716] [INFO ] [pid=82179] [worker] initial sync submitted pages=0
+[2026-07-28 13:57:21.716] [INFO ] [pid=82179] [sync] submit nextRound=1 dirty=<none> pendingDirtySize=0 merged=no
+[2026-07-28 13:57:21.716] [INFO ] [pid=82179] [sync] drain start round=1 pendingDirtySize=0
+[2026-07-28 13:57:21.716] [INFO ] [pid=82179] [sync] aligned round=1 attempt=1 size=0 desired=0 pendingDirtySize=0
+[2026-07-28 13:57:21.717] [INFO ] [pid=82179] [worker] ready fileId=B80C9E35 backendUrl=http://127.0.0.1:39100 initialPages=0 ms=23
+[2026-07-28 13:57:21.717] [INFO ] [pid=82179] [sync] reconcile ok round=1 attempt=1 ms=1
+[2026-07-28 13:57:21.717] [INFO ] [pid=82179] [sync] drain end round=1 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=1
+[2026-07-28 13:57:21.718] [INFO ] [pid=82177] [start] daemon started childPid=82179 ms=731
+[2026-07-28 13:57:21.718] [INFO ] [pid=82179] [watcher] ready dir=/Users/kyo/Projects/python/draw/ppt/pages
+[2026-07-28 13:58:19.887] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_01_cover.jsx
+[2026-07-28 13:58:20.389] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_01_cover] size=1
+[2026-07-28 13:58:20.389] [INFO ] [pid=82179] [sync] submit nextRound=2 dirty=slide_01_cover pendingDirtySize=1 merged=no
+[2026-07-28 13:58:20.390] [INFO ] [pid=82179] [sync] drain start round=2 pendingDirtySize=1
+[2026-07-28 13:58:20.390] [INFO ] [pid=82179] [sync] step=add round=2 attempt=1 pageId=slide_01_cover index=0
+[2026-07-28 13:58:20.390] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_01_cover index=0
+[2026-07-28 13:58:20.390] [INFO ] [pid=82179] [render] start pageId=slide_01_cover file=/Users/kyo/Projects/python/draw/ppt/pages/slide_01_cover.jsx replacements=0
+[2026-07-28 13:58:20.640] [INFO ] [pid=82179] [render] ok pageId=slide_01_cover slides=1 imageReplaced=0 ms=250
+[2026-07-28 13:58:20.640] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01y8uq4p': {
+      id: 'rel:01y8uq4p',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/4f542e82c0a0274de51505f24457f5b6.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 13:58:20.648] [INFO ] [pid=82179] [commit] commit send pageId=59a7a7 targetIndex=0 version=1 baseVersion=0 revisionBytes=2160076
+[2026-07-28 13:58:20.675] [INFO ] [pid=82179] [commit] commit ok pageId=59a7a7 revisionId=1ba1752c ms=27
+[2026-07-28 13:58:20.675] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_01_cover slideId=59a7a7 index=0 version=1 baseVersion=0 revisionId=1ba1752c code=0 images=[local=1 remote=0 cached=0 failed=0] ms=285
+[2026-07-28 13:58:20.676] [INFO ] [pid=82179] [sync] aligned round=2 attempt=1 size=1 desired=1 pendingDirtySize=0
+[2026-07-28 13:58:20.676] [INFO ] [pid=82179] [sync] reconcile ok round=2 attempt=1 ms=286
+[2026-07-28 13:58:20.676] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:58:20.676] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:58:20.683] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=6
+[2026-07-28 13:58:20.683] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=7
+[2026-07-28 13:58:20.683] [INFO ] [pid=82179] [sync] drain end round=2 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=293
+[2026-07-28 13:58:31.228] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_02_catalog.jsx
+[2026-07-28 13:58:31.730] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_02_catalog] size=1
+[2026-07-28 13:58:31.731] [INFO ] [pid=82179] [sync] submit nextRound=3 dirty=slide_02_catalog pendingDirtySize=1 merged=no
+[2026-07-28 13:58:31.731] [INFO ] [pid=82179] [sync] drain start round=3 pendingDirtySize=1
+[2026-07-28 13:58:31.731] [INFO ] [pid=82179] [sync] step=add round=3 attempt=1 pageId=slide_02_catalog index=1
+[2026-07-28 13:58:31.731] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_02_catalog index=1
+[2026-07-28 13:58:31.731] [INFO ] [pid=82179] [render] start pageId=slide_02_catalog file=/Users/kyo/Projects/python/draw/ppt/pages/slide_02_catalog.jsx replacements=0
+[2026-07-28 13:58:31.826] [INFO ] [pid=82179] [render] ok pageId=slide_02_catalog slides=1 imageReplaced=0 ms=95
+[2026-07-28 13:58:31.826] [INFO ] [pid=82179] [render] renderSlideData result.resources={ images: {}, videos: {}, audios: {}, fonts: {} }
+[2026-07-28 13:58:31.831] [INFO ] [pid=82179] [commit] commit send pageId=c4830b targetIndex=1 version=2 baseVersion=1 revisionBytes=19112
+[2026-07-28 13:58:31.834] [INFO ] [pid=82179] [commit] commit ok pageId=c4830b revisionId=60dc8d66 ms=3
+[2026-07-28 13:58:31.835] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_02_catalog slideId=c4830b index=1 version=2 baseVersion=1 revisionId=60dc8d66 code=0 images=[local=0 remote=0 cached=0 failed=0] ms=104
+[2026-07-28 13:58:31.835] [INFO ] [pid=82179] [sync] aligned round=3 attempt=1 size=2 desired=2 pendingDirtySize=0
+[2026-07-28 13:58:31.835] [INFO ] [pid=82179] [sync] reconcile ok round=3 attempt=1 ms=104
+[2026-07-28 13:58:31.835] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:58:31.835] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:58:31.844] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=9
+[2026-07-28 13:58:31.844] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=9
+[2026-07-28 13:58:31.844] [INFO ] [pid=82179] [sync] drain end round=3 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=113
+[2026-07-28 13:58:44.960] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_03_position.jsx
+[2026-07-28 13:58:45.463] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_03_position] size=1
+[2026-07-28 13:58:45.463] [INFO ] [pid=82179] [sync] submit nextRound=4 dirty=slide_03_position pendingDirtySize=1 merged=no
+[2026-07-28 13:58:45.463] [INFO ] [pid=82179] [sync] drain start round=4 pendingDirtySize=1
+[2026-07-28 13:58:45.463] [INFO ] [pid=82179] [sync] step=add round=4 attempt=1 pageId=slide_03_position index=2
+[2026-07-28 13:58:45.463] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_03_position index=2
+[2026-07-28 13:58:45.464] [INFO ] [pid=82179] [render] start pageId=slide_03_position file=/Users/kyo/Projects/python/draw/ppt/pages/slide_03_position.jsx replacements=0
+[2026-07-28 13:58:45.581] [INFO ] [pid=82179] [render] ok pageId=slide_03_position slides=1 imageReplaced=0 ms=117
+[2026-07-28 13:58:45.581] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00lkvnlz': {
+      id: 'rel:00lkvnlz',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/518ce1226e9dff6d12a2500d84e0a8ac.svg'
+    },
+    'rel:00yrq8nf': {
+      id: 'rel:00yrq8nf',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/ce3bc8c862f8a4c954ce55e79f436def.svg'
+    },
+    'rel:01i8y6y8': {
+      id: 'rel:01i8y6y8',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/e5df649f23bc19d983e25ba67badd5bb.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 13:58:45.587] [INFO ] [pid=82179] [commit] commit send pageId=81c520 targetIndex=2 version=3 baseVersion=2 revisionBytes=26496
+[2026-07-28 13:58:45.593] [INFO ] [pid=82179] [commit] commit ok pageId=81c520 revisionId=ea78ed83 ms=5
+[2026-07-28 13:58:45.593] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_03_position slideId=81c520 index=2 version=3 baseVersion=2 revisionId=ea78ed83 code=0 images=[local=3 remote=0 cached=0 failed=0] ms=130
+[2026-07-28 13:58:45.593] [INFO ] [pid=82179] [sync] aligned round=4 attempt=1 size=3 desired=3 pendingDirtySize=0
+[2026-07-28 13:58:45.594] [INFO ] [pid=82179] [sync] reconcile ok round=4 attempt=1 ms=131
+[2026-07-28 13:58:45.594] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:58:45.594] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:58:45.606] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=11
+[2026-07-28 13:58:45.606] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=12
+[2026-07-28 13:58:45.606] [INFO ] [pid=82179] [sync] drain end round=4 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=143
+[2026-07-28 13:58:58.192] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_04_gesture.jsx
+[2026-07-28 13:58:58.694] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_04_gesture] size=1
+[2026-07-28 13:58:58.694] [INFO ] [pid=82179] [sync] submit nextRound=5 dirty=slide_04_gesture pendingDirtySize=1 merged=no
+[2026-07-28 13:58:58.694] [INFO ] [pid=82179] [sync] drain start round=5 pendingDirtySize=1
+[2026-07-28 13:58:58.694] [INFO ] [pid=82179] [sync] step=add round=5 attempt=1 pageId=slide_04_gesture index=3
+[2026-07-28 13:58:58.694] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_04_gesture index=3
+[2026-07-28 13:58:58.695] [INFO ] [pid=82179] [render] start pageId=slide_04_gesture file=/Users/kyo/Projects/python/draw/ppt/pages/slide_04_gesture.jsx replacements=0
+[2026-07-28 13:58:58.783] [INFO ] [pid=82179] [render] ok pageId=slide_04_gesture slides=1 imageReplaced=0 ms=88
+[2026-07-28 13:58:58.783] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00y5iz2s': {
+      id: 'rel:00y5iz2s',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/7f41abdc8ec069cbf1fa86d9f3888d3b.svg'
+    },
+    'rel:002zrqbp': {
+      id: 'rel:002zrqbp',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/4e04eb8df5a7721eab994b2d0b463f55.svg'
+    },
+    'rel:01urq3t0': {
+      id: 'rel:01urq3t0',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/428796d26355c528335a3b4a770793d7.svg'
+    },
+    'rel:006j88vx': {
+      id: 'rel:006j88vx',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/00d3a2c76e9ef8147be626bbe861cf63.svg'
+    },
+    'rel:00w7oi7k': {
+      id: 'rel:00w7oi7k',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/480807c1ab57bf0c215d253875cfd9ec.svg'
+    },
+    'rel:00k7eacf': {
+      id: 'rel:00k7eacf',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/29c88453e6c9498fc9d2d7218f757fe8.svg'
+    },
+    'rel:01lxay42': {
+      id: 'rel:01lxay42',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/a13500bc11725f46e04e0e3db09d2789.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 13:58:58.789] [INFO ] [pid=82179] [commit] commit send pageId=fd98a9 targetIndex=3 version=4 baseVersion=3 revisionBytes=1884816
+[2026-07-28 13:58:58.813] [INFO ] [pid=82179] [commit] commit ok pageId=fd98a9 revisionId=695ec131 ms=22
+[2026-07-28 13:58:58.813] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_04_gesture slideId=fd98a9 index=3 version=4 baseVersion=3 revisionId=695ec131 code=0 images=[local=7 remote=0 cached=0 failed=0] ms=119
+[2026-07-28 13:58:58.813] [INFO ] [pid=82179] [sync] aligned round=5 attempt=1 size=4 desired=4 pendingDirtySize=0
+[2026-07-28 13:58:58.813] [INFO ] [pid=82179] [sync] reconcile ok round=5 attempt=1 ms=119
+[2026-07-28 13:58:58.814] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:58:58.814] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:58:58.830] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=16
+[2026-07-28 13:58:58.830] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=16
+[2026-07-28 13:58:58.831] [INFO ] [pid=82179] [sync] drain end round=5 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=137
+[2026-07-28 13:59:18.285] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_05_principle.jsx
+[2026-07-28 13:59:18.787] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_05_principle] size=1
+[2026-07-28 13:59:18.787] [INFO ] [pid=82179] [sync] submit nextRound=6 dirty=slide_05_principle pendingDirtySize=1 merged=no
+[2026-07-28 13:59:18.787] [INFO ] [pid=82179] [sync] drain start round=6 pendingDirtySize=1
+[2026-07-28 13:59:18.788] [INFO ] [pid=82179] [sync] step=add round=6 attempt=1 pageId=slide_05_principle index=4
+[2026-07-28 13:59:18.788] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_05_principle index=4
+[2026-07-28 13:59:18.788] [INFO ] [pid=82179] [render] start pageId=slide_05_principle file=/Users/kyo/Projects/python/draw/ppt/pages/slide_05_principle.jsx replacements=0
+[2026-07-28 13:59:18.847] [INFO ] [pid=82179] [render] ok pageId=slide_05_principle slides=1 imageReplaced=0 ms=59
+[2026-07-28 13:59:18.847] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00dx29a9': {
+      id: 'rel:00dx29a9',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/0f901959e4d79a4b2ed25c2331dd0c48.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 13:59:18.851] [INFO ] [pid=82179] [commit] commit send pageId=98d87a targetIndex=4 version=5 baseVersion=4 revisionBytes=35036
+[2026-07-28 13:59:18.854] [INFO ] [pid=82179] [commit] commit ok pageId=98d87a revisionId=6d507a30 ms=3
+[2026-07-28 13:59:18.855] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_05_principle slideId=98d87a index=4 version=5 baseVersion=4 revisionId=6d507a30 code=0 images=[local=1 remote=0 cached=0 failed=0] ms=67
+[2026-07-28 13:59:18.855] [INFO ] [pid=82179] [sync] aligned round=6 attempt=1 size=5 desired=5 pendingDirtySize=0
+[2026-07-28 13:59:18.855] [INFO ] [pid=82179] [sync] reconcile ok round=6 attempt=1 ms=67
+[2026-07-28 13:59:18.855] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:59:18.855] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:59:18.869] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=14
+[2026-07-28 13:59:18.869] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=14
+[2026-07-28 13:59:18.869] [INFO ] [pid=82179] [sync] drain end round=6 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=82
+[2026-07-28 13:59:30.666] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_06_collab.jsx
+[2026-07-28 13:59:31.168] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_06_collab] size=1
+[2026-07-28 13:59:31.168] [INFO ] [pid=82179] [sync] submit nextRound=7 dirty=slide_06_collab pendingDirtySize=1 merged=no
+[2026-07-28 13:59:31.168] [INFO ] [pid=82179] [sync] drain start round=7 pendingDirtySize=1
+[2026-07-28 13:59:31.168] [INFO ] [pid=82179] [sync] step=add round=7 attempt=1 pageId=slide_06_collab index=5
+[2026-07-28 13:59:31.168] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_06_collab index=5
+[2026-07-28 13:59:31.168] [INFO ] [pid=82179] [render] start pageId=slide_06_collab file=/Users/kyo/Projects/python/draw/ppt/pages/slide_06_collab.jsx replacements=0
+[2026-07-28 13:59:31.263] [INFO ] [pid=82179] [render] ok pageId=slide_06_collab slides=1 imageReplaced=0 ms=95
+[2026-07-28 13:59:31.263] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:002ihd3a': {
+      id: 'rel:002ihd3a',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/71f6d824f8d32da3deb9e5746ed2e9ee.svg'
+    },
+    'rel:015htuc2': {
+      id: 'rel:015htuc2',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/1a54dcc6b32b9e0cf1d4dc9df23cee27.svg'
+    },
+    'rel:01ji5q1q': {
+      id: 'rel:01ji5q1q',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/97755bd10e3909cef1211fc6c78c24bf.svg'
+    },
+    'rel:01uaglj2': {
+      id: 'rel:01uaglj2',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/fb702da488239dd4bc16b154b3ceb267.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 13:59:31.269] [INFO ] [pid=82179] [commit] commit send pageId=6cd451 targetIndex=5 version=6 baseVersion=5 revisionBytes=1913656
+[2026-07-28 13:59:31.293] [INFO ] [pid=82179] [commit] commit ok pageId=6cd451 revisionId=5f692d41 ms=24
+[2026-07-28 13:59:31.293] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_06_collab slideId=6cd451 index=5 version=6 baseVersion=5 revisionId=5f692d41 code=0 images=[local=4 remote=0 cached=0 failed=0] ms=125
+[2026-07-28 13:59:31.293] [INFO ] [pid=82179] [sync] aligned round=7 attempt=1 size=6 desired=6 pendingDirtySize=0
+[2026-07-28 13:59:31.293] [INFO ] [pid=82179] [sync] reconcile ok round=7 attempt=1 ms=125
+[2026-07-28 13:59:31.293] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:59:31.293] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:59:31.314] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=21
+[2026-07-28 13:59:31.315] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=22
+[2026-07-28 13:59:31.315] [INFO ] [pid=82179] [sync] drain end round=7 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=147
+[2026-07-28 13:59:48.946] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_07_sync.jsx
+[2026-07-28 13:59:49.448] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_07_sync] size=1
+[2026-07-28 13:59:49.448] [INFO ] [pid=82179] [sync] submit nextRound=8 dirty=slide_07_sync pendingDirtySize=1 merged=no
+[2026-07-28 13:59:49.448] [INFO ] [pid=82179] [sync] drain start round=8 pendingDirtySize=1
+[2026-07-28 13:59:49.448] [INFO ] [pid=82179] [sync] step=add round=8 attempt=1 pageId=slide_07_sync index=6
+[2026-07-28 13:59:49.448] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_07_sync index=6
+[2026-07-28 13:59:49.448] [INFO ] [pid=82179] [render] start pageId=slide_07_sync file=/Users/kyo/Projects/python/draw/ppt/pages/slide_07_sync.jsx replacements=0
+[2026-07-28 13:59:49.505] [INFO ] [pid=82179] [render] ok pageId=slide_07_sync slides=1 imageReplaced=0 ms=57
+[2026-07-28 13:59:49.505] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00cr3sbi': {
+      id: 'rel:00cr3sbi',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/1dc61aa15cbc539e05351c96f9f78c4c.svg'
+    },
+    'rel:01jf8jtb': {
+      id: 'rel:01jf8jtb',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/c779cb48d935d0af2d414f1385aeeb57.svg'
+    },
+    'rel:01kxl1ox': {
+      id: 'rel:01kxl1ox',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/b0bb95f2ee968c8635255a243c9698e0.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 13:59:49.508] [INFO ] [pid=82179] [commit] commit send pageId=01f466 targetIndex=6 version=7 baseVersion=6 revisionBytes=28736
+[2026-07-28 13:59:49.511] [INFO ] [pid=82179] [commit] commit ok pageId=01f466 revisionId=a8835f85 ms=2
+[2026-07-28 13:59:49.511] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_07_sync slideId=01f466 index=6 version=7 baseVersion=6 revisionId=a8835f85 code=0 images=[local=3 remote=0 cached=0 failed=0] ms=63
+[2026-07-28 13:59:49.511] [INFO ] [pid=82179] [sync] aligned round=8 attempt=1 size=7 desired=7 pendingDirtySize=0
+[2026-07-28 13:59:49.511] [INFO ] [pid=82179] [sync] reconcile ok round=8 attempt=1 ms=63
+[2026-07-28 13:59:49.511] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:59:49.511] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 13:59:49.530] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=19
+[2026-07-28 13:59:49.530] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=19
+[2026-07-28 13:59:49.530] [INFO ] [pid=82179] [sync] drain end round=8 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=82
+[2026-07-28 14:00:02.592] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_08_ai.jsx
+[2026-07-28 14:00:03.093] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_08_ai] size=1
+[2026-07-28 14:00:03.093] [INFO ] [pid=82179] [sync] submit nextRound=9 dirty=slide_08_ai pendingDirtySize=1 merged=no
+[2026-07-28 14:00:03.093] [INFO ] [pid=82179] [sync] drain start round=9 pendingDirtySize=1
+[2026-07-28 14:00:03.094] [INFO ] [pid=82179] [sync] step=add round=9 attempt=1 pageId=slide_08_ai index=7
+[2026-07-28 14:00:03.094] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_08_ai index=7
+[2026-07-28 14:00:03.094] [INFO ] [pid=82179] [render] start pageId=slide_08_ai file=/Users/kyo/Projects/python/draw/ppt/pages/slide_08_ai.jsx replacements=0
+[2026-07-28 14:00:03.175] [INFO ] [pid=82179] [render] ok pageId=slide_08_ai slides=1 imageReplaced=0 ms=81
+[2026-07-28 14:00:03.175] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:003xiqyh': {
+      id: 'rel:003xiqyh',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/6240081e682741ab3bd496000dffbe02.svg'
+    },
+    'rel:00o41l8x': {
+      id: 'rel:00o41l8x',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/b085167464ccd7617ea585276d7c5c67.svg'
+    },
+    'rel:013raxng': {
+      id: 'rel:013raxng',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/f8f5be516d25c95b9512da062528ac2d.svg'
+    },
+    'rel:01qptk6x': {
+      id: 'rel:01qptk6x',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/8cf8bc32a38a89c4e9c6ac8bf8c707fe.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:00:03.180] [INFO ] [pid=82179] [commit] commit send pageId=d569e3 targetIndex=7 version=8 baseVersion=7 revisionBytes=2193020
+[2026-07-28 14:00:03.207] [INFO ] [pid=82179] [commit] commit ok pageId=d569e3 revisionId=8af1f1c9 ms=27
+[2026-07-28 14:00:03.207] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_08_ai slideId=d569e3 index=7 version=8 baseVersion=7 revisionId=8af1f1c9 code=0 images=[local=4 remote=0 cached=0 failed=0] ms=113
+[2026-07-28 14:00:03.208] [INFO ] [pid=82179] [sync] aligned round=9 attempt=1 size=8 desired=8 pendingDirtySize=0
+[2026-07-28 14:00:03.208] [INFO ] [pid=82179] [sync] reconcile ok round=9 attempt=1 ms=115
+[2026-07-28 14:00:03.208] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:00:03.208] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:00:03.235] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=26
+[2026-07-28 14:00:03.235] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=27
+[2026-07-28 14:00:03.235] [INFO ] [pid=82179] [sync] drain end round=9 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=142
+[2026-07-28 14:00:24.909] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_09_arch.jsx
+[2026-07-28 14:00:25.410] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_09_arch] size=1
+[2026-07-28 14:00:25.410] [INFO ] [pid=82179] [sync] submit nextRound=10 dirty=slide_09_arch pendingDirtySize=1 merged=no
+[2026-07-28 14:00:25.410] [INFO ] [pid=82179] [sync] drain start round=10 pendingDirtySize=1
+[2026-07-28 14:00:25.411] [INFO ] [pid=82179] [sync] step=add round=10 attempt=1 pageId=slide_09_arch index=8
+[2026-07-28 14:00:25.411] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_09_arch index=8
+[2026-07-28 14:00:25.411] [INFO ] [pid=82179] [render] start pageId=slide_09_arch file=/Users/kyo/Projects/python/draw/ppt/pages/slide_09_arch.jsx replacements=0
+[2026-07-28 14:00:25.452] [INFO ] [pid=82179] [render] ok pageId=slide_09_arch slides=1 imageReplaced=0 ms=41
+[2026-07-28 14:00:25.452] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:007d6y8q': {
+      id: 'rel:007d6y8q',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/d61a3eecf65991fe527ec5b34c13c545.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:00:25.455] [INFO ] [pid=82179] [commit] commit send pageId=4f1325 targetIndex=8 version=9 baseVersion=8 revisionBytes=25392
+[2026-07-28 14:00:25.458] [INFO ] [pid=82179] [commit] commit ok pageId=4f1325 revisionId=69663b4f ms=3
+[2026-07-28 14:00:25.459] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_09_arch slideId=4f1325 index=8 version=9 baseVersion=8 revisionId=69663b4f code=0 images=[local=1 remote=0 cached=0 failed=0] ms=48
+[2026-07-28 14:00:25.459] [INFO ] [pid=82179] [sync] aligned round=10 attempt=1 size=9 desired=9 pendingDirtySize=0
+[2026-07-28 14:00:25.459] [INFO ] [pid=82179] [sync] reconcile ok round=10 attempt=1 ms=49
+[2026-07-28 14:00:25.459] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:00:25.459] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:00:25.481] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=22
+[2026-07-28 14:00:25.481] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=22
+[2026-07-28 14:00:25.481] [INFO ] [pid=82179] [sync] drain end round=10 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=71
+[2026-07-28 14:00:40.288] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_10_deploy.jsx
+[2026-07-28 14:00:40.790] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_10_deploy] size=1
+[2026-07-28 14:00:40.790] [INFO ] [pid=82179] [sync] submit nextRound=11 dirty=slide_10_deploy pendingDirtySize=1 merged=no
+[2026-07-28 14:00:40.790] [INFO ] [pid=82179] [sync] drain start round=11 pendingDirtySize=1
+[2026-07-28 14:00:40.791] [INFO ] [pid=82179] [sync] step=add round=11 attempt=1 pageId=slide_10_deploy index=9
+[2026-07-28 14:00:40.791] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_10_deploy index=9
+[2026-07-28 14:00:40.791] [INFO ] [pid=82179] [render] start pageId=slide_10_deploy file=/Users/kyo/Projects/python/draw/ppt/pages/slide_10_deploy.jsx replacements=0
+[2026-07-28 14:00:40.876] [INFO ] [pid=82179] [render] ok pageId=slide_10_deploy slides=1 imageReplaced=0 ms=85
+[2026-07-28 14:00:40.876] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01orkhvi': {
+      id: 'rel:01orkhvi',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/feeebc7aaa847419ae73031f9d7edfc8.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:00:40.881] [INFO ] [pid=82179] [commit] commit send pageId=1f3b73 targetIndex=9 version=10 baseVersion=9 revisionBytes=26828
+[2026-07-28 14:00:40.889] [INFO ] [pid=82179] [commit] commit ok pageId=1f3b73 revisionId=52742c23 ms=7
+[2026-07-28 14:00:40.889] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_10_deploy slideId=1f3b73 index=9 version=10 baseVersion=9 revisionId=52742c23 code=0 images=[local=1 remote=0 cached=0 failed=0] ms=98
+[2026-07-28 14:00:40.889] [INFO ] [pid=82179] [sync] aligned round=11 attempt=1 size=10 desired=10 pendingDirtySize=0
+[2026-07-28 14:00:40.889] [INFO ] [pid=82179] [sync] reconcile ok round=11 attempt=1 ms=99
+[2026-07-28 14:00:40.889] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:00:40.889] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:00:40.926] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=35
+[2026-07-28 14:00:40.926] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=37
+[2026-07-28 14:00:40.926] [INFO ] [pid=82179] [sync] drain end round=11 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=136
+[2026-07-28 14:00:55.456] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_11_highlight.jsx
+[2026-07-28 14:00:55.956] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_11_highlight] size=1
+[2026-07-28 14:00:55.957] [INFO ] [pid=82179] [sync] submit nextRound=12 dirty=slide_11_highlight pendingDirtySize=1 merged=no
+[2026-07-28 14:00:55.957] [INFO ] [pid=82179] [sync] drain start round=12 pendingDirtySize=1
+[2026-07-28 14:00:55.958] [INFO ] [pid=82179] [sync] step=add round=12 attempt=1 pageId=slide_11_highlight index=10
+[2026-07-28 14:00:55.958] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_11_highlight index=10
+[2026-07-28 14:00:55.958] [INFO ] [pid=82179] [render] start pageId=slide_11_highlight file=/Users/kyo/Projects/python/draw/ppt/pages/slide_11_highlight.jsx replacements=0
+[2026-07-28 14:00:56.042] [INFO ] [pid=82179] [render] ok pageId=slide_11_highlight slides=1 imageReplaced=0 ms=84
+[2026-07-28 14:00:56.042] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01b6dz1g': {
+      id: 'rel:01b6dz1g',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/be43310b4e2b5642595ab9723db52366.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:00:56.045] [INFO ] [pid=82179] [commit] commit send pageId=bc5f19 targetIndex=10 version=11 baseVersion=10 revisionBytes=27924
+[2026-07-28 14:00:56.048] [INFO ] [pid=82179] [commit] commit ok pageId=bc5f19 revisionId=53980cbf ms=3
+[2026-07-28 14:00:56.049] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_11_highlight slideId=bc5f19 index=10 version=11 baseVersion=10 revisionId=53980cbf code=0 images=[local=1 remote=0 cached=0 failed=0] ms=91
+[2026-07-28 14:00:56.049] [INFO ] [pid=82179] [sync] aligned round=12 attempt=1 size=11 desired=11 pendingDirtySize=0
+[2026-07-28 14:00:56.049] [INFO ] [pid=82179] [sync] reconcile ok round=12 attempt=1 ms=92
+[2026-07-28 14:00:56.049] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:00:56.049] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:00:56.077] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=28
+[2026-07-28 14:00:56.077] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=28
+[2026-07-28 14:00:56.077] [INFO ] [pid=82179] [sync] drain end round=12 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=120
+[2026-07-28 14:01:08.512] [INFO ] [pid=82179] [watcher] event=add file=pages/slide_12_end.jsx
+[2026-07-28 14:01:09.013] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_12_end] size=1
+[2026-07-28 14:01:09.014] [INFO ] [pid=82179] [sync] submit nextRound=13 dirty=slide_12_end pendingDirtySize=1 merged=no
+[2026-07-28 14:01:09.014] [INFO ] [pid=82179] [sync] drain start round=13 pendingDirtySize=1
+[2026-07-28 14:01:09.014] [INFO ] [pid=82179] [sync] step=add round=13 attempt=1 pageId=slide_12_end index=11
+[2026-07-28 14:01:09.015] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_12_end index=11
+[2026-07-28 14:01:09.015] [INFO ] [pid=82179] [render] start pageId=slide_12_end file=/Users/kyo/Projects/python/draw/ppt/pages/slide_12_end.jsx replacements=0
+[2026-07-28 14:01:09.058] [INFO ] [pid=82179] [render] ok pageId=slide_12_end slides=1 imageReplaced=0 ms=43
+[2026-07-28 14:01:09.058] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00q1vtu1': {
+      id: 'rel:00q1vtu1',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/474f27f7cf5b3d07c9ac2389463c67db.svg'
+    },
+    'rel:008rbo2d': {
+      id: 'rel:008rbo2d',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/33250f9969afd107c3a68447b25c24f7.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:01:09.060] [INFO ] [pid=82179] [commit] commit send pageId=3d5149 targetIndex=11 version=12 baseVersion=11 revisionBytes=13004
+[2026-07-28 14:01:09.063] [INFO ] [pid=82179] [commit] commit ok pageId=3d5149 revisionId=16bedeee ms=2
+[2026-07-28 14:01:09.063] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_12_end slideId=3d5149 index=11 version=12 baseVersion=11 revisionId=16bedeee code=0 images=[local=2 remote=0 cached=0 failed=0] ms=48
+[2026-07-28 14:01:09.064] [INFO ] [pid=82179] [sync] aligned round=13 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:01:09.064] [INFO ] [pid=82179] [sync] reconcile ok round=13 attempt=1 ms=50
+[2026-07-28 14:01:09.064] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:01:09.064] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:01:09.091] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=27
+[2026-07-28 14:01:09.091] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=27
+[2026-07-28 14:01:09.091] [INFO ] [pid=82179] [sync] drain end round=13 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=77
+=== boot pid=82435 ts=2026-07-28 14:01:20.315 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_01_cover.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:20.314] [INFO ] [pid=82435] [validate] start file=pages/slide_01_cover.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:20.541] [INFO ] [pid=82435] [validate] ok slideId=slide_01_cover status=ready totalResources=0 done=0 pending=0 ms=227
+=== boot pid=82439 ts=2026-07-28 14:01:21.156 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_02_catalog.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:21.155] [INFO ] [pid=82439] [validate] start file=pages/slide_02_catalog.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:21.385] [INFO ] [pid=82439] [validate] ok slideId=slide_02_catalog status=ready totalResources=0 done=0 pending=0 ms=230
+=== boot pid=82443 ts=2026-07-28 14:01:21.999 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_03_position.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:21.998] [INFO ] [pid=82443] [validate] start file=pages/slide_03_position.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:22.267] [INFO ] [pid=82443] [validate] ok slideId=slide_03_position status=ready totalResources=0 done=0 pending=0 ms=269
+=== boot pid=82447 ts=2026-07-28 14:01:22.874 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_04_gesture.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:22.873] [INFO ] [pid=82447] [validate] start file=pages/slide_04_gesture.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:23.199] [INFO ] [pid=82447] [validate] ok slideId=slide_04_gesture status=ready totalResources=0 done=0 pending=0 ms=326
+=== boot pid=82451 ts=2026-07-28 14:01:23.812 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_05_principle.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:23.811] [INFO ] [pid=82451] [validate] start file=pages/slide_05_principle.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:24.056] [INFO ] [pid=82451] [validate] ok slideId=slide_05_principle status=ready totalResources=0 done=0 pending=0 ms=245
+=== boot pid=82454 ts=2026-07-28 14:01:24.683 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_06_collab.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:24.683] [INFO ] [pid=82454] [validate] start file=pages/slide_06_collab.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:25.009] [INFO ] [pid=82454] [validate] ok slideId=slide_06_collab status=ready totalResources=0 done=0 pending=0 ms=326
+=== boot pid=82458 ts=2026-07-28 14:01:25.634 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_07_sync.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:25.634] [INFO ] [pid=82458] [validate] start file=pages/slide_07_sync.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:25.895] [INFO ] [pid=82458] [validate] ok slideId=slide_07_sync status=ready totalResources=0 done=0 pending=0 ms=261
+=== boot pid=82462 ts=2026-07-28 14:01:26.514 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_08_ai.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:26.513] [INFO ] [pid=82462] [validate] start file=pages/slide_08_ai.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:26.843] [INFO ] [pid=82462] [validate] ok slideId=slide_08_ai status=ready totalResources=0 done=0 pending=0 ms=330
+=== boot pid=82466 ts=2026-07-28 14:01:27.463 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_09_arch.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:27.463] [INFO ] [pid=82466] [validate] start file=pages/slide_09_arch.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:27.697] [INFO ] [pid=82466] [validate] ok slideId=slide_09_arch status=ready totalResources=0 done=0 pending=0 ms=234
+=== boot pid=82470 ts=2026-07-28 14:01:28.310 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_10_deploy.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:28.310] [INFO ] [pid=82470] [validate] start file=pages/slide_10_deploy.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:28.596] [INFO ] [pid=82470] [validate] ok slideId=slide_10_deploy status=ready totalResources=0 done=0 pending=0 ms=286
+=== boot pid=82474 ts=2026-07-28 14:01:29.206 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_11_highlight.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:29.205] [INFO ] [pid=82474] [validate] start file=pages/slide_11_highlight.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:29.487] [INFO ] [pid=82474] [validate] ok slideId=slide_11_highlight status=ready totalResources=0 done=0 pending=0 ms=282
+=== boot pid=82481 ts=2026-07-28 14:01:30.111 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_12_end.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:01:30.110] [INFO ] [pid=82481] [validate] start file=pages/slide_12_end.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:01:30.317] [INFO ] [pid=82481] [validate] ok slideId=slide_12_end status=ready totalResources=0 done=0 pending=0 ms=207
+[2026-07-28 14:13:14.550] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_02_catalog.jsx
+[2026-07-28 14:13:14.551] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_05_principle.jsx
+[2026-07-28 14:13:14.551] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_06_collab.jsx
+[2026-07-28 14:13:14.552] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_03_position.jsx
+[2026-07-28 14:13:14.552] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_01_cover.jsx
+[2026-07-28 14:13:14.552] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_04_gesture.jsx
+[2026-07-28 14:13:15.052] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_02_catalog,slide_05_principle,slide_06_collab,slide_03_position,slide_01_cover,slide_04_gesture] size=6
+[2026-07-28 14:13:15.053] [INFO ] [pid=82179] [sync] submit nextRound=14 dirty=slide_02_catalog,slide_05_principle,slide_06_collab,slide_03_position,slide_01_cover,slide_04_gesture pendingDirtySize=6 merged=no
+[2026-07-28 14:13:15.053] [INFO ] [pid=82179] [sync] drain start round=14 pendingDirtySize=6
+[2026-07-28 14:13:15.054] [INFO ] [pid=82179] [sync] step=remove-dirty round=14 attempt=1 pageId=slide_01_cover index=0
+[2026-07-28 14:13:15.055] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=0
+[2026-07-28 14:13:15.066] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":0}
+[2026-07-28 14:13:15.071] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=5
+[2026-07-28 14:13:15.071] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=0 serverVersion=13 ms=16
+[2026-07-28 14:13:15.072] [INFO ] [pid=82179] [sync] step=remove-dirty round=14 attempt=1 pageId=slide_02_catalog index=0
+[2026-07-28 14:13:15.072] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=0
+[2026-07-28 14:13:15.074] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":0}
+[2026-07-28 14:13:15.077] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=3
+[2026-07-28 14:13:15.077] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=0 serverVersion=14 ms=5
+[2026-07-28 14:13:15.077] [INFO ] [pid=82179] [sync] step=remove-dirty round=14 attempt=1 pageId=slide_03_position index=0
+[2026-07-28 14:13:15.078] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=0
+[2026-07-28 14:13:15.079] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":0}
+[2026-07-28 14:13:15.080] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=1
+[2026-07-28 14:13:15.080] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=0 serverVersion=15 ms=2
+[2026-07-28 14:13:15.080] [INFO ] [pid=82179] [sync] step=remove-dirty round=14 attempt=1 pageId=slide_04_gesture index=0
+[2026-07-28 14:13:15.080] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=0
+[2026-07-28 14:13:15.081] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":0}
+[2026-07-28 14:13:15.083] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=2
+[2026-07-28 14:13:15.083] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=0 serverVersion=16 ms=3
+[2026-07-28 14:13:15.083] [INFO ] [pid=82179] [sync] step=remove-dirty round=14 attempt=1 pageId=slide_05_principle index=0
+[2026-07-28 14:13:15.083] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=0
+[2026-07-28 14:13:15.084] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":0}
+[2026-07-28 14:13:15.085] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=1
+[2026-07-28 14:13:15.085] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=0 serverVersion=17 ms=2
+[2026-07-28 14:13:15.086] [INFO ] [pid=82179] [sync] step=remove-dirty round=14 attempt=1 pageId=slide_06_collab index=0
+[2026-07-28 14:13:15.086] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=0
+[2026-07-28 14:13:15.087] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":0}
+[2026-07-28 14:13:15.089] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=2
+[2026-07-28 14:13:15.089] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=0 serverVersion=18 ms=3
+[2026-07-28 14:13:15.089] [INFO ] [pid=82179] [sync] step=add round=14 attempt=1 pageId=slide_01_cover index=0
+[2026-07-28 14:13:15.089] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_01_cover index=0
+[2026-07-28 14:13:15.089] [INFO ] [pid=82179] [render] start pageId=slide_01_cover file=/Users/kyo/Projects/python/draw/ppt/pages/slide_01_cover.jsx replacements=0
+[2026-07-28 14:13:15.126] [INFO ] [pid=82179] [render] ok pageId=slide_01_cover slides=1 imageReplaced=0 ms=37
+[2026-07-28 14:13:15.126] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01y8uq4p': {
+      id: 'rel:01y8uq4p',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/4f542e82c0a0274de51505f24457f5b6.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:13:15.133] [INFO ] [pid=82179] [commit] commit send pageId=80f873 targetIndex=0 version=13 baseVersion=18 revisionBytes=2160400
+[2026-07-28 14:13:15.172] [INFO ] [pid=82179] [commit] commit ok pageId=80f873 revisionId=04cd420c ms=39
+[2026-07-28 14:13:15.173] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_01_cover slideId=80f873 index=0 version=13 baseVersion=18 revisionId=04cd420c code=0 images=[local=1 remote=0 cached=0 failed=0] ms=84
+[2026-07-28 14:13:15.173] [INFO ] [pid=82179] [sync] step=add round=14 attempt=1 pageId=slide_02_catalog index=1
+[2026-07-28 14:13:15.173] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_02_catalog index=1
+[2026-07-28 14:13:15.173] [INFO ] [pid=82179] [render] start pageId=slide_02_catalog file=/Users/kyo/Projects/python/draw/ppt/pages/slide_02_catalog.jsx replacements=0
+[2026-07-28 14:13:15.220] [INFO ] [pid=82179] [render] ok pageId=slide_02_catalog slides=1 imageReplaced=0 ms=47
+[2026-07-28 14:13:15.220] [INFO ] [pid=82179] [render] renderSlideData result.resources={ images: {}, videos: {}, audios: {}, fonts: {} }
+[2026-07-28 14:13:15.224] [INFO ] [pid=82179] [commit] commit send pageId=9ed8ac targetIndex=1 version=14 baseVersion=19 revisionBytes=19376
+[2026-07-28 14:13:15.228] [INFO ] [pid=82179] [commit] commit ok pageId=9ed8ac revisionId=294b304a ms=4
+[2026-07-28 14:13:15.228] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_02_catalog slideId=9ed8ac index=1 version=14 baseVersion=19 revisionId=294b304a code=0 images=[local=0 remote=0 cached=0 failed=0] ms=55
+[2026-07-28 14:13:15.229] [INFO ] [pid=82179] [sync] step=add round=14 attempt=1 pageId=slide_03_position index=2
+[2026-07-28 14:13:15.229] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_03_position index=2
+[2026-07-28 14:13:15.229] [INFO ] [pid=82179] [render] start pageId=slide_03_position file=/Users/kyo/Projects/python/draw/ppt/pages/slide_03_position.jsx replacements=0
+[2026-07-28 14:13:15.280] [INFO ] [pid=82179] [render] ok pageId=slide_03_position slides=1 imageReplaced=0 ms=51
+[2026-07-28 14:13:15.280] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00lkvnlz': {
+      id: 'rel:00lkvnlz',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/518ce1226e9dff6d12a2500d84e0a8ac.svg'
+    },
+    'rel:00yrq8nf': {
+      id: 'rel:00yrq8nf',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/ce3bc8c862f8a4c954ce55e79f436def.svg'
+    },
+    'rel:01i8y6y8': {
+      id: 'rel:01i8y6y8',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/e5df649f23bc19d983e25ba67badd5bb.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:13:15.282] [INFO ] [pid=82179] [commit] commit send pageId=aeebf8 targetIndex=2 version=15 baseVersion=20 revisionBytes=26336
+[2026-07-28 14:13:15.285] [INFO ] [pid=82179] [commit] commit ok pageId=aeebf8 revisionId=9e2564c3 ms=2
+[2026-07-28 14:13:15.285] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_03_position slideId=aeebf8 index=2 version=15 baseVersion=20 revisionId=9e2564c3 code=0 images=[local=3 remote=0 cached=0 failed=0] ms=56
+[2026-07-28 14:13:15.285] [INFO ] [pid=82179] [sync] step=add round=14 attempt=1 pageId=slide_04_gesture index=3
+[2026-07-28 14:13:15.285] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_04_gesture index=3
+[2026-07-28 14:13:15.285] [INFO ] [pid=82179] [render] start pageId=slide_04_gesture file=/Users/kyo/Projects/python/draw/ppt/pages/slide_04_gesture.jsx replacements=0
+[2026-07-28 14:13:15.328] [INFO ] [pid=82179] [render] ok pageId=slide_04_gesture slides=1 imageReplaced=0 ms=43
+[2026-07-28 14:13:15.328] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00y5iz2s': {
+      id: 'rel:00y5iz2s',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/7f41abdc8ec069cbf1fa86d9f3888d3b.svg'
+    },
+    'rel:002zrqbp': {
+      id: 'rel:002zrqbp',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/4e04eb8df5a7721eab994b2d0b463f55.svg'
+    },
+    'rel:01urq3t0': {
+      id: 'rel:01urq3t0',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/428796d26355c528335a3b4a770793d7.svg'
+    },
+    'rel:006j88vx': {
+      id: 'rel:006j88vx',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/00d3a2c76e9ef8147be626bbe861cf63.svg'
+    },
+    'rel:00w7oi7k': {
+      id: 'rel:00w7oi7k',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/480807c1ab57bf0c215d253875cfd9ec.svg'
+    },
+    'rel:00k7eacf': {
+      id: 'rel:00k7eacf',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/29c88453e6c9498fc9d2d7218f757fe8.svg'
+    },
+    'rel:01lxay42': {
+      id: 'rel:01lxay42',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/a13500bc11725f46e04e0e3db09d2789.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:13:15.332] [INFO ] [pid=82179] [commit] commit send pageId=ab6167 targetIndex=3 version=16 baseVersion=21 revisionBytes=1884980
+[2026-07-28 14:13:15.356] [INFO ] [pid=82179] [commit] commit ok pageId=ab6167 revisionId=e1bdb788 ms=24
+[2026-07-28 14:13:15.357] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_04_gesture slideId=ab6167 index=3 version=16 baseVersion=21 revisionId=e1bdb788 code=0 images=[local=7 remote=0 cached=0 failed=0] ms=72
+[2026-07-28 14:13:15.357] [INFO ] [pid=82179] [sync] step=add round=14 attempt=1 pageId=slide_05_principle index=4
+[2026-07-28 14:13:15.357] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_05_principle index=4
+[2026-07-28 14:13:15.357] [INFO ] [pid=82179] [render] start pageId=slide_05_principle file=/Users/kyo/Projects/python/draw/ppt/pages/slide_05_principle.jsx replacements=0
+[2026-07-28 14:13:15.390] [INFO ] [pid=82179] [render] ok pageId=slide_05_principle slides=1 imageReplaced=0 ms=33
+[2026-07-28 14:13:15.391] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00dx29a9': {
+      id: 'rel:00dx29a9',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/0f901959e4d79a4b2ed25c2331dd0c48.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:13:15.393] [INFO ] [pid=82179] [commit] commit send pageId=faaf60 targetIndex=4 version=17 baseVersion=22 revisionBytes=34880
+[2026-07-28 14:13:15.395] [INFO ] [pid=82179] [commit] commit ok pageId=faaf60 revisionId=4e95110f ms=2
+[2026-07-28 14:13:15.396] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_05_principle slideId=faaf60 index=4 version=17 baseVersion=22 revisionId=4e95110f code=0 images=[local=1 remote=0 cached=0 failed=0] ms=39
+[2026-07-28 14:13:15.396] [INFO ] [pid=82179] [sync] step=add round=14 attempt=1 pageId=slide_06_collab index=5
+[2026-07-28 14:13:15.396] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_06_collab index=5
+[2026-07-28 14:13:15.396] [INFO ] [pid=82179] [render] start pageId=slide_06_collab file=/Users/kyo/Projects/python/draw/ppt/pages/slide_06_collab.jsx replacements=0
+[2026-07-28 14:13:15.450] [INFO ] [pid=82179] [render] ok pageId=slide_06_collab slides=1 imageReplaced=0 ms=54
+[2026-07-28 14:13:15.450] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:002ihd3a': {
+      id: 'rel:002ihd3a',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/71f6d824f8d32da3deb9e5746ed2e9ee.svg'
+    },
+    'rel:015htuc2': {
+      id: 'rel:015htuc2',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/1a54dcc6b32b9e0cf1d4dc9df23cee27.svg'
+    },
+    'rel:01ji5q1q': {
+      id: 'rel:01ji5q1q',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/97755bd10e3909cef1211fc6c78c24bf.svg'
+    },
+    'rel:01uaglj2': {
+      id: 'rel:01uaglj2',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/fb702da488239dd4bc16b154b3ceb267.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:13:15.455] [INFO ] [pid=82179] [commit] commit send pageId=5b848c targetIndex=5 version=18 baseVersion=23 revisionBytes=1913460
+[2026-07-28 14:13:15.478] [INFO ] [pid=82179] [commit] commit ok pageId=5b848c revisionId=ff7936d4 ms=23
+[2026-07-28 14:13:15.478] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_06_collab slideId=5b848c index=5 version=18 baseVersion=23 revisionId=ff7936d4 code=0 images=[local=4 remote=0 cached=0 failed=0] ms=82
+[2026-07-28 14:13:15.478] [INFO ] [pid=82179] [sync] aligned round=14 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:13:15.478] [INFO ] [pid=82179] [sync] reconcile ok round=14 attempt=1 ms=425
+[2026-07-28 14:13:15.478] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:13:15.478] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:13:15.507] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=29
+[2026-07-28 14:13:15.507] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=29
+[2026-07-28 14:13:15.507] [INFO ] [pid=82179] [sync] drain end round=14 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=454
+[2026-07-28 14:15:03.001] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_09_arch.jsx
+[2026-07-28 14:15:03.001] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_07_sync.jsx
+[2026-07-28 14:15:03.001] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_08_ai.jsx
+[2026-07-28 14:15:03.001] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_10_deploy.jsx
+[2026-07-28 14:15:03.001] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_12_end.jsx
+[2026-07-28 14:15:03.001] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_11_highlight.jsx
+[2026-07-28 14:15:03.501] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_09_arch,slide_07_sync,slide_08_ai,slide_10_deploy,slide_12_end,slide_11_highlight] size=6
+[2026-07-28 14:15:03.502] [INFO ] [pid=82179] [sync] submit nextRound=15 dirty=slide_09_arch,slide_07_sync,slide_08_ai,slide_10_deploy,slide_12_end,slide_11_highlight pendingDirtySize=6 merged=no
+[2026-07-28 14:15:03.502] [INFO ] [pid=82179] [sync] drain start round=15 pendingDirtySize=6
+[2026-07-28 14:15:03.502] [INFO ] [pid=82179] [sync] step=remove-dirty round=15 attempt=1 pageId=slide_07_sync index=6
+[2026-07-28 14:15:03.502] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=6
+[2026-07-28 14:15:03.504] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":6}
+[2026-07-28 14:15:03.505] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=1
+[2026-07-28 14:15:03.505] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=6 serverVersion=25 ms=3
+[2026-07-28 14:15:03.505] [INFO ] [pid=82179] [sync] step=remove-dirty round=15 attempt=1 pageId=slide_08_ai index=6
+[2026-07-28 14:15:03.505] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=6
+[2026-07-28 14:15:03.506] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":6}
+[2026-07-28 14:15:03.507] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=0
+[2026-07-28 14:15:03.507] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=6 serverVersion=26 ms=2
+[2026-07-28 14:15:03.507] [INFO ] [pid=82179] [sync] step=remove-dirty round=15 attempt=1 pageId=slide_09_arch index=6
+[2026-07-28 14:15:03.507] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=6
+[2026-07-28 14:15:03.507] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":6}
+[2026-07-28 14:15:03.508] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=0
+[2026-07-28 14:15:03.508] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=6 serverVersion=27 ms=1
+[2026-07-28 14:15:03.508] [INFO ] [pid=82179] [sync] step=remove-dirty round=15 attempt=1 pageId=slide_10_deploy index=6
+[2026-07-28 14:15:03.508] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=6
+[2026-07-28 14:15:03.509] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":6}
+[2026-07-28 14:15:03.511] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=2
+[2026-07-28 14:15:03.511] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=6 serverVersion=28 ms=3
+[2026-07-28 14:15:03.511] [INFO ] [pid=82179] [sync] step=remove-dirty round=15 attempt=1 pageId=slide_11_highlight index=6
+[2026-07-28 14:15:03.511] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=6
+[2026-07-28 14:15:03.512] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":6}
+[2026-07-28 14:15:03.512] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=0
+[2026-07-28 14:15:03.512] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=6 serverVersion=29 ms=1
+[2026-07-28 14:15:03.513] [INFO ] [pid=82179] [sync] step=remove-dirty round=15 attempt=1 pageId=slide_12_end index=6
+[2026-07-28 14:15:03.513] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=6
+[2026-07-28 14:15:03.513] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":6}
+[2026-07-28 14:15:03.514] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=0
+[2026-07-28 14:15:03.514] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=6 serverVersion=30 ms=1
+[2026-07-28 14:15:03.515] [INFO ] [pid=82179] [sync] step=add round=15 attempt=1 pageId=slide_07_sync index=6
+[2026-07-28 14:15:03.515] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_07_sync index=6
+[2026-07-28 14:15:03.515] [INFO ] [pid=82179] [render] start pageId=slide_07_sync file=/Users/kyo/Projects/python/draw/ppt/pages/slide_07_sync.jsx replacements=0
+[2026-07-28 14:15:03.559] [INFO ] [pid=82179] [render] ok pageId=slide_07_sync slides=1 imageReplaced=0 ms=44
+[2026-07-28 14:15:03.559] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:011rutes': {
+      id: 'rel:011rutes',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/e1fb5263ea55d081c97416f46c1a42b7.svg'
+    },
+    'rel:01jf8jtb': {
+      id: 'rel:01jf8jtb',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/c779cb48d935d0af2d414f1385aeeb57.svg'
+    },
+    'rel:01kxl1ox': {
+      id: 'rel:01kxl1ox',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/b0bb95f2ee968c8635255a243c9698e0.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:15:03.561] [INFO ] [pid=82179] [commit] commit send pageId=d9dd07 targetIndex=6 version=19 baseVersion=30 revisionBytes=28452
+[2026-07-28 14:15:03.563] [INFO ] [pid=82179] [commit] commit ok pageId=d9dd07 revisionId=da015071 ms=2
+[2026-07-28 14:15:03.563] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_07_sync slideId=d9dd07 index=6 version=19 baseVersion=30 revisionId=da015071 code=0 images=[local=3 remote=0 cached=0 failed=0] ms=48
+[2026-07-28 14:15:03.563] [INFO ] [pid=82179] [sync] step=add round=15 attempt=1 pageId=slide_08_ai index=7
+[2026-07-28 14:15:03.563] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_08_ai index=7
+[2026-07-28 14:15:03.564] [INFO ] [pid=82179] [render] start pageId=slide_08_ai file=/Users/kyo/Projects/python/draw/ppt/pages/slide_08_ai.jsx replacements=0
+[2026-07-28 14:15:03.619] [INFO ] [pid=82179] [render] ok pageId=slide_08_ai slides=1 imageReplaced=0 ms=55
+[2026-07-28 14:15:03.619] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:003xiqyh': {
+      id: 'rel:003xiqyh',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/6240081e682741ab3bd496000dffbe02.svg'
+    },
+    'rel:00o41l8x': {
+      id: 'rel:00o41l8x',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/b085167464ccd7617ea585276d7c5c67.svg'
+    },
+    'rel:013raxng': {
+      id: 'rel:013raxng',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/f8f5be516d25c95b9512da062528ac2d.svg'
+    },
+    'rel:01qptk6x': {
+      id: 'rel:01qptk6x',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/8cf8bc32a38a89c4e9c6ac8bf8c707fe.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:15:03.624] [INFO ] [pid=82179] [commit] commit send pageId=716ffa targetIndex=7 version=20 baseVersion=31 revisionBytes=2192216
+[2026-07-28 14:15:03.651] [INFO ] [pid=82179] [commit] commit ok pageId=716ffa revisionId=12e04395 ms=27
+[2026-07-28 14:15:03.651] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_08_ai slideId=716ffa index=7 version=20 baseVersion=31 revisionId=12e04395 code=0 images=[local=4 remote=0 cached=0 failed=0] ms=88
+[2026-07-28 14:15:03.651] [INFO ] [pid=82179] [sync] step=add round=15 attempt=1 pageId=slide_09_arch index=8
+[2026-07-28 14:15:03.651] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_09_arch index=8
+[2026-07-28 14:15:03.651] [INFO ] [pid=82179] [render] start pageId=slide_09_arch file=/Users/kyo/Projects/python/draw/ppt/pages/slide_09_arch.jsx replacements=0
+[2026-07-28 14:15:03.682] [INFO ] [pid=82179] [render] ok pageId=slide_09_arch slides=1 imageReplaced=0 ms=31
+[2026-07-28 14:15:03.682] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01393stx': {
+      id: 'rel:01393stx',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/ad576bcd89f05a283cc636291e6044bb.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:15:03.684] [INFO ] [pid=82179] [commit] commit send pageId=451b0a targetIndex=8 version=21 baseVersion=32 revisionBytes=25456
+[2026-07-28 14:15:03.687] [INFO ] [pid=82179] [commit] commit ok pageId=451b0a revisionId=be218fc5 ms=3
+[2026-07-28 14:15:03.688] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_09_arch slideId=451b0a index=8 version=21 baseVersion=32 revisionId=be218fc5 code=0 images=[local=1 remote=0 cached=0 failed=0] ms=37
+[2026-07-28 14:15:03.688] [INFO ] [pid=82179] [sync] step=add round=15 attempt=1 pageId=slide_10_deploy index=9
+[2026-07-28 14:15:03.688] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_10_deploy index=9
+[2026-07-28 14:15:03.688] [INFO ] [pid=82179] [render] start pageId=slide_10_deploy file=/Users/kyo/Projects/python/draw/ppt/pages/slide_10_deploy.jsx replacements=0
+[2026-07-28 14:15:03.728] [INFO ] [pid=82179] [render] ok pageId=slide_10_deploy slides=1 imageReplaced=0 ms=40
+[2026-07-28 14:15:03.728] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01orkhvi': {
+      id: 'rel:01orkhvi',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/feeebc7aaa847419ae73031f9d7edfc8.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:15:03.731] [INFO ] [pid=82179] [commit] commit send pageId=ab8c16 targetIndex=9 version=22 baseVersion=33 revisionBytes=25964
+[2026-07-28 14:15:03.733] [INFO ] [pid=82179] [commit] commit ok pageId=ab8c16 revisionId=cb2787e8 ms=2
+[2026-07-28 14:15:03.733] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_10_deploy slideId=ab8c16 index=9 version=22 baseVersion=33 revisionId=cb2787e8 code=0 images=[local=1 remote=0 cached=0 failed=0] ms=45
+[2026-07-28 14:15:03.733] [INFO ] [pid=82179] [sync] step=add round=15 attempt=1 pageId=slide_11_highlight index=10
+[2026-07-28 14:15:03.733] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_11_highlight index=10
+[2026-07-28 14:15:03.733] [INFO ] [pid=82179] [render] start pageId=slide_11_highlight file=/Users/kyo/Projects/python/draw/ppt/pages/slide_11_highlight.jsx replacements=0
+[2026-07-28 14:15:03.766] [INFO ] [pid=82179] [render] ok pageId=slide_11_highlight slides=1 imageReplaced=0 ms=33
+[2026-07-28 14:15:03.766] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01b6dz1g': {
+      id: 'rel:01b6dz1g',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/be43310b4e2b5642595ab9723db52366.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:15:03.769] [INFO ] [pid=82179] [commit] commit send pageId=94af1f targetIndex=10 version=23 baseVersion=34 revisionBytes=26764
+[2026-07-28 14:15:03.772] [INFO ] [pid=82179] [commit] commit ok pageId=94af1f revisionId=4d668864 ms=3
+[2026-07-28 14:15:03.772] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_11_highlight slideId=94af1f index=10 version=23 baseVersion=34 revisionId=4d668864 code=0 images=[local=1 remote=0 cached=0 failed=0] ms=39
+[2026-07-28 14:15:03.772] [INFO ] [pid=82179] [sync] step=add round=15 attempt=1 pageId=slide_12_end index=11
+[2026-07-28 14:15:03.773] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_12_end index=11
+[2026-07-28 14:15:03.773] [INFO ] [pid=82179] [render] start pageId=slide_12_end file=/Users/kyo/Projects/python/draw/ppt/pages/slide_12_end.jsx replacements=0
+[2026-07-28 14:15:03.785] [INFO ] [pid=82179] [render] ok pageId=slide_12_end slides=1 imageReplaced=0 ms=12
+[2026-07-28 14:15:03.785] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00q1vtu1': {
+      id: 'rel:00q1vtu1',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/474f27f7cf5b3d07c9ac2389463c67db.svg'
+    },
+    'rel:008rbo2d': {
+      id: 'rel:008rbo2d',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/33250f9969afd107c3a68447b25c24f7.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:15:03.787] [INFO ] [pid=82179] [commit] commit send pageId=07f279 targetIndex=11 version=24 baseVersion=35 revisionBytes=12940
+[2026-07-28 14:15:03.788] [INFO ] [pid=82179] [commit] commit ok pageId=07f279 revisionId=82a54e7c ms=1
+[2026-07-28 14:15:03.788] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_12_end slideId=07f279 index=11 version=24 baseVersion=35 revisionId=82a54e7c code=0 images=[local=2 remote=0 cached=0 failed=0] ms=15
+[2026-07-28 14:15:03.789] [INFO ] [pid=82179] [sync] aligned round=15 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:15:03.789] [INFO ] [pid=82179] [sync] reconcile ok round=15 attempt=1 ms=287
+[2026-07-28 14:15:03.789] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:15:03.789] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:15:03.815] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=26
+[2026-07-28 14:15:03.815] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=26
+[2026-07-28 14:15:03.815] [INFO ] [pid=82179] [sync] drain end round=15 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=313
+=== boot pid=83445 ts=2026-07-28 14:15:09.493 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_01_cover.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:09.493] [INFO ] [pid=83445] [validate] start file=pages/slide_01_cover.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:09.746] [INFO ] [pid=83445] [validate] ok slideId=slide_01_cover status=ready totalResources=0 done=0 pending=0 ms=253
+=== boot pid=83450 ts=2026-07-28 14:15:10.400 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_02_catalog.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:10.400] [INFO ] [pid=83450] [validate] start file=pages/slide_02_catalog.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:10.672] [INFO ] [pid=83450] [validate] ok slideId=slide_02_catalog status=ready totalResources=0 done=0 pending=0 ms=272
+=== boot pid=83455 ts=2026-07-28 14:15:11.323 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_03_position.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:11.323] [INFO ] [pid=83455] [validate] start file=pages/slide_03_position.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:11.629] [INFO ] [pid=83455] [validate] ok slideId=slide_03_position status=ready totalResources=0 done=0 pending=0 ms=306
+=== boot pid=83460 ts=2026-07-28 14:15:12.275 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_04_gesture.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:12.274] [INFO ] [pid=83460] [validate] start file=pages/slide_04_gesture.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:12.637] [INFO ] [pid=83460] [validate] ok slideId=slide_04_gesture status=ready totalResources=0 done=0 pending=0 ms=363
+=== boot pid=83465 ts=2026-07-28 14:15:13.316 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_05_principle.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:13.315] [INFO ] [pid=83465] [validate] start file=pages/slide_05_principle.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:13.587] [INFO ] [pid=83465] [validate] ok slideId=slide_05_principle status=ready totalResources=0 done=0 pending=0 ms=272
+=== boot pid=83470 ts=2026-07-28 14:15:14.249 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_06_collab.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:14.248] [INFO ] [pid=83470] [validate] start file=pages/slide_06_collab.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:14.611] [INFO ] [pid=83470] [validate] ok slideId=slide_06_collab status=ready totalResources=0 done=0 pending=0 ms=363
+=== boot pid=83475 ts=2026-07-28 14:15:15.267 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_07_sync.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:15.266] [INFO ] [pid=83475] [validate] start file=pages/slide_07_sync.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:15.559] [INFO ] [pid=83475] [validate] ok slideId=slide_07_sync status=ready totalResources=0 done=0 pending=0 ms=293
+=== boot pid=83480 ts=2026-07-28 14:15:16.201 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_08_ai.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:16.200] [INFO ] [pid=83480] [validate] start file=pages/slide_08_ai.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:16.537] [WARN ] [pid=83480] [validate] validation FAIL slideId=slide_08_ai code=CONTENT_OVERFLOW message=❌ 15 overflow(s) [bottom] (canvas height=720):
+
+ 7 |         </Box>
+ 8 |         <Box style={{ flex: 1, flexDirection: 'row', gap: 40, marginTop: 8 }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+32px
+ 9 |             <Box style={{ width: 660, position: 'relative', borderRadius: 18, overflow: 'hidden', boxShadow: '0 12px 40px rgba(249,115,22,0.25)' }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+32px
+10 |                 <Image src="resources/images/ai_generation.png" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+32px
+11 |                 <Box style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 130, background: 'linear-gradient(to top, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0) 100%)' }} />
+12 |                 <Box style={{ position: 'absolute', left: 24, bottom: 22, flexDirection: 'row', alignItems: 'center' }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+10px
+13 |                     <Box style={{ width: 8, height: 8, borderRadius: 4, background: '#F97316' }} />
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+4px
+14 |                     <Text style={{ fontSize: 16, color: '#FFFFFF', marginLeft: 10, letterSpacing: 2 }}>SKETCH → AI ART</Text>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+10px
+   ...
+16 |             </Box>
+17 |             <Box style={{ flex: 1, flexDirection: 'column', justifyContent: 'center' }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+32px
+   ...
+25 |                 </Text>
+26 |                 <Box style={{ flexDirection: 'column', marginTop: 24, gap: 12 }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+32px
+   ...
+31 |                     ].map((it) => (
+32 |                         <Box key={it.t} style={{ flexDirection: 'row', alignItems: 'flex-start', padding: 14, background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)' }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+32px
+33 |                             <Box style={{ width: 36, height: 36, borderRadius: 8, background: '#F97316', justifyContent: 'center', alignItems: 'center' }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+2px
+   ...
+35 |                             </Box>
+36 |                             <Box style={{ flex: 1, marginLeft: 12 }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+18px
+37 |                                 <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#FFFFFF' }}>{it.t}</Text>
+38 |                                 <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', marginTop: 4, lineHeight: 1.5 }}>{it.d}</Text>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+18px
+   ...
+44 |         </Box>
+45 |         <Box style={{ height: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+72px
+46 |             <Text style={{ fontSize: 14, color: '#94A3B8' }}>空中ジェスチャーキャンバス・プロジェクト紹介</Text>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+61px
+47 |             <Text style={{ fontSize: 14, color: '#94A3B8' }}>08 / 12</Text>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+61px ms=337
+=== boot pid=83485 ts=2026-07-28 14:15:17.195 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_09_arch.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:17.195] [INFO ] [pid=83485] [validate] start file=pages/slide_09_arch.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:17.462] [INFO ] [pid=83485] [validate] ok slideId=slide_09_arch status=ready totalResources=0 done=0 pending=0 ms=267
+=== boot pid=83490 ts=2026-07-28 14:15:18.102 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_10_deploy.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:18.101] [INFO ] [pid=83490] [validate] start file=pages/slide_10_deploy.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:18.417] [INFO ] [pid=83490] [validate] ok slideId=slide_10_deploy status=ready totalResources=0 done=0 pending=0 ms=316
+=== boot pid=83495 ts=2026-07-28 14:15:19.068 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_11_highlight.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:19.067] [INFO ] [pid=83495] [validate] start file=pages/slide_11_highlight.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:19.367] [WARN ] [pid=83495] [validate] validation FAIL slideId=slide_11_highlight code=CONTENT_OVERFLOW message=❌ 1 overflow(s) [bottom] (canvas height=720):
+
+52 |         </Box>
+53 |         <Box style={{ height: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Bottom+7px ms=300
+=== boot pid=83500 ts=2026-07-28 14:15:20.015 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_12_end.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:15:20.015] [INFO ] [pid=83500] [validate] start file=pages/slide_12_end.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:15:20.245] [INFO ] [pid=83500] [validate] ok slideId=slide_12_end status=ready totalResources=0 done=0 pending=0 ms=230
+[2026-07-28 14:16:30.802] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_11_highlight.jsx
+[2026-07-28 14:16:30.802] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_08_ai.jsx
+[2026-07-28 14:16:31.304] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_11_highlight,slide_08_ai] size=2
+[2026-07-28 14:16:31.304] [INFO ] [pid=82179] [sync] submit nextRound=16 dirty=slide_11_highlight,slide_08_ai pendingDirtySize=2 merged=no
+[2026-07-28 14:16:31.304] [INFO ] [pid=82179] [sync] drain start round=16 pendingDirtySize=2
+[2026-07-28 14:16:31.304] [INFO ] [pid=82179] [sync] step=remove-dirty round=16 attempt=1 pageId=slide_08_ai index=7
+[2026-07-28 14:16:31.304] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=7
+[2026-07-28 14:16:31.306] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":7}
+[2026-07-28 14:16:31.306] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=0
+[2026-07-28 14:16:31.306] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=7 serverVersion=37 ms=2
+[2026-07-28 14:16:31.306] [INFO ] [pid=82179] [sync] step=remove-dirty round=16 attempt=1 pageId=slide_11_highlight index=9
+[2026-07-28 14:16:31.306] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=9
+[2026-07-28 14:16:31.307] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":9}
+[2026-07-28 14:16:31.307] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=0
+[2026-07-28 14:16:31.307] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=9 serverVersion=38 ms=1
+[2026-07-28 14:16:31.307] [INFO ] [pid=82179] [sync] step=add round=16 attempt=1 pageId=slide_08_ai index=7
+[2026-07-28 14:16:31.307] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_08_ai index=7
+[2026-07-28 14:16:31.307] [INFO ] [pid=82179] [render] start pageId=slide_08_ai file=/Users/kyo/Projects/python/draw/ppt/pages/slide_08_ai.jsx replacements=0
+[2026-07-28 14:16:31.367] [INFO ] [pid=82179] [render] ok pageId=slide_08_ai slides=1 imageReplaced=0 ms=60
+[2026-07-28 14:16:31.367] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:003xiqyh': {
+      id: 'rel:003xiqyh',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/6240081e682741ab3bd496000dffbe02.svg'
+    },
+    'rel:00o41l8x': {
+      id: 'rel:00o41l8x',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/b085167464ccd7617ea585276d7c5c67.svg'
+    },
+    'rel:013raxng': {
+      id: 'rel:013raxng',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/f8f5be516d25c95b9512da062528ac2d.svg'
+    },
+    'rel:01qptk6x': {
+      id: 'rel:01qptk6x',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/8cf8bc32a38a89c4e9c6ac8bf8c707fe.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:16:31.373] [INFO ] [pid=82179] [commit] commit send pageId=891412 targetIndex=7 version=25 baseVersion=38 revisionBytes=2192220
+[2026-07-28 14:16:31.400] [INFO ] [pid=82179] [commit] commit ok pageId=891412 revisionId=7508aa48 ms=27
+[2026-07-28 14:16:31.400] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_08_ai slideId=891412 index=7 version=25 baseVersion=38 revisionId=7508aa48 code=0 images=[local=4 remote=0 cached=0 failed=0] ms=93
+[2026-07-28 14:16:31.400] [INFO ] [pid=82179] [sync] step=add round=16 attempt=1 pageId=slide_11_highlight index=10
+[2026-07-28 14:16:31.400] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_11_highlight index=10
+[2026-07-28 14:16:31.400] [INFO ] [pid=82179] [render] start pageId=slide_11_highlight file=/Users/kyo/Projects/python/draw/ppt/pages/slide_11_highlight.jsx replacements=0
+[2026-07-28 14:16:31.447] [INFO ] [pid=82179] [render] ok pageId=slide_11_highlight slides=1 imageReplaced=0 ms=47
+[2026-07-28 14:16:31.447] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01b6dz1g': {
+      id: 'rel:01b6dz1g',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/be43310b4e2b5642595ab9723db52366.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:16:31.449] [INFO ] [pid=82179] [commit] commit send pageId=2e41d8 targetIndex=10 version=26 baseVersion=39 revisionBytes=26780
+[2026-07-28 14:16:31.452] [INFO ] [pid=82179] [commit] commit ok pageId=2e41d8 revisionId=6c937dbf ms=2
+[2026-07-28 14:16:31.452] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_11_highlight slideId=2e41d8 index=10 version=26 baseVersion=39 revisionId=6c937dbf code=0 images=[local=1 remote=0 cached=0 failed=0] ms=52
+[2026-07-28 14:16:31.452] [INFO ] [pid=82179] [sync] aligned round=16 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:16:31.453] [INFO ] [pid=82179] [sync] reconcile ok round=16 attempt=1 ms=149
+[2026-07-28 14:16:31.453] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:16:31.453] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:16:31.482] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=29
+[2026-07-28 14:16:31.482] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=29
+[2026-07-28 14:16:31.482] [INFO ] [pid=82179] [sync] drain end round=16 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=178
+=== boot pid=83599 ts=2026-07-28 14:16:44.257 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_08_ai.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:16:44.255] [INFO ] [pid=83599] [validate] start file=pages/slide_08_ai.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:16:44.641] [INFO ] [pid=83599] [validate] ok slideId=slide_08_ai status=ready totalResources=0 done=0 pending=0 ms=386
+=== boot pid=83604 ts=2026-07-28 14:16:45.315 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_11_highlight.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:16:45.314] [INFO ] [pid=83604] [validate] start file=pages/slide_11_highlight.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:16:45.634] [INFO ] [pid=83604] [validate] ok slideId=slide_11_highlight status=ready totalResources=0 done=0 pending=0 ms=320
+[2026-07-28 14:31:37.149] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_05_principle.jsx
+[2026-07-28 14:31:37.650] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_05_principle] size=1
+[2026-07-28 14:31:37.650] [INFO ] [pid=82179] [sync] submit nextRound=17 dirty=slide_05_principle pendingDirtySize=1 merged=no
+[2026-07-28 14:31:37.650] [INFO ] [pid=82179] [sync] drain start round=17 pendingDirtySize=1
+[2026-07-28 14:31:37.651] [INFO ] [pid=82179] [sync] step=remove-dirty round=17 attempt=1 pageId=slide_05_principle index=4
+[2026-07-28 14:31:37.651] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=4
+[2026-07-28 14:31:37.656] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":4}
+[2026-07-28 14:31:37.658] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=2
+[2026-07-28 14:31:37.658] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=4 serverVersion=41 ms=7
+[2026-07-28 14:31:37.658] [INFO ] [pid=82179] [sync] step=add round=17 attempt=1 pageId=slide_05_principle index=4
+[2026-07-28 14:31:37.658] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_05_principle index=4
+[2026-07-28 14:31:37.658] [INFO ] [pid=82179] [render] start pageId=slide_05_principle file=/Users/kyo/Projects/python/draw/ppt/pages/slide_05_principle.jsx replacements=0
+[2026-07-28 14:31:37.720] [INFO ] [pid=82179] [render] ok pageId=slide_05_principle slides=1 imageReplaced=0 ms=62
+[2026-07-28 14:31:37.720] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01gr9zdm': {
+      id: 'rel:01gr9zdm',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/85fea56861f29a1832fd8ebc2c591da0.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:31:37.724] [INFO ] [pid=82179] [commit] commit send pageId=395dd3 targetIndex=4 version=27 baseVersion=41 revisionBytes=46532
+[2026-07-28 14:31:37.728] [INFO ] [pid=82179] [commit] commit ok pageId=395dd3 revisionId=03fecbda ms=4
+[2026-07-28 14:31:37.729] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_05_principle slideId=395dd3 index=4 version=27 baseVersion=41 revisionId=03fecbda code=0 images=[local=1 remote=0 cached=0 failed=0] ms=71
+[2026-07-28 14:31:37.729] [INFO ] [pid=82179] [sync] aligned round=17 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:31:37.729] [INFO ] [pid=82179] [sync] reconcile ok round=17 attempt=1 ms=79
+[2026-07-28 14:31:37.729] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:31:37.729] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:31:37.759] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=30
+[2026-07-28 14:31:37.759] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=30
+[2026-07-28 14:31:37.759] [INFO ] [pid=82179] [sync] drain end round=17 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=109
+[2026-07-28 14:31:49.467] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_07_sync.jsx
+[2026-07-28 14:31:49.967] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_07_sync] size=1
+[2026-07-28 14:31:49.967] [INFO ] [pid=82179] [sync] submit nextRound=18 dirty=slide_07_sync pendingDirtySize=1 merged=no
+[2026-07-28 14:31:49.968] [INFO ] [pid=82179] [sync] drain start round=18 pendingDirtySize=1
+[2026-07-28 14:31:49.968] [INFO ] [pid=82179] [sync] step=remove-dirty round=18 attempt=1 pageId=slide_07_sync index=6
+[2026-07-28 14:31:49.968] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=6
+[2026-07-28 14:31:49.969] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":6}
+[2026-07-28 14:31:49.970] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=1
+[2026-07-28 14:31:49.970] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=6 serverVersion=43 ms=2
+[2026-07-28 14:31:49.970] [INFO ] [pid=82179] [sync] step=add round=18 attempt=1 pageId=slide_07_sync index=6
+[2026-07-28 14:31:49.970] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_07_sync index=6
+[2026-07-28 14:31:49.970] [INFO ] [pid=82179] [render] start pageId=slide_07_sync file=/Users/kyo/Projects/python/draw/ppt/pages/slide_07_sync.jsx replacements=0
+[2026-07-28 14:31:50.022] [INFO ] [pid=82179] [render] ok pageId=slide_07_sync slides=1 imageReplaced=0 ms=52
+[2026-07-28 14:31:50.022] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00n1zitr': {
+      id: 'rel:00n1zitr',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/b4cbcfb728b8e4396fcc5f3dada3a939.png'
+    },
+    'rel:01jf8jtb': {
+      id: 'rel:01jf8jtb',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/c779cb48d935d0af2d414f1385aeeb57.svg'
+    },
+    'rel:01kxl1ox': {
+      id: 'rel:01kxl1ox',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/b0bb95f2ee968c8635255a243c9698e0.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:31:50.026] [INFO ] [pid=82179] [commit] commit send pageId=d6410b targetIndex=6 version=28 baseVersion=43 revisionBytes=55076
+[2026-07-28 14:31:50.029] [INFO ] [pid=82179] [commit] commit ok pageId=d6410b revisionId=7a734a77 ms=3
+[2026-07-28 14:31:50.030] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_07_sync slideId=d6410b index=6 version=28 baseVersion=43 revisionId=7a734a77 code=0 images=[local=3 remote=0 cached=0 failed=0] ms=60
+[2026-07-28 14:31:50.030] [INFO ] [pid=82179] [sync] aligned round=18 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:31:50.030] [INFO ] [pid=82179] [sync] reconcile ok round=18 attempt=1 ms=62
+[2026-07-28 14:31:50.030] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:31:50.030] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:31:50.053] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:31:50.053] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:31:50.053] [INFO ] [pid=82179] [sync] drain end round=18 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=85
+[2026-07-28 14:32:01.486] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_02_catalog.jsx
+[2026-07-28 14:32:01.988] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_02_catalog] size=1
+[2026-07-28 14:32:01.988] [INFO ] [pid=82179] [sync] submit nextRound=19 dirty=slide_02_catalog pendingDirtySize=1 merged=no
+[2026-07-28 14:32:01.988] [INFO ] [pid=82179] [sync] drain start round=19 pendingDirtySize=1
+[2026-07-28 14:32:01.988] [INFO ] [pid=82179] [sync] step=remove-dirty round=19 attempt=1 pageId=slide_02_catalog index=1
+[2026-07-28 14:32:01.988] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=1
+[2026-07-28 14:32:01.989] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":1}
+[2026-07-28 14:32:01.990] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=1
+[2026-07-28 14:32:01.990] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=1 serverVersion=45 ms=2
+[2026-07-28 14:32:01.990] [INFO ] [pid=82179] [sync] step=add round=19 attempt=1 pageId=slide_02_catalog index=1
+[2026-07-28 14:32:01.990] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_02_catalog index=1
+[2026-07-28 14:32:01.990] [INFO ] [pid=82179] [render] start pageId=slide_02_catalog file=/Users/kyo/Projects/python/draw/ppt/pages/slide_02_catalog.jsx replacements=0
+[2026-07-28 14:32:02.030] [INFO ] [pid=82179] [render] ok pageId=slide_02_catalog slides=1 imageReplaced=0 ms=40
+[2026-07-28 14:32:02.030] [INFO ] [pid=82179] [render] renderSlideData result.resources={ images: {}, videos: {}, audios: {}, fonts: {} }
+[2026-07-28 14:32:02.032] [INFO ] [pid=82179] [commit] commit send pageId=ed71ad targetIndex=1 version=29 baseVersion=45 revisionBytes=19388
+[2026-07-28 14:32:02.034] [INFO ] [pid=82179] [commit] commit ok pageId=ed71ad revisionId=a522be39 ms=2
+[2026-07-28 14:32:02.034] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_02_catalog slideId=ed71ad index=1 version=29 baseVersion=45 revisionId=a522be39 code=0 images=[local=0 remote=0 cached=0 failed=0] ms=44
+[2026-07-28 14:32:02.034] [INFO ] [pid=82179] [sync] aligned round=19 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:32:02.034] [INFO ] [pid=82179] [sync] reconcile ok round=19 attempt=1 ms=46
+[2026-07-28 14:32:02.035] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:02.035] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:02.065] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=30
+[2026-07-28 14:32:02.065] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=30
+[2026-07-28 14:32:02.065] [INFO ] [pid=82179] [sync] drain end round=19 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=77
+[2026-07-28 14:32:10.418] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_03_position.jsx
+[2026-07-28 14:32:10.919] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_03_position] size=1
+[2026-07-28 14:32:10.919] [INFO ] [pid=82179] [sync] submit nextRound=20 dirty=slide_03_position pendingDirtySize=1 merged=no
+[2026-07-28 14:32:10.920] [INFO ] [pid=82179] [sync] drain start round=20 pendingDirtySize=1
+[2026-07-28 14:32:10.920] [INFO ] [pid=82179] [sync] step=remove-dirty round=20 attempt=1 pageId=slide_03_position index=2
+[2026-07-28 14:32:10.920] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=2
+[2026-07-28 14:32:10.923] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":2}
+[2026-07-28 14:32:10.926] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=2
+[2026-07-28 14:32:10.926] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=2 serverVersion=47 ms=6
+[2026-07-28 14:32:10.926] [INFO ] [pid=82179] [sync] step=add round=20 attempt=1 pageId=slide_03_position index=2
+[2026-07-28 14:32:10.926] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_03_position index=2
+[2026-07-28 14:32:10.927] [INFO ] [pid=82179] [render] start pageId=slide_03_position file=/Users/kyo/Projects/python/draw/ppt/pages/slide_03_position.jsx replacements=0
+[2026-07-28 14:32:10.988] [INFO ] [pid=82179] [render] ok pageId=slide_03_position slides=1 imageReplaced=0 ms=62
+[2026-07-28 14:32:10.988] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00lkvnlz': {
+      id: 'rel:00lkvnlz',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/518ce1226e9dff6d12a2500d84e0a8ac.svg'
+    },
+    'rel:00yrq8nf': {
+      id: 'rel:00yrq8nf',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/ce3bc8c862f8a4c954ce55e79f436def.svg'
+    },
+    'rel:01i8y6y8': {
+      id: 'rel:01i8y6y8',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/e5df649f23bc19d983e25ba67badd5bb.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:32:10.991] [INFO ] [pid=82179] [commit] commit send pageId=2b1676 targetIndex=2 version=30 baseVersion=47 revisionBytes=26168
+[2026-07-28 14:32:10.994] [INFO ] [pid=82179] [commit] commit ok pageId=2b1676 revisionId=62e5e27c ms=3
+[2026-07-28 14:32:10.994] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_03_position slideId=2b1676 index=2 version=30 baseVersion=47 revisionId=62e5e27c code=0 images=[local=3 remote=0 cached=0 failed=0] ms=68
+[2026-07-28 14:32:10.994] [INFO ] [pid=82179] [sync] aligned round=20 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:32:10.994] [INFO ] [pid=82179] [sync] reconcile ok round=20 attempt=1 ms=74
+[2026-07-28 14:32:10.994] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:10.994] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:11.017] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:32:11.018] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=24
+[2026-07-28 14:32:11.018] [INFO ] [pid=82179] [sync] drain end round=20 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=98
+[2026-07-28 14:32:20.411] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_04_gesture.jsx
+[2026-07-28 14:32:20.913] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_04_gesture] size=1
+[2026-07-28 14:32:20.914] [INFO ] [pid=82179] [sync] submit nextRound=21 dirty=slide_04_gesture pendingDirtySize=1 merged=no
+[2026-07-28 14:32:20.914] [INFO ] [pid=82179] [sync] drain start round=21 pendingDirtySize=1
+[2026-07-28 14:32:20.914] [INFO ] [pid=82179] [sync] step=remove-dirty round=21 attempt=1 pageId=slide_04_gesture index=3
+[2026-07-28 14:32:20.915] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=3
+[2026-07-28 14:32:20.918] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":3}
+[2026-07-28 14:32:20.921] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=3
+[2026-07-28 14:32:20.921] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=3 serverVersion=49 ms=6
+[2026-07-28 14:32:20.921] [INFO ] [pid=82179] [sync] step=add round=21 attempt=1 pageId=slide_04_gesture index=3
+[2026-07-28 14:32:20.921] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_04_gesture index=3
+[2026-07-28 14:32:20.921] [INFO ] [pid=82179] [render] start pageId=slide_04_gesture file=/Users/kyo/Projects/python/draw/ppt/pages/slide_04_gesture.jsx replacements=0
+[2026-07-28 14:32:20.992] [INFO ] [pid=82179] [render] ok pageId=slide_04_gesture slides=1 imageReplaced=0 ms=71
+[2026-07-28 14:32:20.992] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:00y5iz2s': {
+      id: 'rel:00y5iz2s',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/7f41abdc8ec069cbf1fa86d9f3888d3b.svg'
+    },
+    'rel:002zrqbp': {
+      id: 'rel:002zrqbp',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/4e04eb8df5a7721eab994b2d0b463f55.svg'
+    },
+    'rel:01urq3t0': {
+      id: 'rel:01urq3t0',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/428796d26355c528335a3b4a770793d7.svg'
+    },
+    'rel:006j88vx': {
+      id: 'rel:006j88vx',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/00d3a2c76e9ef8147be626bbe861cf63.svg'
+    },
+    'rel:00w7oi7k': {
+      id: 'rel:00w7oi7k',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/480807c1ab57bf0c215d253875cfd9ec.svg'
+    },
+    'rel:00k7eacf': {
+      id: 'rel:00k7eacf',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/29c88453e6c9498fc9d2d7218f757fe8.svg'
+    },
+    'rel:01lxay42': {
+      id: 'rel:01lxay42',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/a13500bc11725f46e04e0e3db09d2789.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:32:20.998] [INFO ] [pid=82179] [commit] commit send pageId=51c4b1 targetIndex=3 version=31 baseVersion=49 revisionBytes=1884980
+[2026-07-28 14:32:21.023] [INFO ] [pid=82179] [commit] commit ok pageId=51c4b1 revisionId=3ab9c1aa ms=25
+[2026-07-28 14:32:21.024] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_04_gesture slideId=51c4b1 index=3 version=31 baseVersion=49 revisionId=3ab9c1aa code=0 images=[local=7 remote=0 cached=0 failed=0] ms=103
+[2026-07-28 14:32:21.024] [INFO ] [pid=82179] [sync] aligned round=21 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:32:21.024] [INFO ] [pid=82179] [sync] reconcile ok round=21 attempt=1 ms=110
+[2026-07-28 14:32:21.024] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:21.024] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:21.047] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:32:21.047] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:32:21.047] [INFO ] [pid=82179] [sync] drain end round=21 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=133
+[2026-07-28 14:32:30.115] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_09_arch.jsx
+[2026-07-28 14:32:30.617] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_09_arch] size=1
+[2026-07-28 14:32:30.618] [INFO ] [pid=82179] [sync] submit nextRound=22 dirty=slide_09_arch pendingDirtySize=1 merged=no
+[2026-07-28 14:32:30.618] [INFO ] [pid=82179] [sync] drain start round=22 pendingDirtySize=1
+[2026-07-28 14:32:30.619] [INFO ] [pid=82179] [sync] step=remove-dirty round=22 attempt=1 pageId=slide_09_arch index=8
+[2026-07-28 14:32:30.619] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=8
+[2026-07-28 14:32:30.622] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":8}
+[2026-07-28 14:32:30.625] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=3
+[2026-07-28 14:32:30.625] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=8 serverVersion=51 ms=6
+[2026-07-28 14:32:30.625] [INFO ] [pid=82179] [sync] step=add round=22 attempt=1 pageId=slide_09_arch index=8
+[2026-07-28 14:32:30.625] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_09_arch index=8
+[2026-07-28 14:32:30.625] [INFO ] [pid=82179] [render] start pageId=slide_09_arch file=/Users/kyo/Projects/python/draw/ppt/pages/slide_09_arch.jsx replacements=0
+[2026-07-28 14:32:30.672] [INFO ] [pid=82179] [render] ok pageId=slide_09_arch slides=1 imageReplaced=0 ms=47
+[2026-07-28 14:32:30.672] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01f6rqq4': {
+      id: 'rel:01f6rqq4',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/78ded2ea7259ead708c2d53ab4483f25.png'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:32:30.675] [INFO ] [pid=82179] [commit] commit send pageId=7b1a3d targetIndex=8 version=32 baseVersion=51 revisionBytes=79104
+[2026-07-28 14:32:30.678] [INFO ] [pid=82179] [commit] commit ok pageId=7b1a3d revisionId=123bec23 ms=3
+[2026-07-28 14:32:30.679] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_09_arch slideId=7b1a3d index=8 version=32 baseVersion=51 revisionId=123bec23 code=0 images=[local=1 remote=0 cached=0 failed=0] ms=54
+[2026-07-28 14:32:30.679] [INFO ] [pid=82179] [sync] aligned round=22 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:32:30.679] [INFO ] [pid=82179] [sync] reconcile ok round=22 attempt=1 ms=61
+[2026-07-28 14:32:30.679] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:30.679] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:30.702] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:32:30.702] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:32:30.703] [INFO ] [pid=82179] [sync] drain end round=22 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=85
+[2026-07-28 14:32:43.644] [INFO ] [pid=82179] [watcher] event=change file=pages/slide_10_deploy.jsx
+[2026-07-28 14:32:44.145] [INFO ] [pid=82179] [watcher] flush batch dirty=[slide_10_deploy] size=1
+[2026-07-28 14:32:44.145] [INFO ] [pid=82179] [sync] submit nextRound=23 dirty=slide_10_deploy pendingDirtySize=1 merged=no
+[2026-07-28 14:32:44.145] [INFO ] [pid=82179] [sync] drain start round=23 pendingDirtySize=1
+[2026-07-28 14:32:44.145] [INFO ] [pid=82179] [sync] step=remove-dirty round=23 attempt=1 pageId=slide_10_deploy index=9
+[2026-07-28 14:32:44.145] [INFO ] [pid=82179] [backend-ops] removeSlideAt start index=9
+[2026-07-28 14:32:44.146] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide send url=http://127.0.0.1:39100/mcp args={"file_id":"sid_ms46w5n6_8d8ssht0","page_index":9}
+[2026-07-28 14:32:44.147] [INFO ] [pid=82179] [mcp] mcp:slide_remove_slide ok ms=1
+[2026-07-28 14:32:44.147] [INFO ] [pid=82179] [backend-ops] removeSlideAt ok index=9 serverVersion=53 ms=2
+[2026-07-28 14:32:44.147] [INFO ] [pid=82179] [sync] step=add round=23 attempt=1 pageId=slide_10_deploy index=9
+[2026-07-28 14:32:44.147] [INFO ] [pid=82179] [backend-ops] addSlideAt start pageId=slide_10_deploy index=9
+[2026-07-28 14:32:44.147] [INFO ] [pid=82179] [render] start pageId=slide_10_deploy file=/Users/kyo/Projects/python/draw/ppt/pages/slide_10_deploy.jsx replacements=0
+[2026-07-28 14:32:44.183] [INFO ] [pid=82179] [render] ok pageId=slide_10_deploy slides=1 imageReplaced=0 ms=36
+[2026-07-28 14:32:44.183] [INFO ] [pid=82179] [render] renderSlideData result.resources={
+  images: {
+    'rel:01orkhvi': {
+      id: 'rel:01orkhvi',
+      src: '/Users/kyo/Projects/python/draw/ppt/.cache/media/images/feeebc7aaa847419ae73031f9d7edfc8.svg'
+    }
+  },
+  videos: {},
+  audios: {},
+  fonts: {}
+}
+[2026-07-28 14:32:44.185] [INFO ] [pid=82179] [commit] commit send pageId=d775a7 targetIndex=9 version=33 baseVersion=53 revisionBytes=25948
+[2026-07-28 14:32:44.188] [INFO ] [pid=82179] [commit] commit ok pageId=d775a7 revisionId=91c2460b ms=3
+[2026-07-28 14:32:44.189] [INFO ] [pid=82179] [backend-ops] addSlideAt ok pageId=slide_10_deploy slideId=d775a7 index=9 version=33 baseVersion=53 revisionId=91c2460b code=0 images=[local=1 remote=0 cached=0 failed=0] ms=42
+[2026-07-28 14:32:44.189] [INFO ] [pid=82179] [sync] aligned round=23 attempt=1 size=12 desired=12 pendingDirtySize=0
+[2026-07-28 14:32:44.189] [INFO ] [pid=82179] [sync] reconcile ok round=23 attempt=1 ms=44
+[2026-07-28 14:32:44.189] [INFO ] [pid=82179] [backend-ops] save start file=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:44.189] [INFO ] [pid=82179] [commit] save send filePath=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx
+[2026-07-28 14:32:44.212] [INFO ] [pid=82179] [commit] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:32:44.212] [INFO ] [pid=82179] [backend-ops] save ok file_path=/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx ms=23
+[2026-07-28 14:32:44.212] [INFO ] [pid=82179] [sync] drain end round=23 reconciles=1 mergedSubmits=1 pendingDirtySize=0 ms=67
+=== boot pid=84838 ts=2026-07-28 14:32:50.666 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_02_catalog.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:32:50.665] [INFO ] [pid=84838] [validate] start file=pages/slide_02_catalog.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:32:50.935] [INFO ] [pid=84838] [validate] ok slideId=slide_02_catalog status=ready totalResources=0 done=0 pending=0 ms=270
+=== boot pid=84843 ts=2026-07-28 14:32:51.569 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_03_position.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:32:51.569] [INFO ] [pid=84843] [validate] start file=pages/slide_03_position.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:32:51.864] [INFO ] [pid=84843] [validate] ok slideId=slide_03_position status=ready totalResources=0 done=0 pending=0 ms=295
+=== boot pid=84848 ts=2026-07-28 14:32:52.511 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_04_gesture.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:32:52.510] [INFO ] [pid=84848] [validate] start file=pages/slide_04_gesture.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:32:52.849] [INFO ] [pid=84848] [validate] ok slideId=slide_04_gesture status=ready totalResources=0 done=0 pending=0 ms=339
+=== boot pid=84853 ts=2026-07-28 14:32:53.485 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_05_principle.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:32:53.484] [INFO ] [pid=84853] [validate] start file=pages/slide_05_principle.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:32:53.737] [INFO ] [pid=84853] [validate] ok slideId=slide_05_principle status=ready totalResources=0 done=0 pending=0 ms=253
+=== boot pid=84858 ts=2026-07-28 14:32:54.361 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_07_sync.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:32:54.360] [INFO ] [pid=84858] [validate] start file=pages/slide_07_sync.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:32:54.636] [INFO ] [pid=84858] [validate] ok slideId=slide_07_sync status=ready totalResources=0 done=0 pending=0 ms=276
+=== boot pid=84862 ts=2026-07-28 14:32:55.260 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_09_arch.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:32:55.260] [INFO ] [pid=84862] [validate] start file=pages/slide_09_arch.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:32:55.502] [INFO ] [pid=84862] [validate] ok slideId=slide_09_arch status=ready totalResources=0 done=0 pending=0 ms=242
+=== boot pid=84873 ts=2026-07-28 14:32:56.124 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_10_deploy.jsx --project /Users/kyo/Projects/python/draw/ppt ===
+[2026-07-28 14:32:56.124] [INFO ] [pid=84873] [validate] start file=pages/slide_10_deploy.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
+[2026-07-28 14:32:56.427] [INFO ] [pid=84873] [validate] ok slideId=slide_10_deploy status=ready totalResources=0 done=0 pending=0 ms=303

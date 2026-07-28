@@ -1,0 +1,65 @@
+{
+  "filePath": "/Users/kyo/Projects/python/draw/ppt/隔空手势画板.pptx",
+  "lastCommit": {
+    "slide_01_cover": {
+      "revisionId": "04cd420cf9d37e8aedd77631d485ba85c3a6d872",
+      "version": 13,
+      "at": "2026-07-28 14:13:15.172"
+    },
+    "slide_02_catalog": {
+      "revisionId": "a522be398db8e14625d4a0de75d11b657d338381",
+      "version": 29,
+      "at": "2026-07-28 14:32:02.034"
+    },
+    "slide_03_position": {
+      "revisionId": "62e5e27c30ddc386caf8ab8e1e128b856571737d",
+      "version": 30,
+      "at": "2026-07-28 14:32:10.994"
+    },
+    "slide_04_gesture": {
+      "revisionId": "3ab9c1aa9e2d611df2a9e0793d9fd8f81d978b5e",
+      "version": 31,
+      "at": "2026-07-28 14:32:21.024"
+    },
+    "slide_05_principle": {
+      "revisionId": "03fecbda9022428787f9768675fcfbdbd14652ec",
+      "version": 27,
+      "at": "2026-07-28 14:31:37.728"
+    },
+    "slide_06_collab": {
+      "revisionId": "ff7936d403a6c6665b15cc726cab7a7124a5437e",
+      "version": 18,
+      "at": "2026-07-28 14:13:15.478"
+    },
+    "slide_07_sync": {
+      "revisionId": "7a734a770a51d888bccbb8fd914a87305d17eff2",
+      "version": 28,
+      "at": "2026-07-28 14:31:50.029"
+    },
+    "slide_08_ai": {
+      "revisionId": "7508aa48fc00852d568472946cf0079d8501e598",
+      "version": 25,
+      "at": "2026-07-28 14:16:31.400"
+    },
+    "slide_09_arch": {
+      "revisionId": "123bec23d78f2eb942658f4882d6fa4acac21f3d",
+      "version": 32,
+      "at": "2026-07-28 14:32:30.678"
+    },
+    "slide_10_deploy": {
+      "revisionId": "91c2460b743cd7f5d51429be8378f530198d5aa4",
+      "version": 33,
+      "at": "2026-07-28 14:32:44.189"
+    },
+    "slide_11_highlight": {
+      "revisionId": "6c937dbf10089bd7d749b824b482d83934c05579",
+      "version": 26,
+      "at": "2026-07-28 14:16:31.452"
+    },
+    "slide_12_end": {
+      "revisionId": "82a54e7cfdde986d5b273986919a9a7dcde59d2a",
+      "version": 24,
+      "at": "2026-07-28 14:15:03.788"
+    }
+  }
+}
