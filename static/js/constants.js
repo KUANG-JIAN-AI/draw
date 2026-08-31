@@ -1,7 +1,7 @@
 export const HOLD_TO_SELECT_MS = 800;
 export const PINCH_THRESHOLD = 0.075;
-export const WORLD_WIDTH = 4096;
-export const WORLD_HEIGHT = 3072;
+export const WORLD_WIDTH = 1920;
+export const WORLD_HEIGHT = 1440;
 export const VIEWPORT_MARGIN = 80;
 
 export const HAND_CONNECTIONS = [

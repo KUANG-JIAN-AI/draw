@@ -1288,3 +1288,5 @@
 === boot pid=84873 ts=2026-07-28 14:32:56.124 cwd=/Users/kyo/Projects/python/draw/ppt argv=/Users/kyo/.workbuddy/binaries/node/versions/22.22.2/bin/slidep-validate pages/slide_10_deploy.jsx --project /Users/kyo/Projects/python/draw/ppt ===
 [2026-07-28 14:32:56.124] [INFO ] [pid=84873] [validate] start file=pages/slide_10_deploy.jsx projectDir=/Users/kyo/Projects/python/draw/ppt checkOverflow=true
 [2026-07-28 14:32:56.427] [INFO ] [pid=84873] [validate] ok slideId=slide_10_deploy status=ready totalResources=0 done=0 pending=0 ms=303
+[2026-07-29 09:48:30.268] [INFO ] [pid=82179] [worker] shutdown received sig=SIGTERM
+[2026-07-29 09:48:30.903] [INFO ] [pid=82179] [worker] shutdown ok sig=SIGTERM ms=635
