@@ -1,83 +1,89 @@
-# 隔空手势画板
+# 空中ジェスチャーお絵かきボード
 
-这是一个使用 MediaPipe Hands 的前端手势画板，支持摄像头手势画画、颜色选择、线宽切换、橡皮、撤销、清空和保存。
+MediaPipe Hands を使用したフロントエンドのジェスチャーお絵かきボードです。カメラを使ったハンドジェスチャーによる描画、色の選択、線の太さ変更、消しゴム、元に戻す、全消去、保存に対応しています。
 
-## 运行方式
+## 実行方法
 
-1. 创建并激活虚拟环境（推荐）
+1. 仮想環境を作成して有効化（推奨）
 
 ```bash
 cd /Users/kyo/Projects/python/draw
+
 python3 -m venv venv
+
 source venv/bin/activate
 ```
 
-2. 安装依赖
+2. 依存パッケージをインストール
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. 设置配置文件
+3. 設定ファイルを準備
 
 ```bash
 cp .env.example .env
 ```
 
-然后编辑 `.env`：
+その後、`.env` を編集します。
 
 ```dotenv
-AGNES_API_KEY="你的 Agnes API Key"
+AGNES_API_KEY="あなたの Agnes API Key"
 ```
 
-4. 运行 Flask 应用
+4. Flask アプリケーションを起動
 
 ```bash
 python app.py
 ```
 
-5. 在浏览器中打开
+5. ブラウザで開く
 
-```bash
+```text
 http://127.0.0.1:5000
 ```
 
-如果端口 5000 被占用，可指定其它端口：
+ポート 5000 が使用中の場合は、別のポートを指定できます。
 
 ```bash
 python app.py --port 5001
 ```
 
-## 多人协作
+## 複数人での共同作業
 
-客户端现在可通过 Socket.IO 连接同一个房间，实时同步绘画、清空和撤销操作。新用户加入时会自动接收当前画布历史。 
+クライアントは Socket.IO を使用して同じルームに接続し、描画、全消去、元に戻す操作をリアルタイムで同期できます。
 
-## AI 图生图
+新しいユーザーが参加した際には、現在のキャンバスの描画履歴が自動的に送信されます。
 
-画完简笔画后，在右侧 AI 面板选择风格、尺寸和模型，输入想要的效果，然后点击“AI 生成”。后端会把当前画布导出为白底 PNG，并通过 `AGNES_API_KEY` 调用 Agnes Image 图生图接口。
+## AI 画像生成
 
-4. 在浏览器中打开
+簡単なイラストを描いた後、右側の AI パネルでスタイル、サイズ、モデルを選択し、生成したいイメージを入力して「AI 生成」をクリックします。
 
-```
+バックエンドでは現在のキャンバスを白背景の PNG として書き出し、`AGNES_API_KEY` を使用して Agnes Image の image-to-image API を呼び出します。
+
+4. ブラウザで開く
+
+```text
 http://127.0.0.1:5000
 ```
 
-如果端口 5000 已被占用，可指定其他端口：
+ポート 5000 がすでに使用されている場合は、別のポートを指定できます。
 
 ```bash
 python app.py --port 5001
 ```
 
-如需启用调试模式：
+デバッグモードを有効にする場合：
 
 ```bash
 python app.py --debug
 ```
 
-## 项目结构
+## プロジェクト構成
 
-- `app.py` - Flask 入口
-- `templates/index.html` - 页面模板
-- `static/app.js` - 前端逻辑
-- `static/styles.css` - 样式
-- `requirements.txt` - Python 依赖
+* `app.py` - Flask のエントリーポイント
+* `templates/index.html` - ページテンプレート
+* `static/app.js` - フロントエンドロジック
+* `static/styles.css` - スタイルシート
+* `requirements.txt` - Python の依存パッケージ
