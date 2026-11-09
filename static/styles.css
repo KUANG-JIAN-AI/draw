@@ -800,3 +800,28 @@ input {
     max-height: 190px;
   }
 }
+
+/* Keep the workspace stable and reserve overlays for camera interaction. */
+.app { height: 100dvh; min-height: 0; }
+[hidden] { display: none !important; }
+.camera-preview, .gesture-toolbar { display: none; }
+.camera-active .camera-preview { display: block; }
+.camera-active .gesture-toolbar { display: flex; }
+.camera-preview { top: auto; bottom: 70px; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--accent); outline-offset: 3px;
+}
+.ai-prompt, select { font: inherit; }
+@media (max-width: 860px) {
+  .app { height: auto; min-height: 100dvh; }
+  .toolbar { gap: 8px; padding: 10px; }
+  .toolbar > .tool-group { max-width: 100%; flex-wrap: wrap; }
+  .toolbar .field-input { min-width: 0 !important; flex: 1 1 90px; width: 90px; }
+  .actions { position: sticky; bottom: 0; }
+  .stage { min-height: 70dvh; margin: 8px; }
+  .ai-panel { bottom: 10px; max-height: 55dvh; }
+  .hud { font-size: 12px; max-width: calc(100% - 28px); flex-wrap: wrap; }
+  .camera-preview { bottom: 90px; }
+}
+@media (prefers-reduced-motion: reduce) { .ai-loader { animation: none; } }

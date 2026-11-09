@@ -137,10 +137,10 @@ export function createAiImageController({
       setAiStatus("ai_done", "ready");
       try {
         const saved = await saveGeneratedImages(drawingImage, latestAiImageUrl);
-        setStatus(`Saved: ${saved.drawingPath}, ${saved.generatedPath}`, "ready");
+        setStatus("ai_saved", "ready");
       } catch (saveError) {
         console.error(saveError);
-        setStatus(`Generated, but auto-save failed: ${formatGenerationError(saveError)}`, "error");
+        setStatus("ai_save_failed", "error");
       }
     } catch (error) {
       const errorMessage = formatGenerationError(error);

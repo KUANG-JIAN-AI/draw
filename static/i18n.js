@@ -146,6 +146,19 @@ const translations = {
   },
 };
 
+Object.assign(translations.zh, {
+  camera_stop: "关闭摄像头", camera_stopped: "摄像头已关闭", anonymous: "匿名",
+  room_error: "加入房间失败，请检查名称长度", room_disconnected: "连接已断开，正在重连；暂时停止同步绘画",
+  history_limit: "房间历史已达上限，请保存后清空画布", ai_saved: "生成结果和原图已保存",
+  ai_save_failed: "图片已生成，自动保存失败，可下载结果",
+});
+Object.assign(translations.ja, {
+  camera_stop: "カメラを停止", camera_stopped: "カメラを停止しました", anonymous: "匿名",
+  room_error: "ルームに参加できませんでした", room_disconnected: "接続が切れました。再接続中です",
+  history_limit: "履歴の上限です。保存してからキャンバスをクリアしてください", ai_saved: "生成画像と原画を保存しました",
+  ai_save_failed: "生成できましたが自動保存に失敗しました。ダウンロードできます",
+});
+
 let currentLanguage = localStorage.getItem("language") || "zh";
 
 function t(key) {

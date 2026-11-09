@@ -1,78 +1,48 @@
-export function createRoomController({
-  socket,
-  actionHistory,
-  canvas,
-  membersList,
-  roomInput,
-  nameInput,
-  joinRoomButton,
-  setStatus,
-  t,
-}) {
+export function createRoomController({ socket, actionHistory, canvas, membersList, roomInput, nameInput, joinRoomButton, setStatus, t }) {
   let currentRoom = null;
-
-  function bindSocketEvents() {
-    socket.on("action_history", (history) => {
-      actionHistory.length = 0;
-      actionHistory.push(...history);
-      canvas.redrawHistory();
-    });
-
-    socket.on("room_members", (members) => {
-      if (!membersList) return;
-      const membersLabel = t("hud_members");
-      const emptyText = t("hud_empty");
-      membersList.textContent = membersLabel + "：" + (members.length ? members.join("，") : emptyText);
-    });
-
-    window.addEventListener("language-changed", () => {
-      if (membersList && membersList.textContent.includes("：")) {
-        const parts = membersList.textContent.split("：");
-        const memberNames = parts[1];
-        const membersLabel = t("hud_members");
-        membersList.textContent = membersLabel + "：" + memberNames;
-      }
-    });
-
-    socket.on("draw_line", (data) => {
-      actionHistory.push(data);
-      canvas.applyAction(data);
-    });
-
-    socket.on("clear_canvas", () => {
-      actionHistory.length = 0;
-      canvas.clear();
-    });
-
-    socket.on("undo", (history) => {
-      actionHistory.length = 0;
-      actionHistory.push(...history);
-      canvas.redrawHistory();
+  let desiredRoom = null;
+  let name = "";
+  const replaceHistory = ({ room, history }) => {
+    if (room !== desiredRoom) return;
+    currentRoom = room;
+    actionHistory.splice(0, actionHistory.length, ...history);
+    canvas.redrawHistory();
+  };
+  function join() {
+    if (!desiredRoom) return;
+    socket.emit("join_room", { room: desiredRoom, name }, (result) => {
+      if (result?.ok && result.room === desiredRoom) {
+        currentRoom = result.room;
+        setStatus(`${t("room_joined")} ${currentRoom}`, "ready");
+      } else setStatus(t("room_error"), "error");
     });
   }
-
-  function bindRoomEvents() {
-    joinRoomButton?.addEventListener("click", () => {
-      const room = (roomInput?.value || "").trim() || "lobby";
-      const name = (nameInput?.value || "").trim() || `匿名${Math.floor(Math.random() * 9000) + 1000}`;
-      currentRoom = room;
-      socket.emit("join_room", { room, name });
-      setStatus(t("room_joined") + ` ${room}`, "ready");
-    });
-
-    window.addEventListener("beforeunload", () => {
-      if (currentRoom) socket.emit("leave_room", { room: currentRoom });
-    });
-  }
-
   function bindEvents() {
-    bindSocketEvents();
-    bindRoomEvents();
+    socket.on("action_history", replaceHistory);
+    socket.on("history_limit", (data) => {
+      replaceHistory(data);
+      setStatus(t("history_limit"), "error");
+    });
+    socket.on("draw_line", ({ room, action }) => {
+      if (room !== currentRoom) return;
+      actionHistory.push(action);
+      canvas.applyAction(action);
+    });
+    socket.on("room_members", ({ room, members }) => {
+      if (room === desiredRoom) membersList.textContent = `${t("hud_members")}：${members.join("，")}`;
+    });
+    socket.on("disconnect", () => {
+      currentRoom = null;
+      setStatus(t("room_disconnected"), "error");
+    });
+    socket.on("connect", join);
+    joinRoomButton.addEventListener("click", () => {
+      desiredRoom = roomInput.value.trim() || "lobby";
+      name = nameInput.value.trim() || t("anonymous");
+      currentRoom = null;
+      if (socket.connected) join();
+      else setStatus(t("room_disconnected"), "error");
+    });
   }
-
-  function getCurrentRoom() {
-    return currentRoom;
-  }
-
-  return { bindEvents, getCurrentRoom };
+  return { bindEvents, getCurrentRoom: () => currentRoom, isJoining: () => !!desiredRoom && !currentRoom };
 }

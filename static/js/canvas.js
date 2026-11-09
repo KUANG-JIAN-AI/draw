@@ -52,6 +52,7 @@ export function createCanvasController({
   }
 
   function applyAction(action) {
+    if (action.type === "clear") clear();
     if (action.type === "draw_line") {
       drawLine(denormalizePoint(action.from), denormalizePoint(action.to), action);
     }

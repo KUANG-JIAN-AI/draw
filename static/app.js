@@ -64,6 +64,8 @@ const getLanguage = window.getLanguage;
   let hoverStartedAt = 0;
   let hoverActivated = false;
   let aiGenerating = false;
+  let strokeId = null;
+  let noticeUntil = 0;
 
   const socket = window.io({
     transports: ["websocket"],
@@ -86,9 +88,13 @@ const getLanguage = window.getLanguage;
   // --- Canvas actions ---
 
   function clearDrawing() {
-    canvas.clear();
-    actionHistory.length = 0;
-    socket.emit("clear_canvas", { room: roomController?.getCurrentRoom() });
+    if (roomController.isJoining()) return;
+    const room = roomController.getCurrentRoom();
+    if (room) socket.emit("clear_canvas", { room });
+    else {
+      actionHistory.push({ type: "clear" });
+      canvas.redrawHistory();
+    }
     resetDrawingGestureState();
   }
 
@@ -100,16 +106,27 @@ const getLanguage = window.getLanguage;
   }
 
   function undoDrawing() {
-    if (actionHistory.length) {
-      actionHistory.pop();
+    if (roomController.isJoining()) return;
+    const room = roomController.getCurrentRoom();
+    if (room) socket.emit("undo", { room });
+    else {
+      const last = actionHistory.at(-1);
+      if (last?.type === "clear") actionHistory.pop();
+      else if (last) {
+        for (let i = actionHistory.length - 1; i >= 0; i--) {
+          if (actionHistory[i].strokeId === last.strokeId) actionHistory.splice(i, 1);
+        }
+      }
       canvas.redrawHistory();
-      socket.emit("undo", { room: roomController?.getCurrentRoom() });
     }
+    resetDrawingGestureState();
   }
 
   // --- UI helpers ---
 
-  function setStatus(messageOrKey, state = "") {
+  function setStatus(messageOrKey, state = "", transient = false) {
+    if (transient && performance.now() < noticeUntil) return;
+    if (!transient) noticeUntil = performance.now() + 4000;
     statusText.textContent = t(messageOrKey);
     statusDot.className = "status-dot" + (state ? " " + state : "");
   }
@@ -264,9 +281,9 @@ const getLanguage = window.getLanguage;
   }
 
   function updateGestureAiControls() {
-    if (gestureAiStyleButton) gestureAiStyleButton.textContent = `风格: ${selectedOptionLabel(aiStyleSelect)}`;
-    if (gestureAiSizeButton) gestureAiSizeButton.textContent = `尺寸: ${selectedOptionLabel(aiSizeSelect)}`;
-    if (gestureAiModelButton) gestureAiModelButton.textContent = `模型: ${selectedOptionLabel(aiModelSelect)}`;
+    if (gestureAiStyleButton) gestureAiStyleButton.textContent = `${t("ai_style_label")}: ${selectedOptionLabel(aiStyleSelect)}`;
+    if (gestureAiSizeButton) gestureAiSizeButton.textContent = `${t("ai_size_label")}: ${selectedOptionLabel(aiSizeSelect)}`;
+    if (gestureAiModelButton) gestureAiModelButton.textContent = `${t("ai_model_label")}: ${selectedOptionLabel(aiModelSelect)}`;
     if (gestureAiGenerateButton) gestureAiGenerateButton.disabled = aiGenerating;
   }
 
@@ -328,6 +345,7 @@ const getLanguage = window.getLanguage;
   // --- Hand tracking ---
 
   function handleHandsResult(results) {
+    const setTrackingStatus = (text, state) => setStatus(text, state, true);
     const landmarks = results.multiHandLandmarks?.[0];
     const rect = gestureCanvas.getBoundingClientRect();
 
@@ -337,7 +355,7 @@ const getLanguage = window.getLanguage;
       lastPanPoint = null;
       setHoveredGestureTool(null);
       gestureOverlay.draw(null, null, null);
-      setStatus("put_hand", "ready");
+      setTrackingStatus("put_hand", "ready");
       return;
     }
 
@@ -364,7 +382,7 @@ const getLanguage = window.getLanguage;
       lastPanPoint = null;
       pinchWasDown = false;
       if (!updateHoldProgress()) {
-        setStatus(`${t("select_hover")}：${tool.textContent || tool.getAttribute("aria-label")}`, "ready");
+        setTrackingStatus(`${t("select_hover")}：${tool.textContent || tool.getAttribute("aria-label")}`, "ready");
       }
       return;
     }
@@ -378,7 +396,7 @@ const getLanguage = window.getLanguage;
       lastPanPoint = indexPoint;
       lastPoint = null;
       pinchWasDown = false;
-      setStatus("panning_canvas", "ready");
+      setTrackingStatus("panning_canvas", "ready");
       return;
     }
 
@@ -387,16 +405,18 @@ const getLanguage = window.getLanguage;
     if (aiGenerating) {
       lastPoint = null;
       pinchWasDown = isPinching;
-      setStatus("ai_generating", "ready");
+      setTrackingStatus("ai_generating", "ready");
       return;
     }
 
-    if (canDraw && isInsideWorld(worldPoint)) {
+    if (canDraw && !roomController.isJoining() && isInsideWorld(worldPoint)) {
       if (!pinchWasDown) {
+        strokeId = crypto.randomUUID();
         lastPoint = worldPoint;
       } else if (lastPoint && distance(lastPoint, worldPoint) < 80 / viewport.scale) {
         const action = {
           type: "draw_line",
+          strokeId,
           from: normalizePoint(lastPoint),
           to: normalizePoint(worldPoint),
           color,
@@ -406,13 +426,13 @@ const getLanguage = window.getLanguage;
         action.room = roomController?.getCurrentRoom();
         canvas.drawLine(lastPoint, worldPoint, action);
         actionHistory.push(action);
-        socket.emit("draw_line", action);
+        if (action.room) socket.emit("draw_line", action);
       }
       lastPoint = worldPoint;
-      setStatus(erasing ? "erasing" : "drawing", "drawing");
+      setTrackingStatus(erasing ? "erasing" : "drawing", "drawing");
     } else {
       lastPoint = null;
-      setStatus("move_to_toolbar", "ready");
+      setTrackingStatus("move_to_toolbar", "ready");
     }
 
     pinchWasDown = canDraw;
@@ -421,6 +441,19 @@ const getLanguage = window.getLanguage;
   // --- Camera ---
 
   async function startCamera() {
+    if (camera) {
+      await camera.stop();
+      video.srcObject?.getTracks().forEach(track => track.stop());
+      await hands?.close();
+      camera = null;
+      hands = null;
+      resetGestureSelection();
+      gestureOverlay.draw(null, null, null);
+      document.body.classList.remove("camera-active");
+      cameraButton.textContent = t("camera_button");
+      setStatus(t("camera_stopped"));
+      return;
+    }
     if (!window.Hands || !window.Camera) {
       setStatus("loading_gesture_lib", "error");
       return;
@@ -450,9 +483,15 @@ const getLanguage = window.getLanguage;
       });
 
       await camera.start();
-      cameraButton.textContent = t("camera_button");
+      cameraButton.disabled = false;
+      cameraButton.textContent = t("camera_stop");
+      document.body.classList.add("camera-active");
       setStatus("camera_ready", "ready");
     } catch (error) {
+      video.srcObject?.getTracks().forEach(track => track.stop());
+      await hands?.close();
+      camera = null;
+      hands = null;
       console.error(error);
       cameraButton.disabled = false;
       cameraButton.textContent = t("camera_button");
@@ -471,7 +510,10 @@ const getLanguage = window.getLanguage;
       promptInput: aiPromptInput,
       resultImage: aiResultImage,
     },
-    hasDrawing: () => actionHistory.length > 0,
+    hasDrawing: () => {
+      const clearedAt = actionHistory.findLastIndex(action => action.type === "clear");
+      return actionHistory.slice(clearedAt + 1).some(action => action.type === "draw_line");
+    },
     getDrawingDataUrl: canvas.getFlattenedDataUrl,
     setStatus,
     setAiStatus,
@@ -498,13 +540,7 @@ const getLanguage = window.getLanguage;
   });
 
   customColor.addEventListener("input", () => {
-    color = customColor.value;
-    erasing = false;
-    eraserButton.setAttribute("aria-pressed", "false");
-    swatches.forEach((button) => button.classList.remove("active"));
-    document.querySelectorAll(".gesture-tool[data-gesture-action='color']").forEach((button) => {
-      button.classList.remove("active");
-    });
+    updateActiveColor(customColor.value);
     customColor.parentElement.classList.add("active");
   });
 
@@ -564,5 +600,13 @@ const getLanguage = window.getLanguage;
 
   window.addEventListener("resize", () => canvas.resize(gestureOverlay.context));
   window.addEventListener("language-changed", updateGestureAiControls);
+  document.querySelector("#aiToggle").addEventListener("click", () => {
+    const panel = document.querySelector(".ai-panel");
+    panel.hidden = !panel.hidden;
+    document.querySelector("#aiToggle").setAttribute("aria-expanded", String(!panel.hidden));
+  });
+  window.addEventListener("language-changed", () => {
+    cameraButton.textContent = t(camera ? "camera_stop" : "camera_button");
+  });
   updateGestureAiControls();
   canvas.resize(gestureOverlay.context);

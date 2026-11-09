@@ -22,8 +22,8 @@
         <button id="cameraButton" class="tool-button primary" type="button" data-i18n="camera_button">开启摄像头</button>
 
         <div class="tool-group" style="gap:8px;">
-          <input id="roomInput" class="field-input" type="text" data-i18n-placeholder="room_placeholder" placeholder="房间名 (默认 lobby)">
-          <input id="nameInput" class="field-input" type="text" data-i18n-placeholder="name_placeholder" placeholder="昵称 (可选)">
+          <input id="roomInput" maxlength="80" aria-label="房间名" class="field-input" type="text" data-i18n-placeholder="room_placeholder" placeholder="房间名 (默认 lobby)">
+          <input id="nameInput" maxlength="40" aria-label="昵称" class="field-input" type="text" data-i18n-placeholder="name_placeholder" placeholder="昵称 (可选)">
           <button id="joinRoomButton" class="tool-button" type="button" data-i18n="join_room_button">加入房间</button>
         </div>
 
@@ -48,7 +48,7 @@
           <button id="undoButton" class="tool-button" type="button" data-i18n="undo">撤销</button>
           <button id="clearButton" class="tool-button danger" type="button" data-i18n="clear">清空</button>
           <button id="saveButton" class="tool-button" type="button" data-i18n="save">保存</button>
-          <button id="generateButton" class="tool-button primary" type="button" data-i18n="ai_generate">AI 生成</button>
+          <button id="aiToggle" aria-expanded="false" aria-controls="aiPanel" class="tool-button primary" type="button" data-i18n="ai_generate">AI 生成</button>
         </div>
       </header>
 
@@ -97,7 +97,7 @@
           <div id="membersList" class="members-list"></div>
         </div>
 
-        <aside class="ai-panel" aria-label="AI 图生图">
+        <aside id="aiPanel" hidden class="ai-panel" aria-label="AI 图生图">
           <div class="ai-panel-header">
             <strong data-i18n="ai_panel_title">AI 图生图</strong>
             <span id="aiStatus" class="ai-status" data-i18n="ai_idle">准备就绪</span>

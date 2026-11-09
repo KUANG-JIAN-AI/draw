@@ -6,6 +6,8 @@ import json
 import os
 from pathlib import Path
 import re
+import math
+import time
 
 import gevent.monkey
 gevent.monkey.patch_all()
@@ -22,7 +24,12 @@ load_dotenv()
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = os.urandom(24).hex()
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
+socketio = SocketIO(app, async_mode="gevent")
+
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
+MAX_ACTIONS = 30000
+MAX_IMAGE_BYTES = 10 * 1024 * 1024
+_generation_times = {}
 
 DEFAULT_ROOM = "lobby"
 DEFAULT_NAME = "匿名"
@@ -55,6 +62,11 @@ def _decode_data_url(data_url):
     except binascii.Error as error:
         raise ValueError("Invalid base64 image data") from error
 
+    if len(image_bytes) > MAX_IMAGE_BYTES:
+        raise ValueError("Image is too large")
+    signatures = {"png": b"\x89PNG\r\n\x1a\n", "jpg": b"\xff\xd8\xff", "webp": b"RIFF"}
+    if not image_bytes.startswith(signatures[extension]):
+        raise ValueError("Image format does not match content")
     return image_bytes, extension
 
 
@@ -62,14 +74,6 @@ def _read_image_source(source):
     if isinstance(source, str) and source.startswith("data:image/"):
         return _decode_data_url(source)
 
-    if isinstance(source, str) and source.startswith(("http://", "https://")):
-        image_request = urllib.request.Request(source, headers={"User-Agent": "gesture-draw/1.0"})
-        with urllib.request.urlopen(image_request, timeout=60) as response:
-            content_type = response.headers.get_content_type()
-            extension = IMAGE_EXTENSIONS_BY_CONTENT_TYPE.get(content_type)
-            if not extension:
-                raise ValueError(f"Unsupported image content type: {content_type}")
-            return response.read(), extension
 
     raise ValueError("Expected an image data URL or image URL")
 
@@ -117,6 +121,15 @@ def save_generated_images():
 
 @app.post("/api/generate-image")
 def generate_image():
+    now = time.monotonic()
+    address = request.remote_addr
+    with _lock:
+        for key, started in list(_generation_times.items()):
+            if now - started > 60:
+                del _generation_times[key]
+        if address in _generation_times:
+            return jsonify({"error": "请稍候再生成图片"}), 429
+        _generation_times[address] = now
     api_key = os.environ.get("AGNES_API_KEY")
     if not api_key:
         return jsonify({"error": "请先设置环境变量 AGNES_API_KEY"}), 400
@@ -176,86 +189,106 @@ def generate_image():
         return jsonify({"error": "Agnes API 返回了无法解析的内容"}), 502
 
 
-@socketio.on("connect")
-def handle_connect():
-    pass
+def _remove_member(sid):
+    room = sid_room.pop(sid, None)
+    if room:
+        leave_room(room)
+        room_members[room] = [m for m in room_members.get(room, []) if m["sid"] != sid]
+        emit("room_members", {"room": room, "members": [m["name"] for m in room_members[room]]}, room=room)
+        if not room_members[room]:
+            room_members.pop(room, None)
+            action_history.pop(room, None)
 
 
 @socketio.on("join_room")
 def handle_join_room(data):
     if not isinstance(data, dict):
-        return
+        return {"ok": False}
     room = data.get("room") or DEFAULT_ROOM
     name = data.get("name") or DEFAULT_NAME
-    sid = request.sid
-    join_room(room)
+    if not isinstance(room, str) or not isinstance(name, str) or len(room) > 80 or len(name) > 40:
+        return {"ok": False}
     with _lock:
-        sid_room[sid] = room
+        if sid_room.get(request.sid) != room:
+            _remove_member(request.sid)
+        join_room(room)
+        sid_room[request.sid] = room
         members = room_members.setdefault(room, [])
-        if not any(m["sid"] == sid for m in members):
-            members.append({"sid": sid, "name": name})
-        action_history.setdefault(room, [])
-    emit("action_history", action_history.get(room, []), room=sid)
-    emit("room_members", [m["name"] for m in room_members.get(room, [])], room=room)
+        members[:] = [m for m in members if m["sid"] != request.sid]
+        members.append({"sid": request.sid, "name": name})
+        history = action_history.setdefault(room, [])
+        emit("action_history", {"room": room, "history": [{k: v for k, v in a.items() if k != "previous"} for a in history]}, room=request.sid)
+        emit("room_members", {"room": room, "members": [m["name"] for m in members]}, room=room)
+    return {"ok": True, "room": room}
 
 
 @socketio.on("leave_room")
-def handle_leave_room(data):
-    if not isinstance(data, dict):
-        return
-    room = data.get("room")
-    sid = request.sid
-    leave_room(room)
+def handle_leave_room(data=None):
     with _lock:
-        sid_room.pop(sid, None)
-        members = room_members.get(room, [])
-        room_members[room] = [m for m in members if m["sid"] != sid]
-    emit("room_members", [m["name"] for m in room_members.get(room, [])], room=room)
+        _remove_member(request.sid)
+
+
+def _event_room(data):
+    room = sid_room.get(request.sid)
+    return room if isinstance(data, dict) and data.get("room") == room else None
 
 
 @socketio.on("draw_line")
 def handle_draw_line(data):
-    if not isinstance(data, dict):
+    room = _event_room(data)
+    if not room:
         return
-    room = data.get("room") or DEFAULT_ROOM
-    entry = {k: v for k, v in data.items() if k != "room"}
+    for key in ("from", "to"):
+        point = data.get(key)
+        if not isinstance(point, dict) or any(type(point.get(axis)) not in (int, float) or not math.isfinite(point[axis]) or not 0 <= point[axis] <= 1 for axis in ("x", "y")):
+            return
+    if type(data.get("size")) not in (int, float) or data["size"] not in (8, 24):
+        return
+    if not isinstance(data.get("color"), str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", data["color"]):
+        return
+    stroke = data.get("strokeId")
+    if not isinstance(stroke, str) or len(stroke) > 80:
+        return
+    entry = {k: data[k] for k in ("from", "to", "size", "color", "strokeId")}
+    entry.update(type="draw_line", erasing=data.get("erasing") is True, author=request.sid)
     with _lock:
-        action_history.setdefault(room, []).append(entry)
-    emit("draw_line", entry, room=room, include_self=False)
+        history = action_history[room]
+        if len(history) >= MAX_ACTIONS:
+            emit("history_limit", {"room": room, "history": [{k: v for k, v in a.items() if k != "previous"} for a in history]})
+            return
+        history.append(entry)
+        emit("draw_line", {"room": room, "action": entry}, room=room, include_self=False)
 
 
 @socketio.on("clear_canvas")
 def handle_clear_canvas(data):
-    if not isinstance(data, dict):
-        return
-    room = data.get("room") or DEFAULT_ROOM
-    with _lock:
-        action_history[room] = []
-    emit("clear_canvas", room=room, include_self=False)
+    room = _event_room(data)
+    if room:
+        with _lock:
+            previous = [a for a in action_history[room] if a["type"] != "clear"]
+            action_history[room] = [{"type": "clear", "author": request.sid, "previous": previous}]
+            emit("action_history", {"room": room, "history": [{k: v for k, v in a.items() if k != "previous"} for a in action_history[room]]}, room=room)
 
 
 @socketio.on("undo")
 def handle_undo(data):
-    if not isinstance(data, dict):
-        return
-    room = data.get("room") or DEFAULT_ROOM
-    with _lock:
-        if action_history.get(room):
-            action_history[room].pop()
-        history = list(action_history.get(room, []))
-    emit("undo", history, room=room)
+    room = _event_room(data)
+    if room:
+        with _lock:
+            history = action_history[room]
+            own = next((a for a in reversed(history) if a.get("author") == request.sid), None)
+            if own:
+                if own["type"] == "clear":
+                    history[:] = own.get("previous", []) + [a for a in history if a is not own]
+                else:
+                    history[:] = [a for a in history if not (a.get("author") == request.sid and a.get("strokeId") == own["strokeId"])]
+            emit("action_history", {"room": room, "history": [{k: v for k, v in a.items() if k != "previous"} for a in history]}, room=room)
 
 
 @socketio.on("disconnect")
 def handle_disconnect():
-    sid = request.sid
     with _lock:
-        room = sid_room.pop(sid, None)
-        if room:
-            members = room_members.get(room, [])
-            room_members[room] = [m for m in members if m["sid"] != sid]
-    if room:
-        emit("room_members", [m["name"] for m in room_members.get(room, [])], room=room)
+        _remove_member(request.sid)
 
 
 if __name__ == "__main__":
