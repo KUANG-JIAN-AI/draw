@@ -6,6 +6,7 @@ export function createCanvasController({
   gestureCanvas,
   actionHistory,
   getBrushStyle,
+  onViewportChange = () => {},
 }) {
   const drawCtx = drawingCanvas.getContext("2d");
   const viewport = {
@@ -18,11 +19,14 @@ export function createCanvasController({
     const rect = gestureCanvas.getBoundingClientRect();
     const scaledWidth = WORLD_WIDTH * viewport.scale;
     const scaledHeight = WORLD_HEIGHT * viewport.scale;
-    const minX = Math.min(VIEWPORT_MARGIN, rect.width - scaledWidth - VIEWPORT_MARGIN);
-    const minY = Math.min(VIEWPORT_MARGIN, rect.height - scaledHeight - VIEWPORT_MARGIN);
-
-    viewport.x = Math.min(VIEWPORT_MARGIN, Math.max(minX, viewport.x));
-    viewport.y = Math.min(VIEWPORT_MARGIN, Math.max(minY, viewport.y));
+    // Center a sheet that fits; retain a reachable edge when zoomed in.
+    function clampAxis(value, available, size) {
+      if (size <= available - 48) return (available - size) / 2;
+      const margin = Math.min(VIEWPORT_MARGIN, available / 4);
+      return Math.min(margin, Math.max(available - size - margin, value));
+    }
+    viewport.x = clampAxis(viewport.x, rect.width, scaledWidth);
+    viewport.y = clampAxis(viewport.y, rect.height, scaledHeight);
   }
 
   function applyViewport() {
@@ -30,6 +34,27 @@ export function createCanvasController({
     drawingCanvas.style.width = `${WORLD_WIDTH}px`;
     drawingCanvas.style.height = `${WORLD_HEIGHT}px`;
     drawingCanvas.style.transform = `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`;
+    onViewportChange(viewport.scale);
+  }
+
+  function zoomTo(scale, anchor) {
+    if (!Number.isFinite(scale)) return;
+    const rect = gestureCanvas.getBoundingClientRect();
+    const point = anchor || { x: rect.width / 2, y: rect.height / 2 };
+    const next = Math.max(0.05, Math.min(4, scale));
+    const factor = next / viewport.scale;
+    viewport.x = point.x - (point.x - viewport.x) * factor;
+    viewport.y = point.y - (point.y - viewport.y) * factor;
+    viewport.scale = next;
+    applyViewport();
+  }
+
+  function fitToView() {
+    const rect = gestureCanvas.getBoundingClientRect();
+    zoomTo(Math.min((rect.width - 48) / WORLD_WIDTH, (rect.height - 48) / WORLD_HEIGHT, 1));
+    viewport.x = (rect.width - WORLD_WIDTH * viewport.scale) / 2;
+    viewport.y = (rect.height - WORLD_HEIGHT * viewport.scale) / 2;
+    applyViewport();
   }
 
   function drawLine(from, to, style = {}) {
@@ -103,6 +128,8 @@ export function createCanvasController({
 
   return {
     viewport,
+    zoomTo,
+    fitToView,
     applyViewport,
     drawLine,
     applyAction,

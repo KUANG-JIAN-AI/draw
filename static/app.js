@@ -31,10 +31,25 @@ const getLanguage = window.getLanguage;
   const generateButton = document.querySelector("#generateButton");
   const aiGenerateButton = document.querySelector("#aiGenerateButton");
   const aiDownloadButton = document.querySelector("#aiDownloadButton");
-  const aiStyleSelect = document.querySelector("#aiStyleSelect");
-  const aiSizeSelect = document.querySelector("#aiSizeSelect");
-  const aiModelSelect = document.querySelector("#aiModelSelect");
-  const aiPromptInput = document.querySelector("#aiPromptInput");
+  // Off-screen option state powers the toolbar's cycle buttons.
+  function createOptions(options) {
+    const select = document.createElement("select");
+    for (const [value, labelKey] of options) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.dataset.labelKey = labelKey;
+      option.textContent = t(labelKey);
+      select.append(option);
+    }
+    return select;
+  }
+  const aiStyleSelect = createOptions([
+    ["children", "style_children"], ["watercolor", "style_watercolor"],
+    ["cartoon3d", "style_cartoon3d"], ["sticker", "style_sticker"], ["realistic", "style_realistic"],
+  ]);
+  const aiSizeSelect = createOptions([["1024x768", "1024x768"], ["1024x1024", "1024x1024"], ["768x1024", "768x1024"]]);
+  const aiModelSelect = createOptions([["agnes-image-2.1-flash", "2.1 Flash"], ["agnes-image-2.0-flash", "2.0 Flash"]]);
+  const aiPromptInput = null;
   const aiResultImage = document.querySelector("#aiResultImage");
   const aiResultWrap = document.querySelector(".ai-result-wrap");
   const aiResultLoading = document.querySelector("#aiResultLoading");
@@ -65,6 +80,7 @@ const getLanguage = window.getLanguage;
   let hoverActivated = false;
   let aiGenerating = false;
   let strokeId = null;
+  let twoHandZoom = null;
   let noticeUntil = 0;
 
   const socket = window.io({
@@ -78,6 +94,11 @@ const getLanguage = window.getLanguage;
     gestureCanvas,
     actionHistory,
     getBrushStyle: () => ({ color, size, erasing }),
+    onViewportChange: (scale) => {
+      document.querySelector("#zoomReset").textContent = `${Math.round(scale * 100)}%`;
+      document.querySelector("#zoomOut").disabled = scale <= 0.05;
+      document.querySelector("#zoomIn").disabled = scale >= 4;
+    },
   });
   const gestureOverlay = createGestureOverlay({
     gestureCanvas,
@@ -281,6 +302,9 @@ const getLanguage = window.getLanguage;
   }
 
   function updateGestureAiControls() {
+    [aiStyleSelect, aiSizeSelect, aiModelSelect].forEach(select => {
+      for (const option of select.options) option.textContent = t(option.dataset.labelKey);
+    });
     if (gestureAiStyleButton) gestureAiStyleButton.textContent = `${t("ai_style_label")}: ${selectedOptionLabel(aiStyleSelect)}`;
     if (gestureAiSizeButton) gestureAiSizeButton.textContent = `${t("ai_size_label")}: ${selectedOptionLabel(aiSizeSelect)}`;
     if (gestureAiModelButton) gestureAiModelButton.textContent = `${t("ai_model_label")}: ${selectedOptionLabel(aiModelSelect)}`;
@@ -346,7 +370,43 @@ const getLanguage = window.getLanguage;
 
   function handleHandsResult(results) {
     const setTrackingStatus = (text, state) => setStatus(text, state, true);
-    const landmarks = results.multiHandLandmarks?.[0];
+    const detectedHands = results.multiHandLandmarks || [];
+    if (detectedHands.length >= 2) {
+      const rect = gestureCanvas.getBoundingClientRect();
+      const [first, second] = detectedHands;
+      const pinched = [first, second].every(hand => normalizedDistance(hand[8], hand[4]) < PINCH_THRESHOLD);
+      const a = landmarkToPoint(first[8], rect);
+      const b = landmarkToPoint(second[8], rect);
+      const span = distance(a, b);
+      const midpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      resetDrawingGestureState();
+      setHoveredGestureTool(null);
+      const drawZoomFeedback = (active) => gestureOverlay.drawZoom(detectedHands, {
+        active, scale: viewport.scale,
+        label: t(active ? "zoom_feedback_active" : "zoom_feedback_ready"),
+        hint: t(active ? "zoom_feedback_move" : "zoom_feedback_pinch"),
+      });
+      if (!pinched || span < 60) {
+        twoHandZoom = null;
+        drawZoomFeedback(false);
+        setTrackingStatus("zoom_two_hands_hint", "ready");
+        return;
+      }
+      if (!twoHandZoom) {
+        twoHandZoom = { span, scale: viewport.scale, anchor: midpoint };
+      } else {
+        // Smooth tracking jitter while keeping the starting midpoint fixed.
+        const target = Math.max(0.05, Math.min(4, twoHandZoom.scale * span / twoHandZoom.span));
+        canvas.zoomTo(viewport.scale + (target - viewport.scale) * 0.25, twoHandZoom.anchor);
+      }
+      drawZoomFeedback(true);
+      setTrackingStatus("zoom_two_hands_active", "ready");
+      return;
+    }
+    // Releasing either hand ends zoom and starts the next stroke afresh.
+    if (twoHandZoom) resetDrawingGestureState();
+    twoHandZoom = null;
+    const landmarks = detectedHands[0];
     const rect = gestureCanvas.getBoundingClientRect();
 
     if (!landmarks) {
@@ -447,6 +507,7 @@ const getLanguage = window.getLanguage;
       await hands?.close();
       camera = null;
       hands = null;
+      twoHandZoom = null;
       resetGestureSelection();
       gestureOverlay.draw(null, null, null);
       document.body.classList.remove("camera-active");
@@ -467,7 +528,7 @@ const getLanguage = window.getLanguage;
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
       });
       hands.setOptions({
-        maxNumHands: 1,
+        maxNumHands: 2,
         modelComplexity: 1,
         minDetectionConfidence: 0.72,
         minTrackingConfidence: 0.68,
@@ -509,6 +570,7 @@ const getLanguage = window.getLanguage;
       modelSelect: aiModelSelect,
       promptInput: aiPromptInput,
       resultImage: aiResultImage,
+      originalImage: document.querySelector("#aiOriginalImage"),
     },
     hasDrawing: () => {
       const clearedAt = actionHistory.findLastIndex(action => action.type === "clear");
@@ -519,6 +581,10 @@ const getLanguage = window.getLanguage;
     setAiStatus,
     setGenerating: (isGenerating) => {
       aiGenerating = isGenerating;
+      if (isGenerating) {
+        document.querySelector(".ai-panel").hidden = false;
+        document.querySelector("#aiToggle").setAttribute("aria-expanded", "true");
+      }
       aiResultWrap?.classList.toggle("is-loading", isGenerating);
       aiResultLoading?.setAttribute("aria-hidden", String(!isGenerating));
       if (isGenerating) {
@@ -610,3 +676,25 @@ const getLanguage = window.getLanguage;
   });
   updateGestureAiControls();
   canvas.resize(gestureOverlay.context);
+
+  function changeZoom(scale, anchor) {
+    resetDrawingGestureState();
+    canvas.zoomTo(scale, anchor);
+  }
+  document.querySelector("#zoomIn").addEventListener("click", () => changeZoom(viewport.scale * 1.2));
+  document.querySelector("#zoomOut").addEventListener("click", () => changeZoom(viewport.scale / 1.2));
+  document.querySelector("#zoomReset").addEventListener("click", () => changeZoom(1));
+  document.querySelector("#zoomFit").addEventListener("click", () => {
+    resetDrawingGestureState();
+    canvas.fitToView();
+  });
+  document.querySelector(".stage").addEventListener("wheel", (event) => {
+    // Preserve native scrolling inside panels and toolbars.
+    if (event.target.closest(".ai-panel, .gesture-toolbar, .hud, .zoom-controls, .camera-preview")) return;
+    event.preventDefault();
+    const rect = gestureCanvas.getBoundingClientRect();
+    const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? rect.height : 1);
+    changeZoom(viewport.scale * Math.exp(-Math.max(-200, Math.min(200, delta)) * 0.002), {
+      x: event.clientX - rect.left, y: event.clientY - rect.top,
+    });
+  }, { passive: false });

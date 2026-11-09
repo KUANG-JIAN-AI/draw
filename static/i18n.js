@@ -147,12 +147,28 @@ const translations = {
 };
 
 Object.assign(translations.zh, {
+  ai_preview: "图片预览",
+  comparison_original: "绘画原图", comparison_generated: "AI 生成图",
+  comparison_original_empty: "生成后展示本次绘画快照", comparison_generated_empty: "生成后在这里查看效果",
+  zoom_feedback_active: "双手缩放中", zoom_feedback_ready: "已识别双手",
+  zoom_feedback_move: "← 拉开放大 · 靠近缩小 →  松开结束", zoom_feedback_pinch: "两手各捏合拇指和食指，开始缩放",
+  zoom_two_hands_hint: "双手各自捏合拇指和食指，拉开放大、靠近缩小；单手继续绘画",
+  zoom_two_hands_active: "双手缩放中：拉开放大，靠近缩小；松开结束",
+  zoom_controls: "画布缩放", zoom_in: "放大", zoom_out: "缩小", zoom_reset: "恢复 100%", zoom_fit: "适应窗口",
   camera_stop: "关闭摄像头", camera_stopped: "摄像头已关闭", anonymous: "匿名",
   room_error: "加入房间失败，请检查名称长度", room_disconnected: "连接已断开，正在重连；暂时停止同步绘画",
   history_limit: "房间历史已达上限，请保存后清空画布", ai_saved: "生成结果和原图已保存",
   ai_save_failed: "图片已生成，自动保存失败，可下载结果",
 });
 Object.assign(translations.ja, {
+  ai_preview: "画像プレビュー",
+  comparison_original: "描いた原画", comparison_generated: "AI 生成画像",
+  comparison_original_empty: "生成に使った原画をここに表示", comparison_generated_empty: "生成後に結果をここに表示",
+  zoom_feedback_active: "ズーム中", zoom_feedback_ready: "両手を検出",
+  zoom_feedback_move: "離すと拡大・近づけると縮小・開いて終了", zoom_feedback_pinch: "両手で親指と人差し指をつまむと開始",
+  zoom_two_hands_hint: "両手で親指と人差し指をつまみ、離すと拡大、近づけると縮小。片手で描画",
+  zoom_two_hands_active: "両手でズーム中：離すと拡大、近づけると縮小。指を開くと終了",
+  zoom_controls: "キャンバスのズーム", zoom_in: "拡大", zoom_out: "縮小", zoom_reset: "100% に戻す", zoom_fit: "全体を表示",
   camera_stop: "カメラを停止", camera_stopped: "カメラを停止しました", anonymous: "匿名",
   room_error: "ルームに参加できませんでした", room_disconnected: "接続が切れました。再接続中です",
   history_limit: "履歴の上限です。保存してからキャンバスをクリアしてください", ai_saved: "生成画像と原画を保存しました",

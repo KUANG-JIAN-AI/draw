@@ -825,3 +825,39 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .camera-preview { bottom: 90px; }
 }
 @media (prefers-reduced-motion: reduce) { .ai-loader { animation: none; } }
+
+.zoom-controls {
+  position: absolute; z-index: 6; right: 14px; bottom: 14px;
+  display: flex; gap: 6px; padding: 6px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: rgba(255,255,255,.95); box-shadow: 0 2px 12px #17203318;
+}
+.zoom-controls .tool-button { min-width: 38px; }
+.zoom-value { min-width: 70px !important; font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) {
+  .zoom-controls { right: 10px; bottom: 10px; }
+  .stage .hud { bottom: 76px; }
+  .stage .ai-panel { bottom: 132px; }
+  .stage .camera-preview { bottom: 156px; }
+}
+@media (min-width: 861px) {
+  .stage .hud { max-width: min(620px, calc(100% - 340px)); }
+}
+
+.zoom-help { display: none; position: absolute; z-index: 5; right: 14px; bottom: 76px; max-width: min(320px, calc(100% - 28px)); padding: 8px 12px; border-radius: 8px; background: #ffffffed; color: var(--ink); font-size: 12px; pointer-events: none; }
+.camera-active .zoom-help { display: block; }
+@media (max-width: 860px) { .zoom-help { bottom: auto; top: 156px; } }
+
+/* Compare the exact generation input and output at equal visual sizes. */
+.stage .ai-panel { width: min(640px, calc(100% - 190px)); }
+.image-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; padding: 10px; }
+.comparison-item { margin: 0; min-width: 0; }
+.comparison-item figcaption { margin-bottom: 8px; font-size: 13px; font-weight: 650; }
+.comparison-preview { display: grid; place-items: center; aspect-ratio: 4 / 3; border: 1px solid var(--line); border-radius: 6px; background: white; overflow: hidden; }
+.comparison-preview .ai-result { width: 100%; height: 100%; max-height: none; object-fit: contain; }
+.comparison-empty { padding: 14px; color: var(--muted); font-size: 12px; text-align: center; }
+.ai-result.has-result + .comparison-empty { display: none; }
+@media (max-width: 860px) {
+  .stage .ai-panel { width: auto; max-height: 55dvh; }
+  .image-comparison { gap: 8px; padding: 8px; }
+}

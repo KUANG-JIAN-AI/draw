@@ -72,6 +72,7 @@ export function createAiImageController({
   setGenerating = () => {},
 }) {
   let latestAiImageUrl = "";
+  let generating = false;
   const {
     generateButton,
     panelGenerateButton,
@@ -81,10 +82,11 @@ export function createAiImageController({
     modelSelect,
     promptInput,
     resultImage,
+    originalImage,
   } = elements;
 
   async function generate() {
-    if (!panelGenerateButton) return;
+    if (generating) return;
 
     if (!hasDrawing()) {
       setAiStatus("ai_failed", "error");
@@ -95,7 +97,8 @@ export function createAiImageController({
     const sizeValue = sizeSelect?.value || "1024x768";
     const { width, height } = sizeToDimensions(sizeValue);
 
-    panelGenerateButton.disabled = true;
+    generating = true;
+    if (panelGenerateButton) panelGenerateButton.disabled = true;
     if (generateButton) generateButton.disabled = true;
     setGenerating(true);
     setAiStatus("ai_generating", "loading");
@@ -131,9 +134,11 @@ export function createAiImageController({
         throw new Error("No image found in Agnes response");
       }
 
+      originalImage.src = drawingImage;
+      originalImage.classList.add("has-result");
       resultImage.src = latestAiImageUrl;
       resultImage.classList.add("has-result");
-      downloadButton.disabled = false;
+      if (downloadButton) downloadButton.disabled = false;
       setAiStatus("ai_done", "ready");
       try {
         const saved = await saveGeneratedImages(drawingImage, latestAiImageUrl);
@@ -149,7 +154,8 @@ export function createAiImageController({
       setStatus(errorMessage || "ai_generation_failed", "error");
     } finally {
       setGenerating(false);
-      panelGenerateButton.disabled = false;
+      generating = false;
+      if (panelGenerateButton) panelGenerateButton.disabled = false;
       if (generateButton) generateButton.disabled = false;
     }
   }
