@@ -105,6 +105,11 @@
           <div id="membersList" class="members-list"></div>
         </div>
 
+        <select id="aiModelSelect" hidden>
+          {% for value, label in image_models.items() %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
         <aside id="aiPanel" hidden class="ai-panel" aria-label="AI 图生图">
           <div class="ai-panel-header">
             <strong data-i18n="ai_panel_title">AI 图生图</strong>

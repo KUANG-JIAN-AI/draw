@@ -29,7 +29,7 @@ cp .env.example .env
 その後、`.env` を編集します。
 
 ```dotenv
-AGNES_API_KEY="あなたの Agnes API Key"
+OPENAI_API_KEY="あなたの OpenAI API Key"
 ```
 
 4. Flask アプリケーションを起動
@@ -58,9 +58,11 @@ python app.py --port 5001
 
 ## AI 画像生成
 
-簡単なイラストを描いた後、右側の AI パネルでスタイル、サイズ、モデルを選択し、生成したいイメージを入力して「AI 生成」をクリックします。
+簡単なイラストを描いた後、「AI 生成」をクリックします。カメラを起動すると、ジェスチャーツールバーでスタイル、サイズ、モデルを切り替えられます。生成後は原画と生成結果が並んで表示されます。
 
-バックエンドでは現在のキャンバスを白背景の PNG として書き出し、`AGNES_API_KEY` を使用して Agnes Image の image-to-image API を呼び出します。
+后端读取项目根目录 `.env` 中的 `OPENAI_API_KEY`。保存后重启服务即可生效。点击「AI 生成」会将白底草图和风格提示发送至 OpenAI 的 `/v1/images/edits`，默认使用 GPT Image 2.5 Flare，每次生成一张中等质量的 PNG，费用计入该密钥所属的 API 项目。也可在手势工具栏切换到 GPT Image 2.5 Sunburst。
+
+原有小组配置仍可使用。只设置 `AGNES_API_KEY` 时使用 Agnes，同时配置两个密钥时优先使用 OpenAI。
 
 4. ブラウザで開く
 

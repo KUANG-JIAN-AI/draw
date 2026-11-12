@@ -48,7 +48,7 @@ const getLanguage = window.getLanguage;
     ["cartoon3d", "style_cartoon3d"], ["sticker", "style_sticker"], ["realistic", "style_realistic"],
   ]);
   const aiSizeSelect = createOptions([["1024x768", "1024x768"], ["1024x1024", "1024x1024"], ["768x1024", "768x1024"]]);
-  const aiModelSelect = createOptions([["agnes-image-2.1-flash", "2.1 Flash"], ["agnes-image-2.0-flash", "2.0 Flash"]]);
+  const aiModelSelect = document.querySelector("#aiModelSelect");
   const aiPromptInput = null;
   const aiResultImage = document.querySelector("#aiResultImage");
   const aiResultWrap = document.querySelector(".ai-result-wrap");
@@ -302,7 +302,7 @@ const getLanguage = window.getLanguage;
   }
 
   function updateGestureAiControls() {
-    [aiStyleSelect, aiSizeSelect, aiModelSelect].forEach(select => {
+    [aiStyleSelect, aiSizeSelect].forEach(select => {
       for (const option of select.options) option.textContent = t(option.dataset.labelKey);
     });
     if (gestureAiStyleButton) gestureAiStyleButton.textContent = `${t("ai_style_label")}: ${selectedOptionLabel(aiStyleSelect)}`;

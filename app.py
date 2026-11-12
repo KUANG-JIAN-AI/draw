@@ -34,8 +34,12 @@ _generation_times = {}
 DEFAULT_ROOM = "lobby"
 DEFAULT_NAME = "匿名"
 AGNES_IMAGE_ENDPOINT = "https://apihub.agnes-ai.com/v1/images/generations"
-AGNES_IMAGE_MODELS = {"agnes-image-2.1-flash", "agnes-image-2.0-flash"}
-AGNES_IMAGE_SIZES = {"1024x1024", "1024x768", "768x1024"}
+OPENAI_IMAGE_ENDPOINT = "https://api.openai.com/v1/images/edits"
+IMAGE_MODELS = {
+    "OpenAI": {"gpt-image-2.5-flare": "GPT Image 2.5 Flare", "gpt-image-2.5-sunburst": "GPT Image 2.5 Sunburst"},
+    "Agnes": {"agnes-image-2.1-flash": "2.1 Flash", "agnes-image-2.0-flash": "2.0 Flash"},
+}
+IMAGE_SIZES = ("1024x1024", "1024x768", "768x1024")
 SAVED_IMAGES_DIR = Path(__file__).resolve().parent / "saved-images"
 DATA_URL_PATTERN = re.compile(r"^data:image/(?P<ext>png|jpeg|jpg|webp);base64,(?P<data>.+)$", re.DOTALL)
 IMAGE_EXTENSIONS_BY_CONTENT_TYPE = {
@@ -86,14 +90,21 @@ def _save_image_source(source, stem):
     return file_path
 
 
+def image_provider():
+    if os.environ.get("OPENAI_API_KEY") or not os.environ.get("AGNES_API_KEY"):
+        return "OpenAI"
+    return "Agnes"
+
+
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", image_models=IMAGE_MODELS[image_provider()])
 
 
 @app.get("/api/generate-image/status")
 def generate_image_status():
-    return jsonify({"configured": bool(os.environ.get("AGNES_API_KEY"))})
+    provider = image_provider()
+    return jsonify({"provider": provider, "configured": bool(os.environ.get(f"{provider.upper()}_API_KEY"))})
 
 
 @app.post("/api/save-generated-images")
@@ -121,6 +132,31 @@ def save_generated_images():
 
 @app.post("/api/generate-image")
 def generate_image():
+    provider = image_provider()
+    key_name = f"{provider.upper()}_API_KEY"
+    api_key = os.environ.get(key_name)
+    if not api_key:
+        return jsonify({"error": f"请在服务器上设置 {key_name}"}), 503
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "缺少画布数据"}), 400
+    image = data.get("image")
+    try:
+        _read_image_source(image)
+    except ValueError:
+        return jsonify({"error": "缺少有效的画布图片"}), 400
+    prompt = data.get("prompt")
+    if not isinstance(prompt, str) or not prompt.strip():
+        return jsonify({"error": "请输入生成提示词"}), 400
+    models = IMAGE_MODELS[provider]
+    model = data.get("model") or next(iter(models))
+    size = data.get("size") or "1024x768"
+    if not isinstance(model, str) or model not in models:
+        return jsonify({"error": f"不支持的 {provider} 图像模型，请刷新页面"}), 400
+    if size not in IMAGE_SIZES:
+        return jsonify({"error": "不支持的图片尺寸"}), 400
+
     now = time.monotonic()
     address = request.remote_addr
     with _lock:
@@ -130,37 +166,16 @@ def generate_image():
         if address in _generation_times:
             return jsonify({"error": "请稍候再生成图片"}), 429
         _generation_times[address] = now
-    api_key = os.environ.get("AGNES_API_KEY")
-    if not api_key:
-        return jsonify({"error": "请先设置环境变量 AGNES_API_KEY"}), 400
-
-    data = request.get_json(silent=True) or {}
-    image = data.get("image")
-    prompt = (data.get("prompt") or "").strip()
-    model = data.get("model") or "agnes-image-2.1-flash"
-    size = data.get("size") or "1024x768"
-
-    if not image or not isinstance(image, str) or not image.startswith("data:image/"):
-        return jsonify({"error": "缺少有效的画布图片"}), 400
-    if not prompt:
-        return jsonify({"error": "请输入生成提示词"}), 400
-    if model not in AGNES_IMAGE_MODELS:
-        return jsonify({"error": "不支持的 Agnes 图像模型"}), 400
-    if size not in AGNES_IMAGE_SIZES:
-        return jsonify({"error": "不支持的图片尺寸"}), 400
-
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "size": size,
-        "extra_body": {
-            "image": [image],
-            "response_format": "b64_json",
-        },
-    }
+    payload = {"model": model, "prompt": prompt.strip(), "size": size}
+    if provider == "OpenAI":
+        endpoint = OPENAI_IMAGE_ENDPOINT
+        payload.update(images=[{"image_url": image}], quality="medium", output_format="png", n=1)
+    else:
+        endpoint = AGNES_IMAGE_ENDPOINT
+        payload["extra_body"] = {"image": [image], "response_format": "b64_json"}
     body = json.dumps(payload).encode("utf-8")
-    agnes_request = urllib.request.Request(
-        AGNES_IMAGE_ENDPOINT,
+    image_request = urllib.request.Request(
+        endpoint,
         data=body,
         headers={
             "Authorization": f"Bearer {api_key}",
@@ -170,23 +185,22 @@ def generate_image():
     )
 
     try:
-        with urllib.request.urlopen(agnes_request, timeout=180) as response:
+        with urllib.request.urlopen(image_request, timeout=180) as response:
             response_body = response.read().decode("utf-8")
     except urllib.error.HTTPError as error:
-        error_body = error.read().decode("utf-8", errors="replace")
-        app.logger.warning("Agnes API request failed (%s): %s", error.code, error_body[:1000])
-        return jsonify({"error": "Agnes API 请求失败", "details": error_body}), error.code
+        app.logger.warning("%s image request returned HTTP %s", provider, error.code)
+        hints = {401: "请检查服务器的 API 密钥", 403: "请检查项目的图像模型权限", 429: "请检查 API 额度或稍后重试"}
+        return jsonify({"error": f"{provider} HTTP {error.code} · {hints.get(error.code, '图像编辑请求失败')}"}), error.code
     except urllib.error.URLError as error:
-        app.logger.warning("Could not connect to Agnes API: %s", error.reason)
-        return jsonify({"error": "无法连接 Agnes API", "details": str(error.reason)}), 502
+        app.logger.warning("Could not connect to %s: %s", provider, error.reason)
+        return jsonify({"error": f"无法连接 {provider} API"}), 502
     except TimeoutError:
-        app.logger.warning("Agnes API request timed out")
-        return jsonify({"error": "Agnes API 请求超时"}), 504
+        return jsonify({"error": f"{provider} API 请求超时"}), 504
 
     try:
         return jsonify(json.loads(response_body))
     except json.JSONDecodeError:
-        return jsonify({"error": "Agnes API 返回了无法解析的内容"}), 502
+        return jsonify({"error": f"{provider} API 返回了无法解析的内容"}), 502
 
 
 def _remove_member(sid):

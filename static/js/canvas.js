@@ -121,7 +121,10 @@ export function createCanvasController({
     output.height = targetHeight;
     outputCtx.fillStyle = "#ffffff";
     outputCtx.fillRect(0, 0, output.width, output.height);
-    outputCtx.drawImage(drawingCanvas, 0, 0, output.width, output.height);
+    const scale = Math.min(output.width / WORLD_WIDTH, output.height / WORLD_HEIGHT);
+    const width = WORLD_WIDTH * scale;
+    const height = WORLD_HEIGHT * scale;
+    outputCtx.drawImage(drawingCanvas, (output.width - width) / 2, (output.height - height) / 2, width, height);
 
     return output.toDataURL("image/png");
   }

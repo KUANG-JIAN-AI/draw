@@ -21,7 +21,7 @@ function buildPrompt(promptInput, styleSelect) {
   ].join(" ");
 }
 
-function getResultImageFromAgnes(data) {
+function getResultImage(data) {
   const first = data?.data?.[0] || data?.images?.[0] || data?.output?.[0] || data;
   const b64 = first?.b64_json || first?.base64 || first?.image_base64 || first?.data;
   const url = first?.url || first?.image_url;
@@ -108,14 +108,14 @@ export function createAiImageController({
       const statusResponse = await fetch("/api/generate-image/status");
       const status = await statusResponse.json();
       if (!status.configured) {
-        throw new Error("Agnes API key is not configured");
+        throw new Error(`请先在服务器配置 ${status.provider.toUpperCase()}_API_KEY`);
       }
 
       const drawingImage = getDrawingDataUrl(width, height);
       const payload = {
         image: drawingImage,
         prompt: buildPrompt(promptInput, styleSelect),
-        model: modelSelect?.value || "agnes-image-2.1-flash",
+        model: modelSelect?.value,
         size: sizeValue,
       };
 
@@ -129,9 +129,9 @@ export function createAiImageController({
         throw new Error(data?.details || data?.error || response.statusText);
       }
 
-      latestAiImageUrl = getResultImageFromAgnes(data);
+      latestAiImageUrl = getResultImage(data);
       if (!latestAiImageUrl) {
-        throw new Error("No image found in Agnes response");
+        throw new Error("No image found in the API response");
       }
 
       originalImage.src = drawingImage;
@@ -163,7 +163,7 @@ export function createAiImageController({
   function download() {
     if (!latestAiImageUrl) return;
     const link = document.createElement("a");
-    link.download = `agnes-ai-image-${new Date().toISOString().slice(0, 10)}.png`;
+    link.download = `ai-image-${new Date().toISOString().slice(0, 10)}.png`;
     link.href = latestAiImageUrl;
     link.click();
   }
