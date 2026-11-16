@@ -28,6 +28,11 @@ export function createRoomController({ socket, actionHistory, canvas, membersLis
       actionHistory.push(action);
       canvas.applyAction(action);
     });
+    socket.on("fill", ({ room, action }) => {
+      if (room !== currentRoom) return;
+      actionHistory.push(action);
+      canvas.applyAction(action);
+    });
     socket.on("room_members", ({ room, members }) => {
       if (room === desiredRoom) membersList.textContent = `${t("hud_members")}：${members.join("，")}`;
     });

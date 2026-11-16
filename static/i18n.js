@@ -175,6 +175,33 @@ Object.assign(translations.ja, {
   ai_save_failed: "生成できましたが自動保存に失敗しました。ダウンロードできます",
 });
 
+Object.assign(translations.zh, {
+  menu_fist_hold: "已识别握拳，请保持半秒", menu_fist_release: "请先张开手掌，再握拳打开工具",
+  menu_tools: "工具", menu_title: "快捷工具", menu_hint: "松开拳头，食指指向按钮停留选择；再次握拳关闭",
+  menu_back: "返回画画", menu_confirm: "确认", menu_cancel: "取消",
+  menu_opening: "打开工具", menu_closing: "关闭工具", menu_resume: "工具已关闭，松开捏合后重新捏合画画",
+  menu_clear_confirm: "确认清空画布？可以撤销。", menu_generate_confirm: "确认使用以下设置生成图片？",
+  menu_canvas_hint: "松开捏合后握拳打开工具；捏合画画；张掌拖动；双手捏合缩放",
+  precision: "精细", fill: "填色", precision_mode: "精细模式",
+  smoothing: "防抖", smoothing_off: "关闭", smoothing_medium: "适中", smoothing_strong: "强",
+  fill_hint: "填色模式：指向封闭区域，捏合一次；可撤销。未封闭区域会填到外面。",
+  precision_hint: "精细模式：笔尖移动减半。松手后可重新摆位，再捏合落笔。", normal_mode: "普通绘画模式",
+  camera_ready: "摄像头已开启：松开捏合后握拳约半秒打开工具，捏合画画",
+});
+Object.assign(translations.ja, {
+  menu_fist_hold: "握った手を認識しました。約0.5秒保持してください", menu_fist_release: "一度手を開いてから、握ってツールを開いてください",
+  menu_tools: "ツール", menu_title: "クイックツール", menu_hint: "手を開き、人差し指をボタンに重ねて選択。もう一度握ると閉じます",
+  menu_back: "描画に戻る", menu_confirm: "確認", menu_cancel: "キャンセル",
+  menu_opening: "ツールを開く", menu_closing: "ツールを閉じる", menu_resume: "ツールを閉じました。つまみを解除してから、再びつまんで描画",
+  menu_clear_confirm: "キャンバスを消去しますか？元に戻せます。", menu_generate_confirm: "次の設定で画像を生成しますか？",
+  menu_canvas_hint: "つまみを解除して手を握るとツール表示。つまんで描画、開いた手で移動、両手のつまみでズーム",
+  precision: "精密", fill: "塗りつぶし", precision_mode: "精密モード",
+  smoothing: "手ぶれ補正", smoothing_off: "オフ", smoothing_medium: "中", smoothing_strong: "強",
+  fill_hint: "塗りつぶし：閉じた領域で一度つまみます。隙間があると外にも広がります。元に戻す操作が可能です。",
+  precision_hint: "精密モード：ペン先の移動量が半分になります。つまみを離して手を置き直せます。", normal_mode: "通常描画モード",
+  camera_ready: "カメラ起動済み：つまみを解除して約0.5秒握るとツール表示。つまんで描画",
+});
+
 let currentLanguage = localStorage.getItem("language") || "zh";
 
 function t(key) {

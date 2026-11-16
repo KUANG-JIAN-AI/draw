@@ -21,6 +21,22 @@ class RoomTests(unittest.TestCase):
                     color='#111827', size=8, erasing=False,
                     **{'from': {'x': .1, 'y': .1}, 'to': {'x': .2, 'y': .2}}))
 
+    def test_fill_sync_validation_and_undo(self):
+        a, b, outsider = self.clients
+        self.join(a, 'paint')
+        self.join(b, 'paint')
+        b.get_received()
+        payload = dict(room='paint', strokeId='fill-1', color='#e11d48', **{'from': {'x': .5, 'y': .5}})
+        outsider.emit('fill', payload)
+        self.assertEqual(server.action_history['paint'], [])
+        a.emit('fill', dict(payload, color='invalid'))
+        self.assertEqual(server.action_history['paint'], [])
+        a.emit('fill', payload)
+        self.assertEqual(server.action_history['paint'][0]['type'], 'fill')
+        self.assertTrue(any(e['name'] == 'fill' for e in b.get_received()))
+        a.emit('undo', {'room': 'paint'})
+        self.assertEqual(server.action_history['paint'], [])
+
     def test_membership_and_room_switch(self):
         a, b, outsider = self.clients
         self.join(a, 'one')

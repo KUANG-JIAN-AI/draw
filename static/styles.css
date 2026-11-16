@@ -861,3 +861,40 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .stage .ai-panel { width: auto; max-height: 55dvh; }
   .image-comparison { gap: 8px; padding: 8px; }
 }
+
+.comfort-tools { flex-wrap: wrap; gap: 8px; }
+.comfort-tools label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.comfort-tools select { border: 1px solid #cbd5e1; border-radius: 8px; background: white; padding: 7px; color: #111827; }
+.tool-button[aria-pressed="true"] { background: #ccfbf1; border-color: #0f766e; color: #115e59; }
+
+/* Central tools stay within the camera's comfortable selection area. */
+.gesture-menu-toggle { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 7; }
+.gesture-menu { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 6; width: min(560px, calc(100% - 28px)); max-height: calc(100% - 90px); overflow-y: auto; padding: 18px; border: 1px solid #b8d8d3; border-radius: 20px; background: rgba(245, 252, 250, .98); box-shadow: 0 16px 60px #123b3540; }
+.gesture-menu-header { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; color: #163e38; }
+.gesture-menu-header span { font-size: 13px; }
+.gesture-menu .gesture-panel { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; box-sizing: border-box; flex-direction: row; background: transparent; border: 0; padding: 0; margin: 0 0 10px; gap: 10px; }
+.gesture-menu .color-pad { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.gesture-menu .gesture-tool { width: 100%; min-width: 0; min-height: 60px; margin: 0; font-size: 15px; background-color: #fff; color: #163e38; border-color: #cbd5e1; background-image: linear-gradient(rgba(15, 118, 110, .16), rgba(15, 118, 110, .16)); border-radius: 12px; }
+.gesture-menu .swatch { width: 58px; height: 58px; justify-self: center; background: var(--swatch); border: 4px solid #fff; box-shadow: 0 0 0 1px #b5c8c2; }
+.gesture-menu .swatch.active { box-shadow: 0 0 0 3px #123e35; }
+.gesture-menu .gesture-ai-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gesture-menu .gesture-tool.compact { font-size: 12px; white-space: normal; }
+.gesture-menu .gesture-tool.gesture-hover { outline: 3px solid #f59e0b; outline-offset: 2px; }
+.gesture-menu .gesture-tool.active:not(.swatch) { background-color: #0f766e; border-color: #0f766e; color: #fff; background-image: linear-gradient(rgba(255, 255, 255, .24), rgba(255, 255, 255, .24)); }
+.gesture-menu .gesture-tool.danger { color: #b91c1c; }
+.gesture-menu .menu-close { background-color: #fff; color: #163e38; }
+.menu-confirmation { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.menu-confirmation span { grid-column: 1 / -1; color: #163e38; }
+.gesture-menu.confirming .menu-drawing, .gesture-menu.confirming .menu-ai { display: none; }
+.fist-progress { position: absolute; z-index: 8; left: 50%; top: 16px; transform: translateX(-50%); background: #163e38; color: white; border-radius: 12px; padding: 12px 20px; pointer-events: none; }
+@media (max-width: 600px) {
+  .gesture-menu { padding: 12px; }
+  .gesture-menu .gesture-panel { gap: 8px; }
+  .gesture-menu .gesture-tool { min-height: 52px; font-size: 13px; }
+  .gesture-menu .swatch { width: 44px; height: 44px; }
+}
+
+.gesture-menu-open #gestureCanvas { z-index: 7; pointer-events: none; }
+.gesture-menu { box-sizing: border-box; }
+
+.gesture-menu { max-height: none; overflow: visible; transform: translate(-50%, -50%) scale(var(--menu-scale, 1)); transform-origin: center; }

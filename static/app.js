@@ -1,8 +1,8 @@
+import { createFistLatch, createHandGestureTracker } from "./js/gesture-menu.js";
 import { HOLD_TO_SELECT_MS, PINCH_THRESHOLD } from "./js/constants.js";
 import {
   distance,
   isInsideWorld,
-  isOpenPalm,
   landmarkToPoint,
   normalizePoint,
   normalizedDistance,
@@ -70,6 +70,12 @@ const getLanguage = window.getLanguage;
   let color = "#111827";
   let size = 8;
   let erasing = false;
+  let filling = false;
+  let precision = false;
+  let filteredPoint = null;
+  let rawStrokePoint = null;
+  let precisionPoint = null;
+  let lastSampleTime = 0;
   let camera = null;
   let hands = null;
   let lastPoint = null;
@@ -81,6 +87,69 @@ const getLanguage = window.getLanguage;
   let aiGenerating = false;
   let strokeId = null;
   let twoHandZoom = null;
+  let menuOpen = false;
+  let pendingMenuAction = null;
+  let requirePinchRelease = false;
+  const fistLatch = createFistLatch();
+  const handGestureTracker = createHandGestureTracker();
+  const gestureMenu = document.querySelector("#gestureMenu");
+  const fistProgress = document.querySelector("#fistProgress");
+
+  function fitGestureMenu() {
+    if (!menuOpen) return;
+    const available = gestureCanvas.getBoundingClientRect().height - 48;
+    const scale = Math.min(1, Math.max(0.1, available / gestureMenu.scrollHeight));
+    gestureMenu.style.setProperty("--menu-scale", scale);
+  }
+
+  function setMenuOpen(open) {
+    menuOpen = open;
+    document.querySelector(".stage").classList.toggle("gesture-menu-open", open);
+    gestureMenu.hidden = !open;
+    document.querySelector("#gestureMenuToggle").setAttribute("aria-expanded", String(open));
+    pendingMenuAction = null;
+    document.querySelector("#menuConfirmation").hidden = true;
+    gestureMenu.classList.remove("confirming");
+    fitGestureMenu();
+    requirePinchRelease = true;
+    fistProgress.hidden = true;
+    resetGestureSelection();
+    setStatus(open ? "menu_hint" : "menu_resume", "ready");
+  }
+
+  function selectMenuTool(tool) {
+    if (!tool || tool.disabled) return;
+    const action = tool.dataset.gestureAction;
+    if (action === "close") { setMenuOpen(false); return; }
+    if (action === "cancel") {
+      pendingMenuAction = null;
+      document.querySelector("#menuConfirmation").hidden = true;
+      gestureMenu.classList.remove("confirming");
+      fitGestureMenu();
+      setHoveredGestureTool(null);
+      return;
+    }
+    if (action === "ai-generate" || action === "clear") {
+      pendingMenuAction = tool;
+      document.querySelector("#menuConfirmText").textContent = action === "clear" ? t("menu_clear_confirm") : `${t("menu_generate_confirm")} ${selectedOptionLabel(aiStyleSelect)} · ${selectedOptionLabel(aiSizeSelect)} · ${selectedOptionLabel(aiModelSelect)}`;
+      document.querySelector("#menuConfirmation").hidden = false;
+      gestureMenu.classList.add("confirming");
+      fitGestureMenu();
+      setHoveredGestureTool(null);
+      return;
+    }
+    if (action === "confirm") {
+      const pending = pendingMenuAction;
+      if (!pending) return;
+      setMenuOpen(false);
+      activateGestureTool(pending);
+      return;
+    }
+    activateGestureTool(tool);
+    // AI settings can be cycled before confirming generation.
+    if (!action.startsWith("ai-")) setMenuOpen(false);
+    else fitGestureMenu();
+  }
   let noticeUntil = 0;
 
   const socket = window.io({
@@ -197,6 +266,8 @@ const getLanguage = window.getLanguage;
   function resetDrawingGestureState() {
     pinchWasDown = false;
     lastPoint = null;
+    filteredPoint = rawStrokePoint = precisionPoint = null;
+    lastSampleTime = 0;
     lastPanPoint = null;
   }
 
@@ -209,11 +280,8 @@ const getLanguage = window.getLanguage;
 
     if (progress >= 1 && !hoverActivated) {
       hoverActivated = true;
-      activateGestureTool(hoveredGestureTool);
-      hoveredGestureTool.classList.remove("selected-flash");
-      void hoveredGestureTool.offsetWidth;
-      hoveredGestureTool.classList.add("selected-flash");
-      setTimeout(() => hoveredGestureTool?.classList.remove("selected-flash"), 360);
+      const selected = hoveredGestureTool;
+      selectMenuTool(selected);
       return true;
     }
 
@@ -225,7 +293,8 @@ const getLanguage = window.getLanguage;
     const screenX = rect.left + point.x;
     const screenY = rect.top + point.y;
     const element = document.elementFromPoint(screenX, screenY);
-    return element?.closest?.(".gesture-tool") || null;
+    const tool = element?.closest?.(".gesture-tool");
+    return menuOpen && tool && gestureMenu.contains(tool) && !tool.disabled ? tool : null;
   }
 
   function hasStableDrawingLandmarks(landmarks) {
@@ -262,6 +331,34 @@ const getLanguage = window.getLanguage;
     customColor.value = nextColor;
   }
 
+  function setFill(value) {
+    filling = value;
+    if (value) {
+      erasing = false;
+      eraserButton.setAttribute("aria-pressed", "false");
+      document.querySelectorAll("[data-gesture-action='eraser']").forEach(b => b.classList.remove("active"));
+    }
+    document.querySelector("#fillButton").setAttribute("aria-pressed", String(value));
+    document.querySelectorAll("[data-gesture-action='fill']").forEach(b => b.classList.toggle("active", value));
+    resetDrawingGestureState();
+    if (value) setStatus("fill_hint", "ready");
+  }
+
+  function togglePrecision() {
+    precision = !precision;
+    document.querySelector("#precisionButton").setAttribute("aria-pressed", String(precision));
+    document.querySelectorAll("[data-gesture-action='precision']").forEach(b => b.classList.toggle("active", precision));
+    resetDrawingGestureState();
+    setStatus(precision ? "precision_hint" : "normal_mode", "ready");
+  }
+
+  function fillAt(point) {
+    const action = { type: "fill", from: normalizePoint(point), color, strokeId: crypto.randomUUID(), room: roomController.getCurrentRoom() };
+    actionHistory.push(action);
+    canvas.applyAction(action);
+    if (action.room) socket.emit("fill", action);
+  }
+
   function updateBrushSize(nextSize) {
     size = Number(nextSize);
     sizeOptions.forEach((button) => {
@@ -273,6 +370,7 @@ const getLanguage = window.getLanguage;
   }
 
   function toggleEraser() {
+    setFill(false);
     erasing = !erasing;
     eraserButton.setAttribute("aria-pressed", String(erasing));
     document.querySelectorAll(".gesture-tool[data-gesture-action='eraser']").forEach((button) => {
@@ -313,6 +411,8 @@ const getLanguage = window.getLanguage;
 
   function activateGestureTool(tool) {
     const action = tool.dataset.gestureAction;
+    if (action === "fill") { setFill(!filling); return; }
+    if (action === "precision") { togglePrecision(); return; }
 
     if (action === "color") {
       updateActiveColor(tool.dataset.color);
@@ -371,6 +471,16 @@ const getLanguage = window.getLanguage;
   function handleHandsResult(results) {
     const setTrackingStatus = (text, state) => setStatus(text, state, true);
     const detectedHands = results.multiHandLandmarks || [];
+    if (detectedHands.length !== 1) {
+      fistLatch.reset();
+      handGestureTracker.reset();
+      fistProgress.hidden = true;
+      if (menuOpen) {
+        resetGestureSelection();
+        gestureOverlay.draw(null, null, null);
+        return;
+      }
+    }
     if (detectedHands.length >= 2) {
       const rect = gestureCanvas.getBoundingClientRect();
       const [first, second] = detectedHands;
@@ -420,18 +530,57 @@ const getLanguage = window.getLanguage;
     }
 
     const indexTip = landmarks[8];
-    const thumbTip = landmarks[4];
     const indexPoint = landmarkToPoint(indexTip, rect);
-    const worldPoint = screenToWorld(indexPoint, viewport);
-    const pinchDistance = normalizedDistance(indexTip, thumbTip);
-    const isPinching = pinchDistance < PINCH_THRESHOLD;
-    const openPalm = isOpenPalm(landmarks);
+    let worldPoint = screenToWorld(indexPoint, viewport);
+    const { fist, closing, pinching: isPinching, openPalm } = handGestureTracker.update(landmarks);
+    const fistState = fistLatch.update({ fist, closing, pinching: isPinching, now: performance.now() });
+    if (fistState.triggered) setMenuOpen(!menuOpen);
+    fistProgress.hidden = fistState.progress === 0 || fistState.triggered;
+    fistProgress.textContent = `${t(menuOpen ? "menu_closing" : "menu_opening")} ${Math.round(fistState.progress * 100)}%`;
+    if (menuOpen) {
+      resetDrawingGestureState();
+      const menuTool = !fist && !closing && !isPinching ? findGestureToolAt(indexPoint) : null;
+      setHoveredGestureTool(menuTool);
+      gestureOverlay.draw(landmarks, indexPoint, { tool: menuTool, isFist: fist });
+      if (menuTool) updateHoldProgress();
+      return;
+    }
+    if (fist || closing || requirePinchRelease) {
+      resetDrawingGestureState();
+      if (!fist && !closing && !isPinching) requirePinchRelease = false;
+      gestureOverlay.draw(landmarks, indexPoint, { isFist: fist });
+      if (fist && !fistState.triggered) setTrackingStatus(fistState.progress > 0 ? "menu_fist_hold" : "menu_fist_release", "ready");
+      return;
+    }
     const canDraw = isPinching && !openPalm && hasStableDrawingLandmarks(landmarks);
     const isPanning = openPalm;
     const tool = isPinching && !openPalm ? null : findGestureToolAt(indexPoint);
 
+    // Only filter an active stroke. Hovering and menus keep absolute positioning.
+    if (canDraw && !tool && !filling) {
+      const now = performance.now();
+      const raw = { ...worldPoint };
+      if (!pinchWasDown || !rawStrokePoint) {
+        precisionPoint = { ...raw };
+        filteredPoint = { ...raw };
+      } else {
+        const gain = precision ? 0.5 : 1;
+        precisionPoint.x += (raw.x - rawStrokePoint.x) * gain;
+        precisionPoint.y += (raw.y - rawStrokePoint.y) * gain;
+        const setting = Number(document.querySelector("#smoothingLevel").value);
+        const alpha = setting === 0 ? 1 : 1 - Math.pow(1 - setting, Math.min(50, now - lastSampleTime) / 33.33);
+        filteredPoint.x += (precisionPoint.x - filteredPoint.x) * alpha;
+        filteredPoint.y += (precisionPoint.y - filteredPoint.y) * alpha;
+      }
+      rawStrokePoint = raw;
+      lastSampleTime = now;
+      worldPoint = { ...filteredPoint };
+    } else {
+      filteredPoint = rawStrokePoint = precisionPoint = null;
+    }
+    const pointerPoint = canDraw && !filling ? { x: worldPoint.x * viewport.scale + viewport.x, y: worldPoint.y * viewport.scale + viewport.y } : indexPoint;
     setHoveredGestureTool(tool);
-    gestureOverlay.draw(landmarks, indexPoint, {
+    gestureOverlay.draw(landmarks, pointerPoint, {
       isPinching: isPinching && !openPalm,
       isPanning,
       tool,
@@ -470,6 +619,12 @@ const getLanguage = window.getLanguage;
     }
 
     if (canDraw && !roomController.isJoining() && isInsideWorld(worldPoint)) {
+      if (filling) {
+        if (!pinchWasDown) fillAt(worldPoint);
+        pinchWasDown = true;
+        lastPoint = null;
+        return;
+      }
       if (!pinchWasDown) {
         strokeId = crypto.randomUUID();
         lastPoint = worldPoint;
@@ -508,6 +663,9 @@ const getLanguage = window.getLanguage;
       camera = null;
       hands = null;
       twoHandZoom = null;
+      setMenuOpen(false);
+      fistLatch.reset();
+      handGestureTracker.reset();
       resetGestureSelection();
       gestureOverlay.draw(null, null, null);
       document.body.classList.remove("camera-active");
@@ -574,7 +732,7 @@ const getLanguage = window.getLanguage;
     },
     hasDrawing: () => {
       const clearedAt = actionHistory.findLastIndex(action => action.type === "clear");
-      return actionHistory.slice(clearedAt + 1).some(action => action.type === "draw_line");
+      return actionHistory.slice(clearedAt + 1).some(action => ["draw_line", "fill"].includes(action.type));
     },
     getDrawingDataUrl: canvas.getFlattenedDataUrl,
     setStatus,
@@ -601,9 +759,7 @@ const getLanguage = window.getLanguage;
     button.addEventListener("click", () => updateActiveColor(button.dataset.color));
   });
 
-  document.querySelectorAll(".gesture-tool[data-gesture-action='color']").forEach((button) => {
-    button.addEventListener("click", () => updateActiveColor(button.dataset.color));
-  });
+
 
   customColor.addEventListener("input", () => {
     updateActiveColor(customColor.value);
@@ -614,18 +770,20 @@ const getLanguage = window.getLanguage;
     button.addEventListener("click", () => updateBrushSize(button.dataset.size));
   });
 
-  document.querySelectorAll(".gesture-tool[data-gesture-action='size']").forEach((button) => {
-    button.addEventListener("click", () => updateBrushSize(button.dataset.size));
-  });
+
 
   [aiStyleSelect, aiSizeSelect, aiModelSelect].forEach((select) => {
     select?.addEventListener("change", updateGestureAiControls);
   });
 
-  document.querySelectorAll(".gesture-tool[data-gesture-action^='ai-']").forEach((button) => {
-    button.addEventListener("click", () => activateGestureTool(button));
-  });
 
+
+  document.querySelector("#precisionButton").addEventListener("click", togglePrecision);
+  document.querySelector("#fillButton").addEventListener("click", () => setFill(!filling));
+  document.querySelector("#smoothingLevel").addEventListener("change", resetDrawingGestureState);
+  document.querySelector("#gestureMenuToggle").addEventListener("click", () => setMenuOpen(!menuOpen));
+  gestureMenu.querySelectorAll(".gesture-tool").forEach(b => b.addEventListener("click", () => selectMenuTool(b)));
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && menuOpen) setMenuOpen(false); });
   cameraButton.addEventListener("click", startCamera);
   eraserButton.addEventListener("click", toggleEraser);
   undoButton.addEventListener("click", undoDrawing);
@@ -633,10 +791,6 @@ const getLanguage = window.getLanguage;
   saveButton.addEventListener("click", saveDrawing);
   aiImageController.bindEvents();
 
-  document.querySelector(".gesture-tool[data-gesture-action='eraser']").addEventListener("click", toggleEraser);
-  document.querySelector(".gesture-tool[data-gesture-action='undo']").addEventListener("click", undoDrawing);
-  document.querySelector(".gesture-tool[data-gesture-action='clear']").addEventListener("click", () => clearDrawing());
-  document.querySelector(".gesture-tool[data-gesture-action='save']").addEventListener("click", saveDrawing);
 
   // --- Language buttons ---
 
@@ -664,8 +818,8 @@ const getLanguage = window.getLanguage;
     langJaBtn.style.color = "#ffffff";
   }
 
-  window.addEventListener("resize", () => canvas.resize(gestureOverlay.context));
-  window.addEventListener("language-changed", updateGestureAiControls);
+  window.addEventListener("resize", () => { canvas.resize(gestureOverlay.context); fitGestureMenu(); });
+  window.addEventListener("language-changed", () => { updateGestureAiControls(); fitGestureMenu(); });
   document.querySelector("#aiToggle").addEventListener("click", () => {
     const panel = document.querySelector(".ai-panel");
     panel.hidden = !panel.hidden;
@@ -676,6 +830,7 @@ const getLanguage = window.getLanguage;
   });
   updateGestureAiControls();
   canvas.resize(gestureOverlay.context);
+  canvas.fitToView();
 
   function changeZoom(scale, anchor) {
     resetDrawingGestureState();

@@ -1,3 +1,4 @@
+import { floodFill } from "./flood-fill.js";
 import { VIEWPORT_MARGIN, WORLD_HEIGHT, WORLD_WIDTH } from "./constants.js";
 import { denormalizePoint } from "./geometry.js";
 
@@ -76,7 +77,20 @@ export function createCanvasController({
     }
   }
 
+  function fillRegion(point, color) {
+    const buffer = document.createElement("canvas");
+    buffer.width = WORLD_WIDTH; buffer.height = WORLD_HEIGHT;
+    const ctx = buffer.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(drawingCanvas, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    const image = ctx.getImageData(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    if (!floodFill(image, point.x, point.y, color)) return;
+    ctx.putImageData(image, 0, 0);
+    drawCtx.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    drawCtx.drawImage(buffer, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+  }
+
   function applyAction(action) {
+    if (action.type === "fill") fillRegion(denormalizePoint(action.from), action.color);
     if (action.type === "clear") clear();
     if (action.type === "draw_line") {
       drawLine(denormalizePoint(action.from), denormalizePoint(action.to), action);

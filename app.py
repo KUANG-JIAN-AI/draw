@@ -274,6 +274,29 @@ def handle_draw_line(data):
         emit("draw_line", {"room": room, "action": entry}, room=room, include_self=False)
 
 
+@socketio.on("fill")
+def handle_fill(data):
+    room = _event_room(data)
+    if not room:
+        return
+    point = data.get("from")
+    if not isinstance(point, dict) or any(type(point.get(axis)) not in (int, float) or not math.isfinite(point[axis]) or not 0 <= point[axis] <= 1 for axis in ("x", "y")):
+        return
+    if not isinstance(data.get("color"), str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", data["color"]):
+        return
+    if not isinstance(data.get("strokeId"), str) or len(data["strokeId"]) > 80:
+        return
+    entry = {k: data[k] for k in ("from", "color", "strokeId")}
+    entry.update(type="fill", author=request.sid)
+    with _lock:
+        history = action_history[room]
+        if len(history) >= MAX_ACTIONS:
+            emit("history_limit", {"room": room, "history": [{k: v for k, v in a.items() if k != "previous"} for a in history]})
+            return
+        history.append(entry)
+        emit("fill", {"room": room, "action": entry}, room=room, include_self=False)
+
+
 @socketio.on("clear_canvas")
 def handle_clear_canvas(data):
     room = _event_room(data)

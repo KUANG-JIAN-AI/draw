@@ -43,6 +43,11 @@
           <button class="size-option" type="button" data-size="24" data-i18n="thick">粗</button>
         </div>
 
+        <div class="tool-group comfort-tools">
+          <label><span data-i18n="smoothing">防抖</span> <select id="smoothingLevel" aria-label="防抖强度" data-i18n-label="smoothing"><option value="0" data-i18n="smoothing_off">关闭</option><option value="0.55" selected data-i18n="smoothing_medium">适中</option><option value="0.3" data-i18n="smoothing_strong">强</option></select></label>
+          <button id="precisionButton" data-i18n="precision_mode" class="tool-button" type="button" aria-pressed="false">精细模式</button>
+          <button id="fillButton" data-i18n="fill" class="tool-button" type="button" aria-pressed="false">区域填色</button>
+        </div>
         <div class="tool-group actions" data-i18n-label="operations">
           <button id="eraserButton" class="tool-button" type="button" aria-pressed="false" data-i18n="eraser">橡皮</button>
           <button id="undoButton" class="tool-button" type="button" data-i18n="undo">撤销</button>
@@ -56,7 +61,7 @@
       <section class="stage" aria-label="手势画布">
         <canvas id="drawingCanvas"></canvas>
         <canvas id="gestureCanvas"></canvas>
-        <div class="zoom-help" data-i18n="zoom_two_hands_hint">双手各自捏合拇指和食指，拉开放大、靠近缩小；单手继续绘画</div>
+        <div class="zoom-help" data-i18n="menu_canvas_hint">双手捏合缩放；松手抬笔；精细模式下笔尖移动减半；填色时捏合一次</div>
         <div class="zoom-controls" role="group" data-i18n-label="zoom_controls" aria-label="画布缩放">
           <button id="zoomOut" class="tool-button" type="button" data-i18n-label="zoom_out" aria-label="缩小">−</button>
           <button id="zoomReset" class="tool-button zoom-value" type="button" data-i18n-label="zoom_reset" aria-label="恢复 100%">100%</button>
@@ -68,7 +73,11 @@
           <video id="cameraView" playsinline muted></video>
         </div>
 
-        <div class="gesture-toolbar gesture-toolbar-right drawing-gesture-toolbar" aria-label="绘画手势工具栏">
+        <button id="gestureMenuToggle" class="tool-button gesture-menu-toggle" type="button" aria-expanded="false" aria-controls="gestureMenu" data-i18n="menu_tools">工具</button>
+        <div id="fistProgress" class="fist-progress" hidden role="status"></div>
+        <section id="gestureMenu" class="gesture-menu" hidden aria-label="快捷工具" data-i18n-label="menu_title">
+          <header class="gesture-menu-header"><strong data-i18n="menu_title">快捷工具</strong><span data-i18n="menu_hint">指向按钮停留选择；再次握拳关闭</span></header>
+        <div class="menu-drawing" aria-label="绘画手势工具栏">
           <div class="gesture-panel color-pad">
             <button class="gesture-tool swatch active" type="button" data-gesture-action="color" data-color="#111827" style="--swatch:#111827" aria-label="黑色"></button>
             <button class="gesture-tool swatch" type="button" data-gesture-action="color" data-color="#e11d48" style="--swatch:#e11d48" aria-label="玫红"></button>
@@ -83,6 +92,8 @@
           </div>
 
           <div class="gesture-panel">
+            <button class="gesture-tool gesture-button" type="button" data-gesture-action="precision" data-i18n="precision">精细</button>
+            <button class="gesture-tool gesture-button" type="button" data-gesture-action="fill" data-i18n="fill">填色</button>
             <button class="gesture-tool gesture-button" type="button" data-gesture-action="eraser" data-i18n="eraser">橡皮</button>
             <button class="gesture-tool gesture-button" type="button" data-gesture-action="undo" data-i18n="undo">撤销</button>
             <button class="gesture-tool gesture-button danger" type="button" data-gesture-action="clear" data-i18n="clear">清空</button>
@@ -90,18 +101,26 @@
           </div>
         </div>
 
-        <div class="gesture-toolbar gesture-toolbar-right ai-gesture-toolbar" aria-label="AI 手势工具栏">
+        <div class="menu-ai" aria-label="AI 手势工具栏">
           <div class="gesture-panel gesture-ai-panel">
             <button id="gestureAiStyleButton" class="gesture-tool gesture-button compact" type="button" data-gesture-action="ai-style">风格</button>
             <button id="gestureAiSizeButton" class="gesture-tool gesture-button compact" type="button" data-gesture-action="ai-size">尺寸</button>
             <button id="gestureAiModelButton" class="gesture-tool gesture-button compact" type="button" data-gesture-action="ai-model">模型</button>
-            <button id="gestureAiGenerateButton" class="gesture-tool gesture-button primary" type="button" data-gesture-action="ai-generate">AI 生成</button>
+            <button id="gestureAiGenerateButton" class="gesture-tool gesture-button primary" type="button" data-gesture-action="ai-generate" data-i18n="ai_generate">AI 生成</button>
           </div>
         </div>
 
+          <div id="menuConfirmation" class="menu-confirmation" hidden>
+            <span id="menuConfirmText"></span>
+            <button class="gesture-tool gesture-button" data-gesture-action="confirm" type="button" data-i18n="menu_confirm">确认</button>
+            <button class="gesture-tool gesture-button" data-gesture-action="cancel" type="button" data-i18n="menu_cancel">取消</button>
+          </div>
+          <button class="gesture-tool gesture-button menu-close" data-gesture-action="close" type="button" data-i18n="menu_back">返回画画</button>
+        </section>
+
         <div class="hud" aria-live="polite">
           <span id="statusDot" class="status-dot"></span>
-          <span id="statusText">先开启摄像头；食指停在工具上一会儿会自动选择，捏合画画，张开手掌拖动画布</span>
+          <span id="statusText" data-i18n="menu_canvas_hint">先开启摄像头；松开捏合后握拳打开工具，捏合画画，张掌拖动画布</span>
           <div id="membersList" class="members-list"></div>
         </div>
 

@@ -4,10 +4,12 @@ import { landmarkToPoint } from "./geometry.js";
 export function createGestureOverlay({ gestureCanvas, getBrushSize }) {
   const gestureCtx = gestureCanvas.getContext("2d");
 
-  function drawPointer(point, isPinching, tool) {
+  function drawPointer(point, isPinching, tool, fist = false) {
     const indicatorSize = Math.max(10, getBrushSize() * (isPinching ? 0.82 : 0.72));
     const color = tool
       ? "rgba(245,158,11,0.92)"
+      : fist
+        ? "rgba(124,58,237,0.92)"
       : isPinching
         ? "rgba(225,29,72,0.9)"
         : "rgba(15,118,110,0.88)";
@@ -50,7 +52,7 @@ export function createGestureOverlay({ gestureCanvas, getBrushSize }) {
       gestureCtx.fill();
     }
 
-    drawPointer(point, isPinching, tool);
+    drawPointer(point, isPinching, tool, Boolean(state?.isFist));
   }
 
   function drawZoom(hands, { active, scale, label, hint }) {
