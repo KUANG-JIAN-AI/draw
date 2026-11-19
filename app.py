@@ -6,7 +6,6 @@ import json
 import os
 from pathlib import Path
 import re
-import math
 import time
 
 import gevent.monkey
@@ -160,9 +159,10 @@ def generate_image():
     now = time.monotonic()
     address = request.remote_addr
     with _lock:
-        for key, started in list(_generation_times.items()):
-            if now - started > 60:
-                del _generation_times[key]
+        expired = [k for k, t in _generation_times.items() if now - t > 60]
+        for k in expired:
+            _generation_times.pop(k, None)
+
         if address in _generation_times:
             return jsonify({"error": "请稍候再生成图片"}), 429
         _generation_times[address] = now
@@ -247,6 +247,13 @@ def _event_room(data):
     return room if isinstance(data, dict) and data.get("room") == room else None
 
 
+def _valid_canvas_point(point):
+    return isinstance(point, dict) and all(
+        type(point.get(axis)) in (int, float) and 0 <= point[axis] <= 1
+        for axis in ("x", "y")
+    )
+
+
 @socketio.on("draw_line")
 def handle_draw_line(data):
     room = _event_room(data)
@@ -254,7 +261,7 @@ def handle_draw_line(data):
         return
     for key in ("from", "to"):
         point = data.get(key)
-        if not isinstance(point, dict) or any(type(point.get(axis)) not in (int, float) or not math.isfinite(point[axis]) or not 0 <= point[axis] <= 1 for axis in ("x", "y")):
+        if not _valid_canvas_point(point):
             return
     if type(data.get("size")) not in (int, float) or data["size"] not in (8, 24):
         return
@@ -274,13 +281,60 @@ def handle_draw_line(data):
         emit("draw_line", {"room": room, "action": entry}, room=room, include_self=False)
 
 
+@socketio.on("finish_shape")
+def handle_finish_shape(data):
+    room = _event_room(data)
+    if not room or not isinstance(data.get("strokeId"), str):
+        return
+
+    shape = data.get("shapeType")
+    if shape == "line":
+        keys = ("from", "to")
+        if not all(_valid_canvas_point(data.get(key)) for key in keys):
+            return
+    elif shape == "circle":
+        keys = ("center", "radius")
+        radius = data.get("radius")
+        if not _valid_canvas_point(data.get("center")) or type(radius) not in (int, float) or not 0 < radius <= 1920:
+            return
+    elif shape in ("triangle", "rectangle"):
+        keys = ("points",)
+        points = data.get("points")
+        if not isinstance(points, list) or len(points) != (3 if shape == "triangle" else 4) or not all(map(_valid_canvas_point, points)):
+            return
+    else:
+        return
+
+    with _lock:
+        history = action_history.get(room, [])
+        indices = [
+            i for i, action in enumerate(history)
+            if action.get("author") == request.sid and action.get("strokeId") == data["strokeId"]
+        ]
+        if len(indices) < 4:
+            return
+        segments = [history[i] for i in indices]
+        first = segments[0]
+        if any(a["type"] != "draw_line" or a["erasing"] or a["color"] != first["color"]
+               or a["size"] != first["size"] for a in segments):
+            return
+
+        entry = {key: first[key] for key in ("strokeId", "author", "color", "size", "erasing")}
+        entry.update({key: data[key] for key in keys})
+        entry.update(type="shape", shapeType=shape)
+        history[indices[0]] = entry
+        for i in reversed(indices[1:]):
+            del history[i]
+        emit("finish_shape", {"room": room, "action": entry}, room=room)
+
+
 @socketio.on("fill")
 def handle_fill(data):
     room = _event_room(data)
     if not room:
         return
     point = data.get("from")
-    if not isinstance(point, dict) or any(type(point.get(axis)) not in (int, float) or not math.isfinite(point[axis]) or not 0 <= point[axis] <= 1 for axis in ("x", "y")):
+    if not _valid_canvas_point(point):
         return
     if not isinstance(data.get("color"), str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", data["color"]):
         return

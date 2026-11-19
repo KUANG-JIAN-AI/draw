@@ -8,6 +8,7 @@ import {
   normalizedDistance,
   screenToWorld,
 } from "./js/geometry.js";
+import { recognizeShape } from "./js/shape-recognition.js";
 import { createAiImageController } from "./js/ai-image.js";
 import { createCanvasController } from "./js/canvas.js";
 import { createGestureOverlay } from "./js/gesture-overlay.js";
@@ -85,7 +86,7 @@ const getLanguage = window.getLanguage;
   let hoverStartedAt = 0;
   let hoverActivated = false;
   let aiGenerating = false;
-  let strokeId = null;
+  let stroke = null;
   let twoHandZoom = null;
   let menuOpen = false;
   let pendingMenuAction = null;
@@ -263,7 +264,37 @@ const getLanguage = window.getLanguage;
     resetDrawingGestureState();
   }
 
+  function finishStroke() {
+    const completed = stroke;
+    stroke = null;
+    if (!completed?.eligible || !completed.firstAction || completed.room !== roomController.getCurrentRoom() ||
+        roomController.isJoining()) return;
+
+    const shape = recognizeShape(completed.points, viewport.scale);
+    if (shape.type === "freehand") return;
+
+    const { strokeId, color, size, room } = completed.firstAction;
+    const action = { type: "shape", shapeType: shape.type, strokeId, color, size, room, erasing: false };
+    if (shape.type === "line") {
+      action.from = normalizePoint(shape.from);
+      action.to = normalizePoint(shape.to);
+    } else if (shape.type === "circle") {
+      action.center = normalizePoint(shape.center);
+      action.radius = shape.radius;
+    } else {
+      if (!shape.points.every(isInsideWorld)) return;
+      action.points = shape.points.map(normalizePoint);
+    }
+
+    if (room) {
+      socket.emit("finish_shape", action);
+    } else {
+      canvas.replaceStroke(action);
+    }
+  }
+
   function resetDrawingGestureState() {
+    stroke = null;
     pinchWasDown = false;
     lastPoint = null;
     filteredPoint = rawStrokePoint = precisionPoint = null;
@@ -520,9 +551,7 @@ const getLanguage = window.getLanguage;
     const rect = gestureCanvas.getBoundingClientRect();
 
     if (!landmarks) {
-      pinchWasDown = false;
-      lastPoint = null;
-      lastPanPoint = null;
+      resetDrawingGestureState();
       setHoveredGestureTool(null);
       gestureOverlay.draw(null, null, null);
       setTrackingStatus("put_hand", "ready");
@@ -552,6 +581,8 @@ const getLanguage = window.getLanguage;
       if (fist && !fistState.triggered) setTrackingStatus(fistState.progress > 0 ? "menu_fist_hold" : "menu_fist_release", "ready");
       return;
     }
+    if (!isPinching) finishStroke();
+
     const canDraw = isPinching && !openPalm && hasStableDrawingLandmarks(landmarks);
     const isPanning = openPalm;
     const tool = isPinching && !openPalm ? null : findGestureToolAt(indexPoint);
@@ -612,6 +643,7 @@ const getLanguage = window.getLanguage;
     lastPanPoint = null;
 
     if (aiGenerating) {
+      stroke = null;
       lastPoint = null;
       pinchWasDown = isPinching;
       setTrackingStatus("ai_generating", "ready");
@@ -625,27 +657,41 @@ const getLanguage = window.getLanguage;
         lastPoint = null;
         return;
       }
-      if (!pinchWasDown) {
-        strokeId = crypto.randomUUID();
-        lastPoint = worldPoint;
+      const room = roomController.getCurrentRoom();
+      if (!stroke || stroke.room !== room) {
+        stroke = {
+          id: crypto.randomUUID(),
+          room,
+          points: [worldPoint],
+          firstAction: null,
+          eligible: !erasing,
+        };
       } else if (lastPoint && distance(lastPoint, worldPoint) < 80 / viewport.scale) {
         const action = {
           type: "draw_line",
-          strokeId,
+          strokeId: stroke.id,
           from: normalizePoint(lastPoint),
           to: normalizePoint(worldPoint),
           color,
           size,
           erasing,
+          room,
         };
-        action.room = roomController?.getCurrentRoom();
+        stroke.firstAction ??= action;
+        if (erasing || color !== stroke.firstAction.color || size !== stroke.firstAction.size) {
+          stroke.eligible = false;
+        }
+        if (stroke.eligible) stroke.points.push(worldPoint);
         canvas.drawLine(lastPoint, worldPoint, action);
         actionHistory.push(action);
         if (action.room) socket.emit("draw_line", action);
+      } else {
+        stroke.eligible = false;
       }
       lastPoint = worldPoint;
       setTrackingStatus(erasing ? "erasing" : "drawing", "drawing");
     } else {
+      if (stroke) stroke.eligible = false;
       lastPoint = null;
       setTrackingStatus("move_to_toolbar", "ready");
     }

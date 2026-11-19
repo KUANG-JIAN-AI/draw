@@ -28,6 +28,9 @@ export function createRoomController({ socket, actionHistory, canvas, membersLis
       actionHistory.push(action);
       canvas.applyAction(action);
     });
+    socket.on("finish_shape", ({ room, action }) => {
+      if (room === currentRoom) canvas.replaceStroke(action);
+    });
     socket.on("fill", ({ room, action }) => {
       if (room !== currentRoom) return;
       actionHistory.push(action);

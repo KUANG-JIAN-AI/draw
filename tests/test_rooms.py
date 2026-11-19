@@ -64,6 +64,33 @@ class RoomTests(unittest.TestCase):
         a.emit('undo', {'room': 'shared'})
         self.assertEqual([x['strokeId'] for x in server.action_history['shared']], ['b', 'c'])
 
+    def test_finish_shape_replaces_only_own_stroke_and_syncs(self):
+        a, b, newcomer = self.clients
+        self.join(a, 'shape-room')
+        self.join(b, 'shape-room')
+        for _ in range(4):
+            self.draw(a, 'shape-room', 'shape-stroke')
+        self.draw(b, 'shape-room', 'other-stroke')
+        payload = dict(room='shape-room', strokeId='shape-stroke', shapeType='circle',
+                       center={'x': .2, 'y': .2}, radius=40)
+        b.emit('finish_shape', payload)
+        a.emit('finish_shape', dict(payload, radius=-1))
+        self.assertEqual(len(server.action_history['shape-room']), 5)
+
+        a.emit('finish_shape', payload)
+        shape, other = server.action_history['shape-room']
+        self.assertEqual((shape['type'], shape['size'], shape['radius']), ('shape', 8, 40))
+        self.assertEqual(other['strokeId'], 'other-stroke')
+        for client in (a, b):
+            events = client.get_received()
+            self.assertTrue(any(e['name'] == 'finish_shape' and e['args'][0]['action'] == shape
+                                for e in events))
+        self.join(newcomer, 'shape-room')
+        snapshot = next(e for e in newcomer.get_received() if e['name'] == 'action_history')
+        self.assertEqual(snapshot['args'][0]['history'], [shape, other])
+        a.emit('undo', {'room': 'shape-room'})
+        self.assertEqual(server.action_history['shape-room'], [other])
+
     def test_limit_clear_and_empty_room_cleanup(self):
         a, _, _ = self.clients
         self.join(a, 'bounded')

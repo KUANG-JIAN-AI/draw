@@ -89,12 +89,64 @@ export function createCanvasController({
     drawCtx.drawImage(buffer, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
   }
 
+  function drawShape(action) {
+    const brush = getBrushStyle();
+    const prevOp = drawCtx.globalCompositeOperation;
+    try {
+      const erasing = action.erasing ?? brush.erasing;
+      const color = erasing ? "destination-out" : action.color || brush.color;
+      const lineSize = erasing ? (action.size || brush.size) * 1.8 : (action.size || brush.size);
+      drawCtx.globalCompositeOperation = erasing ? "destination-out" : "source-over";
+      drawCtx.strokeStyle = color;
+      drawCtx.lineWidth = lineSize;
+      drawCtx.beginPath();
+
+      if (action.shapeType === "line") {
+        const from = denormalizePoint(action.from);
+        const to = denormalizePoint(action.to);
+        drawCtx.moveTo(from.x, from.y);
+        drawCtx.lineTo(to.x, to.y);
+      } else if (action.shapeType === "circle") {
+        const center = denormalizePoint(action.center);
+        drawCtx.arc(center.x, center.y, action.radius, 0, Math.PI * 2);
+      } else if (action.shapeType === "rectangle" || action.shapeType === "triangle") {
+        const pts = action.points.map(denormalizePoint);
+        if (pts.length > 0) {
+          drawCtx.moveTo(pts[0].x, pts[0].y);
+          for (let i = 1; i < pts.length; i++) {
+            drawCtx.lineTo(pts[i].x, pts[i].y);
+          }
+          drawCtx.closePath();
+        }
+      }
+      drawCtx.stroke();
+    } finally {
+      drawCtx.globalCompositeOperation = prevOp;
+    }
+  }
+
   function applyAction(action) {
     if (action.type === "fill") fillRegion(denormalizePoint(action.from), action.color);
     if (action.type === "clear") clear();
     if (action.type === "draw_line") {
       drawLine(denormalizePoint(action.from), denormalizePoint(action.to), action);
     }
+    if (action.type === "shape") {
+      drawShape(action);
+    }
+  }
+
+  function replaceStroke(action) {
+    const matches = (segment) => segment.type === "draw_line" &&
+      segment.strokeId === action.strokeId &&
+      (segment.author === undefined || segment.author === action.author);
+    const first = actionHistory.findIndex(matches);
+    if (first === -1) return;
+    for (let i = actionHistory.length - 1; i > first; i--) {
+      if (matches(actionHistory[i])) actionHistory.splice(i, 1);
+    }
+    actionHistory[first] = action;
+    redrawHistory();
   }
 
   function redrawHistory() {
@@ -151,6 +203,7 @@ export function createCanvasController({
     drawLine,
     applyAction,
     redrawHistory,
+    replaceStroke,
     resize,
     clear,
     getFlattenedDataUrl,
