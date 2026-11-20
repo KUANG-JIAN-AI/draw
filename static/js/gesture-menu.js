@@ -1,3 +1,4 @@
+import { PINCH_RELEASE_RATIO, PINCH_START_RATIO } from "./constants.js";
 import { normalizedDistance, isOpenPalm } from './geometry.js';
 
 function jointCosine(a, joint, b) {
@@ -27,27 +28,52 @@ export function createPinchTracker() {
   let active = false;
   return {
     reset() { active = false; },
-    update(hand) {
+    update(hand, preserveOnRelease = false) {
       const palm = normalizedDistance(hand[0], hand[9]);
       if (palm < 0.025) { active = false; return false; }
       const ratio = normalizedDistance(hand[4], hand[8]) / palm;
-      active = ratio < (active ? 0.55 : 0.38);
-      return active;
+      const held = ratio < (active ? PINCH_RELEASE_RATIO : PINCH_START_RATIO);
+      if (held || !preserveOnRelease) active = held;
+      return held;
     },
   };
 }
 
 export function createHandGestureTracker() {
   const pinch = createPinchTracker();
+  const ambiguousReleaseMs = 70;
+  let wasPinching = false;
+  let releaseStarted = null;
+
   return {
-    reset() { pinch.reset(); },
-    update(hand) {
+    reset() {
+      pinch.reset();
+      wasPinching = false;
+      releaseStarted = null;
+    },
+    update(hand, now = performance.now()) {
       const curled = curledFingers(hand);
       const fist = curled[0] && curled.filter(Boolean).length >= 3;
       const closing = !fist && curled[0] && curled.filter(Boolean).length >= 2;
-      const pinching = !fist && pinch.update(hand);
-      if (fist) pinch.reset();
-      return { fist, closing, pinching, openPalm: !pinching && !fist && !closing && isOpenPalm(hand) };
+
+      if (wasPinching || (!fist && !closing)) {
+        if (pinch.update(hand, wasPinching && (fist || closing))) {
+          wasPinching = true;
+          releaseStarted = null;
+          return { fist: false, closing: false, pinching: true, openPalm: false };
+        }
+        if (wasPinching && (fist || closing)) {
+          releaseStarted ??= now;
+          if (now - releaseStarted < ambiguousReleaseMs) {
+            return { fist: false, closing: false, pinching: true, openPalm: false, pinchUncertain: true };
+          }
+        }
+      }
+
+      pinch.reset();
+      wasPinching = false;
+      releaseStarted = null;
+      return { fist, closing, pinching: false, openPalm: !fist && !closing && isOpenPalm(hand) };
     },
   };
 }

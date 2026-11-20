@@ -51,10 +51,11 @@ test('sustained drawing pinch, tracking loss, and interrupted fist cannot trigge
 
 test('brief pinch while curling does not cancel an armed menu gesture', () => {
   const tracker = createHandGestureTracker(), latch = createFistLatch();
-  const frame = (now, pose) => latch.update({ ...tracker.update(handPose(pose)), now });
+  const frame = (now, pose) => latch.update({ ...tracker.update(handPose(pose), now), now });
   frame(0, 'open'); frame(200, 'open'); frame(250, 'pinch'); frame(300, 'pinch');
   frame(350, 'fist');
-  assert.equal(frame(850, 'fist').triggered, true);
+  frame(420, 'fist');
+  assert.equal(frame(920, 'fist').triggered, true);
   assert.equal(frame(1400, 'fist').triggered, false);
 });
 
@@ -95,7 +96,7 @@ test('pinch thresholds scale with palm size and reset when tracking is lost', ()
 test('panning then a slow hand closure can open menu without drawing first', () => {
   const tracker = createHandGestureTracker(), latch = createFistLatch();
   const frame = (now, hand) => {
-    const state = tracker.update(hand);
+    const state = tracker.update(hand, now);
     return { state, result: latch.update({ ...state, now }) };
   };
   // Moving an open palm keeps the menu armed regardless of canvas movement.
@@ -124,4 +125,34 @@ test('occluded little finger does not block a fist but extended index prevents i
   assert.equal(isFist(hand), true);
   hand[8].y = .28;
   assert.equal(isFist(hand), false);
+});
+
+test('an active drawing pinch survives curled fingers and a brief ambiguous release', () => {
+  const tracker = createHandGestureTracker();
+  const latch = createFistLatch();
+  const frame = (hand, now) => {
+    const state = tracker.update(hand, now);
+    assert.equal(latch.update({ ...state, now }).triggered, false);
+    return state;
+  };
+  frame(handPose('open'), 0);
+  frame(handPose('open'), 200);
+  assert.equal(frame(handPose('pinch'), 220).pinching, true);
+
+  const curledPinch = handPose('fist');
+  curledPinch[4] = { ...curledPinch[8], x: curledPinch[8].x + .09 };
+  for (let now = 240; now <= 840; now += 20) {
+    const state = frame(curledPinch, now);
+    assert.equal(state.pinching, true);
+    assert.equal(state.fist, false);
+    assert.equal(state.closing, false);
+  }
+
+  assert.equal(frame(handPose('fist'), 860).pinchUncertain, true);
+  assert.equal(frame(curledPinch, 900).pinching, true);
+  assert.equal(frame(handPose('fist'), 920).pinchUncertain, true);
+  const released = frame(handPose('fist'), 990);
+  assert.equal(released.pinching, false);
+  assert.equal(released.fist, true);
+  frame(handPose('fist'), 1600);
 });

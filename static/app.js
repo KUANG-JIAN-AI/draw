@@ -1,11 +1,11 @@
 import { createFistLatch, createHandGestureTracker } from "./js/gesture-menu.js";
-import { HOLD_TO_SELECT_MS, PINCH_THRESHOLD } from "./js/constants.js";
+import { HOLD_TO_SELECT_MS } from "./js/constants.js";
+import { createHandSelection } from "./js/hand-selection.js";
 import {
   distance,
   isInsideWorld,
   landmarkToPoint,
   normalizePoint,
-  normalizedDistance,
   screenToWorld,
 } from "./js/geometry.js";
 import { recognizeShape } from "./js/shape-recognition.js";
@@ -93,6 +93,7 @@ const getLanguage = window.getLanguage;
   let requirePinchRelease = false;
   const fistLatch = createFistLatch();
   const handGestureTracker = createHandGestureTracker();
+  const handSelection = createHandSelection();
   const gestureMenu = document.querySelector("#gestureMenu");
   const fistProgress = document.querySelector("#fistProgress");
 
@@ -502,55 +503,41 @@ const getLanguage = window.getLanguage;
   function handleHandsResult(results) {
     const setTrackingStatus = (text, state) => setStatus(text, state, true);
     const detectedHands = results.multiHandLandmarks || [];
-    if (detectedHands.length !== 1) {
-      fistLatch.reset();
-      handGestureTracker.reset();
-      fistProgress.hidden = true;
-      if (menuOpen) {
-        resetGestureSelection();
-        gestureOverlay.draw(null, null, null);
-        return;
-      }
-    }
-    if (detectedHands.length >= 2) {
-      const rect = gestureCanvas.getBoundingClientRect();
-      const [first, second] = detectedHands;
-      const pinched = [first, second].every(hand => normalizedDistance(hand[8], hand[4]) < PINCH_THRESHOLD);
-      const a = landmarkToPoint(first[8], rect);
-      const b = landmarkToPoint(second[8], rect);
-      const span = distance(a, b);
-      const midpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-      resetDrawingGestureState();
-      setHoveredGestureTool(null);
-      const drawZoomFeedback = (active) => gestureOverlay.drawZoom(detectedHands, {
-        active, scale: viewport.scale,
-        label: t(active ? "zoom_feedback_active" : "zoom_feedback_ready"),
-        hint: t(active ? "zoom_feedback_move" : "zoom_feedback_pinch"),
-      });
-      if (!pinched || span < 60) {
-        twoHandZoom = null;
-        drawZoomFeedback(false);
-        setTrackingStatus("zoom_two_hands_hint", "ready");
-        return;
-      }
+    const rect = gestureCanvas.getBoundingClientRect();
+    const now = performance.now();
+    const { primary: landmarks, zooming, span, midpoint } = handSelection.update(
+      detectedHands, rect, now, !menuOpen && !requirePinchRelease,
+    );
+
+    if (zooming) {
+      if (!span) return; // Hold the last view during a brief drop in tracking.
       if (!twoHandZoom) {
+        finishStroke();
+        resetDrawingGestureState();
+        fistLatch.reset();
+        handGestureTracker.reset();
+        fistProgress.hidden = true;
+        setHoveredGestureTool(null);
         twoHandZoom = { span, scale: viewport.scale, anchor: midpoint };
       } else {
-        // Smooth tracking jitter while keeping the starting midpoint fixed.
         const target = Math.max(0.05, Math.min(4, twoHandZoom.scale * span / twoHandZoom.span));
         canvas.zoomTo(viewport.scale + (target - viewport.scale) * 0.25, twoHandZoom.anchor);
       }
-      drawZoomFeedback(true);
+      gestureOverlay.drawZoom(detectedHands, {
+        active: true, scale: viewport.scale,
+        label: t("zoom_feedback_active"),
+        hint: t("zoom_feedback_move"),
+      });
       setTrackingStatus("zoom_two_hands_active", "ready");
       return;
     }
-    // Releasing either hand ends zoom and starts the next stroke afresh.
     if (twoHandZoom) resetDrawingGestureState();
     twoHandZoom = null;
-    const landmarks = detectedHands[0];
-    const rect = gestureCanvas.getBoundingClientRect();
 
     if (!landmarks) {
+      fistLatch.reset();
+      handGestureTracker.reset();
+      fistProgress.hidden = true;
       resetDrawingGestureState();
       setHoveredGestureTool(null);
       gestureOverlay.draw(null, null, null);
@@ -561,8 +548,10 @@ const getLanguage = window.getLanguage;
     const indexTip = landmarks[8];
     const indexPoint = landmarkToPoint(indexTip, rect);
     let worldPoint = screenToWorld(indexPoint, viewport);
-    const { fist, closing, pinching: isPinching, openPalm } = handGestureTracker.update(landmarks);
-    const fistState = fistLatch.update({ fist, closing, pinching: isPinching, now: performance.now() });
+    const { fist, closing, pinching: isPinching, openPalm, pinchUncertain } =
+      handGestureTracker.update(landmarks, now);
+    if (!isPinching) finishStroke();
+    const fistState = fistLatch.update({ fist, closing, pinching: isPinching, now });
     if (fistState.triggered) setMenuOpen(!menuOpen);
     fistProgress.hidden = fistState.progress === 0 || fistState.triggered;
     fistProgress.textContent = `${t(menuOpen ? "menu_closing" : "menu_opening")} ${Math.round(fistState.progress * 100)}%`;
@@ -581,7 +570,8 @@ const getLanguage = window.getLanguage;
       if (fist && !fistState.triggered) setTrackingStatus(fistState.progress > 0 ? "menu_fist_hold" : "menu_fist_release", "ready");
       return;
     }
-    if (!isPinching) finishStroke();
+    // Keep the last good sample while a curled-hand release is being confirmed.
+    if (pinchUncertain) return;
 
     const canDraw = isPinching && !openPalm && hasStableDrawingLandmarks(landmarks);
     const isPanning = openPalm;
@@ -589,7 +579,6 @@ const getLanguage = window.getLanguage;
 
     // Only filter an active stroke. Hovering and menus keep absolute positioning.
     if (canDraw && !tool && !filling) {
-      const now = performance.now();
       const raw = { ...worldPoint };
       if (!pinchWasDown || !rawStrokePoint) {
         precisionPoint = { ...raw };
@@ -709,6 +698,7 @@ const getLanguage = window.getLanguage;
       camera = null;
       hands = null;
       twoHandZoom = null;
+      handSelection.reset();
       setMenuOpen(false);
       fistLatch.reset();
       handGestureTracker.reset();

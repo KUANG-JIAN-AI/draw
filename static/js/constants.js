@@ -1,5 +1,6 @@
 export const HOLD_TO_SELECT_MS = 800;
-export const PINCH_THRESHOLD = 0.075;
+export const PINCH_START_RATIO = 0.38;
+export const PINCH_RELEASE_RATIO = 0.55;
 export const WORLD_WIDTH = 1920;
 export const WORLD_HEIGHT = 1440;
 export const VIEWPORT_MARGIN = 80;
