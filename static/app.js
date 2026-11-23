@@ -819,7 +819,30 @@ const getLanguage = window.getLanguage;
   document.querySelector("#smoothingLevel").addEventListener("change", resetDrawingGestureState);
   document.querySelector("#gestureMenuToggle").addEventListener("click", () => setMenuOpen(!menuOpen));
   gestureMenu.querySelectorAll(".gesture-tool").forEach(b => b.addEventListener("click", () => selectMenuTool(b)));
-  document.addEventListener("keydown", event => { if (event.key === "Escape" && menuOpen) setMenuOpen(false); });
+  const toolbarDisclosures = document.querySelectorAll(".toolbar-disclosure");
+  document.addEventListener("click", (event) => {
+    for (const disclosure of toolbarDisclosures) {
+      if (!disclosure.contains(event.target)) disclosure.open = false;
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const disclosure = [...toolbarDisclosures].find((item) => item.open);
+    if (disclosure) {
+      disclosure.open = false;
+      disclosure.querySelector("summary").focus();
+    } else if (menuOpen) {
+      setMenuOpen(false);
+    }
+  });
+  for (const id of ["joinRoomButton", "aiToggle"]) {
+    const button = document.getElementById(id);
+    button.addEventListener("click", () => {
+      const disclosure = button.closest(".toolbar-disclosure");
+      disclosure.open = false;
+      disclosure.querySelector("summary").focus();
+    });
+  }
   cameraButton.addEventListener("click", startCamera);
   eraserButton.addEventListener("click", toggleEraser);
   undoButton.addEventListener("click", undoDrawing);
@@ -881,7 +904,7 @@ const getLanguage = window.getLanguage;
   });
   document.querySelector(".stage").addEventListener("wheel", (event) => {
     // Preserve native scrolling inside panels and toolbars.
-    if (event.target.closest(".ai-panel, .gesture-toolbar, .hud, .zoom-controls, .camera-preview")) return;
+    if (event.target.closest(".toolbar, .ai-panel, .gesture-toolbar, .hud, .zoom-controls, .camera-preview")) return;
     event.preventDefault();
     const rect = gestureCanvas.getBoundingClientRect();
     const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? rect.height : 1);

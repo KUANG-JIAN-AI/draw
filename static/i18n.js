@@ -1,6 +1,8 @@
 // Translation mappings for Chinese and Japanese
 const translations = {
   zh: {
+    toolbar_room: "房间",
+    toolbar_more: "更多",
     // Toolbar
     title: "隔空手势画板",
     camera_button: "开启摄像头",
@@ -73,6 +75,8 @@ const translations = {
     camera_preview: "カメラプレビュー",
   },
   ja: {
+    toolbar_room: "ルーム",
+    toolbar_more: "その他",
     // Toolbar
     title: "エアジェスチャー画板",
     camera_button: "カメラを開く",
@@ -202,18 +206,33 @@ Object.assign(translations.ja, {
   camera_ready: "カメラ起動済み：つまみを解除して約0.5秒握るとツール表示。つまんで描画",
 });
 
-let currentLanguage = localStorage.getItem("language") || "zh";
+function initialLanguage() {
+  try {
+    const saved = localStorage.getItem("language");
+    if (saved === "zh" || saved === "ja") return saved;
+  } catch {
+    // Browser storage can be disabled.
+  }
+
+  const locale = navigator.languages?.[0] || navigator.language || "";
+  return /^zh(?:-|$)/i.test(locale) ? "zh" : "ja";
+}
+
+let currentLanguage = initialLanguage();
 
 function t(key) {
   return translations[currentLanguage]?.[key] || translations.zh[key] || key;
 }
 
 function setLanguage(lang) {
-  if (translations[lang]) {
-    currentLanguage = lang;
+  if (lang !== "zh" && lang !== "ja") return;
+  currentLanguage = lang;
+  try {
     localStorage.setItem("language", lang);
-    updateUIText();
+  } catch {
+    // The selection still applies to the current page.
   }
+  updateUIText();
 }
 
 function getLanguage() {

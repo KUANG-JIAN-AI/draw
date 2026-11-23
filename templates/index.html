@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>エアジェスチャー画板</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=1.0.0">
+    <title data-i18n="title">エアジェスチャー画板</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=1.1.0">
   </head>
   <body>
     <main class="app">
@@ -14,47 +14,62 @@
           <span data-i18n="title">隔空手势画板</span>
         </div>
 
-        <div class="tool-group lang-group">
-          <button id="langZhBtn" class="tool-button lang-btn" type="button">中文</button>
-          <button id="langJaBtn" class="tool-button lang-btn" type="button">日本語</button>
+        <div class="toolbar-strip">
+          <button id="cameraButton" class="tool-button primary" type="button" data-i18n="camera_button">开启摄像头</button>
+
+          <div class="tool-group color-group" aria-label="颜色">
+            <button class="swatch active" type="button" data-color="#111827" style="--swatch:#111827" aria-label="黑色"></button>
+            <button class="swatch" type="button" data-color="#e11d48" style="--swatch:#e11d48" aria-label="玫红"></button>
+            <button class="swatch" type="button" data-color="#f59e0b" style="--swatch:#f59e0b" aria-label="琥珀"></button>
+            <button class="swatch" type="button" data-color="#10b981" style="--swatch:#10b981" aria-label="绿色"></button>
+            <button class="swatch" type="button" data-color="#2563eb" style="--swatch:#2563eb" aria-label="蓝色"></button>
+            <label class="color-picker">
+              <input id="customColor" type="color" value="#111827" aria-label="自定义颜色">
+            </label>
+          </div>
+
+          <div class="size-toggle" data-i18n-label="line_thickness">
+            <button class="size-option active" type="button" data-size="8" data-i18n="thin">细</button>
+            <button class="size-option" type="button" data-size="24" data-i18n="thick">粗</button>
+          </div>
+
+          <div class="tool-group toolbar-actions" data-i18n-label="operations">
+            <button id="fillButton" data-i18n="fill" class="tool-button" type="button" aria-pressed="false">区域填色</button>
+            <button id="eraserButton" class="tool-button" type="button" aria-pressed="false" data-i18n="eraser">橡皮</button>
+            <button id="undoButton" class="tool-button" type="button" data-i18n="undo">撤销</button>
+            <button id="generateButton" class="tool-button primary" type="button" data-i18n="ai_generate">AI 生成</button>
+          </div>
         </div>
 
-        <button id="cameraButton" class="tool-button primary" type="button" data-i18n="camera_button">开启摄像头</button>
-
-        <div class="tool-group" style="gap:8px;">
-          <input id="roomInput" maxlength="80" aria-label="房间名" class="field-input" type="text" data-i18n-placeholder="room_placeholder" placeholder="房间名 (默认 lobby)">
-          <input id="nameInput" maxlength="40" aria-label="昵称" class="field-input" type="text" data-i18n-placeholder="name_placeholder" placeholder="昵称 (可选)">
-          <button id="joinRoomButton" class="tool-button" type="button" data-i18n="join_room_button">加入房间</button>
-        </div>
-
-        <div class="tool-group color-group" aria-label="颜色">
-          <button class="swatch active" type="button" data-color="#111827" style="--swatch:#111827" aria-label="黑色"></button>
-          <button class="swatch" type="button" data-color="#e11d48" style="--swatch:#e11d48" aria-label="玫红"></button>
-          <button class="swatch" type="button" data-color="#f59e0b" style="--swatch:#f59e0b" aria-label="琥珀"></button>
-          <button class="swatch" type="button" data-color="#10b981" style="--swatch:#10b981" aria-label="绿色"></button>
-          <button class="swatch" type="button" data-color="#2563eb" style="--swatch:#2563eb" aria-label="蓝色"></button>
-          <label class="color-picker">
-            <input id="customColor" type="color" value="#111827" aria-label="自定义颜色">
-          </label>
-        </div>
-
-        <div class="size-toggle" data-i18n-label="line_thickness">
-          <button class="size-option active" type="button" data-size="8" data-i18n="thin">细</button>
-          <button class="size-option" type="button" data-size="24" data-i18n="thick">粗</button>
-        </div>
-
-        <div class="tool-group comfort-tools">
-          <label><span data-i18n="smoothing">防抖</span> <select id="smoothingLevel" aria-label="防抖强度" data-i18n-label="smoothing"><option value="0" data-i18n="smoothing_off">关闭</option><option value="0.55" selected data-i18n="smoothing_medium">适中</option><option value="0.3" data-i18n="smoothing_strong">强</option></select></label>
-          <button id="precisionButton" data-i18n="precision_mode" class="tool-button" type="button" aria-pressed="false">精细模式</button>
-          <button id="fillButton" data-i18n="fill" class="tool-button" type="button" aria-pressed="false">区域填色</button>
-        </div>
-        <div class="tool-group actions" data-i18n-label="operations">
-          <button id="eraserButton" class="tool-button" type="button" aria-pressed="false" data-i18n="eraser">橡皮</button>
-          <button id="undoButton" class="tool-button" type="button" data-i18n="undo">撤销</button>
-          <button id="clearButton" class="tool-button danger" type="button" data-i18n="clear">清空</button>
-          <button id="saveButton" class="tool-button" type="button" data-i18n="save">保存</button>
-          <button id="generateButton" class="tool-button primary" type="button" data-i18n="ai_generate">AI 生成</button>
-          <button id="aiToggle" aria-expanded="false" aria-controls="aiPanel" class="tool-button" type="button" data-i18n="ai_preview">图片预览</button>
+        <div class="toolbar-disclosures">
+          <details class="toolbar-disclosure">
+            <summary class="tool-button"><span data-i18n="toolbar_room">房间</span></summary>
+            <div class="toolbar-panel">
+              <div class="toolbar-room-fields">
+                <input id="roomInput" maxlength="80" aria-label="房间名" class="field-input" type="text" data-i18n-placeholder="room_placeholder" placeholder="房间名 (默认 lobby)">
+                <input id="nameInput" maxlength="40" aria-label="昵称" class="field-input" type="text" data-i18n-placeholder="name_placeholder" placeholder="昵称 (可选)">
+                <button id="joinRoomButton" class="tool-button" type="button" data-i18n="join_room_button">加入房间</button>
+              </div>
+            </div>
+          </details>
+          <details class="toolbar-disclosure">
+            <summary class="tool-button"><span data-i18n="toolbar_more">更多</span></summary>
+            <div class="toolbar-panel">
+              <div class="tool-group comfort-tools">
+                <label><span data-i18n="smoothing">防抖</span> <select id="smoothingLevel" aria-label="防抖强度" data-i18n-label="smoothing"><option value="0" data-i18n="smoothing_off">关闭</option><option value="0.55" selected data-i18n="smoothing_medium">适中</option><option value="0.3" data-i18n="smoothing_strong">强</option></select></label>
+                <button id="precisionButton" data-i18n="precision_mode" class="tool-button" type="button" aria-pressed="false">精细模式</button>
+              </div>
+              <div class="toolbar-panel-actions">
+                <button id="clearButton" class="tool-button danger" type="button" data-i18n="clear">清空</button>
+                <button id="saveButton" class="tool-button" type="button" data-i18n="save">保存</button>
+                <button id="aiToggle" aria-expanded="false" aria-controls="aiPanel" class="tool-button" type="button" data-i18n="ai_preview">图片预览</button>
+              </div>
+              <div class="tool-group lang-group">
+                <button id="langZhBtn" class="tool-button lang-btn" type="button">中文</button>
+                <button id="langJaBtn" class="tool-button lang-btn" type="button">日本語</button>
+              </div>
+            </div>
+          </details>
         </div>
       </header>
 
